@@ -35,5 +35,5 @@ build() {
 
 package() {
 	cd "$pkgname"
-	make DESTDIR="$pkgdir/" install
+	install -Dm755 ./riceman "$pkgdir/usr/bin/riceman"
 }
