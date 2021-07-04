@@ -1,6 +1,6 @@
 # Maintainer: Zaedus <nintendozaedus@gmail.com>
 pkgname='riceman'
-pkgver=1.0.0
+pkgver=v1.0.0.r0.g9245424
 pkgrel=1
 pkgdesc="The official rice manager for Rice Linux"
 arch=("x86_64")
@@ -25,7 +25,7 @@ validpgpkeys=()
 
 pkgver() {
 	cd "$pkgname"
-  	printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+  	git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
 }
 
 build() {
