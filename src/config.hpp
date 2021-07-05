@@ -1,7 +1,10 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-typedef struct {
+typedef struct RicemanColors {
+
+    RicemanColors() : colon{":: "}, title{""}, repo{""}, version{""}, groups{""}, meta{""}, warn{""}, err{""}, faint{""}, nocolor{""} {}
+
     const char *colon;
 	const char *title;
 	const char *repo;
@@ -12,11 +15,11 @@ typedef struct {
 	const char *err;
 	const char *faint;
 	const char *nocolor;
-} RicemanColors;
+};
 
 typedef struct RicemanConfig
 {
-    RicemanConfig() : op(OP_MAIN), color(false), verbose(false), version(false), help(false), noconfirm(false), noprogressbar(false) {}
+    RicemanConfig() : op{OP_MAIN}, color{false}, verbose{false}, version{false}, help{false}, noconfirm{false}, noprogressbar{false}, colstr{} {}
 
     int op;
 
