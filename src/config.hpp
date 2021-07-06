@@ -7,23 +7,26 @@ struct RicemanColors {
 
     RicemanColors() : colon{":: "}, title{""}, repo{""}, version{""}, groups{""}, meta{""}, warn{""}, err{""}, faint{""}, nocolor{""} {}
 
-    const char *colon;
-	const char *title;
-	const char *repo;
-	const char *version;
-	const char *groups;
-	const char *meta;
-	const char *warn;
-	const char *err;
-	const char *faint;
-	const char *nocolor;
+    std::string colon;
+	std::string title;
+	std::string repo;
+	std::string version;
+	std::string groups;
+	std::string meta;
+	std::string warn;
+	std::string err;
+	std::string faint;
+	std::string nocolor;
 };
 
 struct RicemanConfig
 {
-    RicemanConfig() : op{OP_MAIN}, color{false}, verbose{false}, version{false}, help{false}, noconfirm{false}, noprogressbar{false}, colstr{} {}
+    RicemanConfig() : op{OP_UNSET}, color{false}, verbose{false}, 
+                    version{false}, help{false}, noconfirm{false}, 
+                    noprogressbar{false}, colstr{}, loglevel(LOG_ERROR | LOG_WARNING) {}
 
     int op;
+    int loglevel;
 
     bool color;
     bool verbose;
@@ -33,5 +36,7 @@ struct RicemanConfig
     bool noprogressbar;
     RicemanColors colstr;
 };
+
+RicemanConfig* config;
 
 #endif // CONFIG_HPP
