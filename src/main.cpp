@@ -16,8 +16,12 @@ void help(int &op, const char * const pname)
 
 void version()
 {
-    cout << "Riceman " << VERSION << endl;
-    cout << "Copyright (C) 2021 Zaedus" << endl;
+    cout << "Riceman " << VERSION << endl
+         << "Copyright (C) 2021 Zaedus" << endl
+         << endl
+         << "This program may be freely redistributed under" << endl
+         << "the terms of the GNU General Public License." << endl;
+
 
 }
 
