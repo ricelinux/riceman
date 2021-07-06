@@ -1,6 +1,11 @@
 #ifndef CONSTANTS_HPP
 #define CONSTANTS_HPP
 
+// Version
+#ifndef VERSION
+#define VERSION "???"
+#endif
+
 // Repository Info
 #define RICE_REPO "https://ricelinux.github.io/ricelinux-rices/"
 #define RICE_DB RICE_REPO "rices.db"
