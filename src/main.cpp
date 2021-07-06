@@ -1,5 +1,6 @@
 #include "constants.hpp"
 #include "config.hpp"
+#include "util.hpp"
 
 #include <iostream>
 #include <getopt.h>
@@ -7,6 +8,18 @@
 using std::cout, std::endl;
 
 RicemanConfig* config;
+
+void help(int &op, const char * const pname)
+{
+    cout << pname << endl;
+}
+
+void version()
+{
+    cout << "Riceman " << VERSION << endl;
+    cout << "Copyright (C) 2021 Zaedus" << endl;
+
+}
 
 static int parsearg_op(int opt, bool dryrun)
 {
@@ -56,6 +69,23 @@ static int parseargs(int argc, char *argv[])
 		}
 		parsearg_op(opt, 0);
 	}
+
+    if (config->op == OP_MAIN)
+    {
+        // Handle errors by creating a function in util.cpp
+    }
+
+    if (config->help)
+    {
+        help(config->op, mbasename(argv[0]));
+        exit(EXIT_SUCCESS);
+    }
+
+    if (config->version)
+    {
+        version();
+        exit(EXIT_SUCCESS);
+    }
 }
 
 int main(int argc, char *argv[]) 
