@@ -2,7 +2,10 @@
 #define UTIL_HPP
 
 #include <string.h>
+#include <string>
+#include <iostream>
 
-const char *mbasename(const char* path);
+const std::string basename(const std::string &path);
+const bool log(const int level, const std::string &message);
 
 #endif // UTIL_HPP
