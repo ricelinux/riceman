@@ -34,13 +34,25 @@
 #define BOLDWHITE     "\033[1;37m"
 #define GREY46        "\033[38;5;243m"
 
+// Cursor
+#define CURSOR_HIDE "\x1B[?25l"
+#define CURSOR_SHOW "\x1B[?25h"
+
+
 // Operations
 enum {
-	OP_MAIN = 1,
+	OP_UNSET = 1,
 	OP_REMOVE,
 	OP_UPGRADE,
 	OP_QUERY,
 	OP_SYNC,
 };
+
+// Log levels
+enum {
+	LOG_ERROR 		= 1,
+	LOG_WARNING		= (1 << 1),
+	LOG_DEBUG		= (1 << 2),
+}
 
 #endif // CONSTANTS_HPP
