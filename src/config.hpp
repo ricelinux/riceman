@@ -34,4 +34,7 @@ typedef struct _riceman_config
 
 } RicemanConfig;
 
+// Make config global
+extern RicemanConfig *config;
+
 #endif // CONFIG_HPP
