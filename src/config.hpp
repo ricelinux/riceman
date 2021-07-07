@@ -2,41 +2,36 @@
 #define CONFIG_HPP
 
 #include "constants.hpp"
+#include <string>
 
-struct RicemanColors {
-
-    RicemanColors() : colon{":: "}, title{""}, repo{""}, version{""}, groups{""}, meta{""}, warn{""}, err{""}, faint{""}, nocolor{""} {}
-
-    std::string colon;
-	std::string title;
-	std::string repo;
-	std::string version;
-	std::string groups;
-	std::string meta;
-	std::string warn;
-	std::string err;
-	std::string faint;
-	std::string nocolor;
-};
-
-struct RicemanConfig
+typedef struct _riceman_colors
 {
-    RicemanConfig() : op{OP_UNSET}, color{false}, verbose{false}, 
-                    version{false}, help{false}, noconfirm{false}, 
-                    noprogressbar{false}, colstr{}, loglevel(LOG_ERROR | LOG_WARNING) {}
+    std::string colon = ":: ";
+	std::string title = "";
+	std::string repo = "";
+	std::string version = "";
+	std::string groups = "";
+	std::string meta = "";
+	std::string warn = "";
+	std::string err = "";
+	std::string faint = "";
+	std::string nocolor = "";
 
-    int op;
-    int loglevel;
+} RicemanColors;
 
-    bool color;
-    bool verbose;
-    bool version;
-    bool help;
-	bool noconfirm;
-    bool noprogressbar;
+typedef struct _riceman_config
+{
+    int op = OP_UNSET;
+    int loglevel = LOG_ERROR | LOG_WARNING;
+    int color = COLOR_UNSET;
+    
+    bool verbose = false;
+    bool version = false;
+    bool help = false;
+	bool noconfirm = false;
+    bool noprogressbar = false;
     RicemanColors colstr;
-};
 
-RicemanConfig* config;
+} RicemanConfig;
 
 #endif // CONFIG_HPP
