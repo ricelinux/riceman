@@ -20,7 +20,7 @@ const bool log(const int level, const std::string &message)
 {
 	if ((config->loglevel & level) == 0) return false;
 	
-	switch(config->loglevel)
+	switch(level)
 	{
 		case LOG_ERROR:
 			std::cout << config->colstr.err << "error: " << config->colstr.nocolor; 
