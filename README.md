@@ -34,4 +34,4 @@ SYNC OPTIONS
 
 ### Thank you to...
 
-- the pacman devs (for the argument schema)
+- the pacman devs
