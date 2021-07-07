@@ -1,16 +1,16 @@
 #ifndef CONSTANTS_HPP
 #define CONSTANTS_HPP
 
-// Version
+/* Version */
 #ifndef VERSION
 #define VERSION "???"
 #endif
 
-// Repository Info
+/* Repository Info */
 #define RICE_REPO "https://ricelinux.github.io/ricelinux-rices/"
 #define RICE_DB RICE_REPO "rices.db"
 
-// Colors
+/* Colors */
 #define NOCOLOR       "\033[0m"
 
 #define BOLD          "\033[0;1m"
@@ -34,12 +34,12 @@
 #define BOLDWHITE     "\033[1;37m"
 #define GREY46        "\033[38;5;243m"
 
-// Cursor
+/* Cursor */
 #define CURSOR_HIDE "\x1B[?25l"
 #define CURSOR_SHOW "\x1B[?25h"
 
 
-// Operations
+/* Operations */
 enum {
 	OP_UNSET = 1,
 	OP_REMOVE,
@@ -48,11 +48,18 @@ enum {
 	OP_SYNC,
 };
 
-// Log levels
+/* Log levels */
 enum {
 	LOG_ERROR 		= 1,
 	LOG_WARNING		= (1 << 1),
 	LOG_DEBUG		= (1 << 2),
-}
+};
+
+/* Color Option Level */
+enum {
+	COLOR_UNSET = 1,
+	COLOR_ENABLED,
+	COLOR_DISABLED,
+};
 
 #endif // CONSTANTS_HPP
