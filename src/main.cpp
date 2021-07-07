@@ -1,12 +1,13 @@
 #include "constants.hpp"
 #include "config.hpp"
 #include "util.hpp"
+
 #include <iostream>
 #include <getopt.h>
 
-using std::cout, std::endl, std::string;
+using std::cout, std::endl;
 
-void help(int &op, string pname)
+void help(int &op, std::string pname)
 {
     cout << pname << endl;
 }
@@ -48,7 +49,7 @@ static int parseargs(int argc, char *argv[])
 {
     int opt;
     int option_index = 0;
-    const char *optstring = "SRQVh:";
+    const char *optstring = "SRQV";
     static const struct option opts[] =
     {
         { "sync",       no_argument,    0,  'S' },
@@ -70,7 +71,7 @@ static int parseargs(int argc, char *argv[])
 		parsearg_op(opt, 0);
 	}
 
-    if (config->op == OP_UNSET)
+    if (config->op == 0)
     {
         log(LOG_ERROR, "too many operations specified");
         return 1;
