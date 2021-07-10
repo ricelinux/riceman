@@ -21,7 +21,29 @@ void version()
          << "the terms of the GNU General Public License." << endl;
 }
 
-static int parsearg_sync(int opt)
+bool cleanup()
+{
+    // TODO: show cursor, stop handling interrupts
+
+    free(config);
+}
+
+bool parsearg_global(int opt)
+{
+
+}
+
+bool parsearg_remove(int opt)
+{
+    // TODO: handle remove opts
+}
+
+bool parsearg_query(int opt)
+{
+    // TODO: handle query opts
+}
+
+bool parsearg_sync(int opt)
 {
     switch (opt)
     {
@@ -29,10 +51,19 @@ static int parsearg_sync(int opt)
         case 'y':
             config->sync.refresh = 1;
             break;
+        case OP_UPGRADES:
+        case 'u':
+            config->sync.upgrade = 1;
+            break;
+        default:
+            return false;
+            break;
     };
+
+    return true;
 }
 
-static int parsearg_op(int opt, bool dryrun)
+bool parsearg_op(int opt, bool dryrun)
 {
     switch(opt) {
         case 'S':
@@ -51,17 +82,18 @@ static int parsearg_op(int opt, bool dryrun)
             if(dryrun) break;
             config->help = true; break;
         default:
-            return 1;
+            return false;
+            break;
     }
-    return 0;
+    return true;
 }
 
-static int parseargs(int argc, char *argv[])
+bool parseargs(int argc, char *argv[])
 {
-    int ret = 0;
+    bool ret = true;
     int opt;
     int option_index = 0;
-    const char *optstring = "SRQVy";
+    const char *optstring = "SRQVyu";
     static const struct option opts[] =
     {
         { "sync",       no_argument,    0,  'S' },
@@ -79,10 +111,13 @@ static int parseargs(int argc, char *argv[])
     // parse operational args
     while((opt = getopt_long(argc, argv, optstring, opts, &option_index)) != -1)
     {
-		if(opt == 0) {
+		if(opt == 0)
+        {
 			continue;
-		} else if(opt == '?') {
-			return 1;
+		} 
+        else if(opt == '?')
+        {
+			return false;
 		}
 		parsearg_op(opt, 0);
 	}
@@ -90,7 +125,7 @@ static int parseargs(int argc, char *argv[])
     if (config->op == 0)
     {
         log(LOG_ERROR, "too many operations specified");
-        return 1;
+        return false;
     }
 
     if (config->help)
@@ -107,7 +142,7 @@ static int parseargs(int argc, char *argv[])
 
     // parse other args
     optind = 1;
-    while((opt = getopt_long(argc, argv, optstring, opts, &option_index)) != 1)
+    while((opt = getopt_long(argc, argv, optstring, opts, &option_index)) != -1)
     {
         if (opt == 0)
         {
@@ -115,12 +150,24 @@ static int parseargs(int argc, char *argv[])
         } 
         else if (opt == '?')
         {
-            return 1;
+            return false;
         }
-        else if (parsearg_op(opt, true) == 0)
+        else if (parsearg_op(opt, true) == true)
         {
             continue;
         }
+
+        switch(config->op)
+        {
+            case OP_SYNC:
+                ret = parsearg_sync(opt);
+                break;
+            default:
+                ret = false;
+                break;
+        };
+
+        if (ret == false) continue;
     }
 
     return ret;
@@ -128,6 +175,14 @@ static int parseargs(int argc, char *argv[])
 
 int main(int argc, char *argv[]) 
 {
+    bool ret;
+
     config = new RicemanConfig();
-    parseargs(argc, argv);
+    ret = parseargs(argc, argv);
+
+    if (!ret)
+    {
+        cleanup();
+        exit(EXIT_FAILURE);
+    }
 }
