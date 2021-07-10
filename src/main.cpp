@@ -94,7 +94,7 @@ bool parseargs(int argc, char *argv[])
     bool ret = true;
     int opt;
     int option_index = 0;
-    const char *optstring = "SRQVyu";
+    const char *optstring = "SRQVhyu";
     static const struct option opts[] =
     {
         { "sync",       no_argument,        0,  'S' },
