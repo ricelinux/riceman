@@ -21,6 +21,17 @@ void version()
          << "the terms of the GNU General Public License." << endl;
 }
 
+static int parsearg_sync(int opt)
+{
+    switch (opt)
+    {
+        case OP_REFRESH:
+        case 'y':
+            config->sync.refresh = 1;
+            break;
+    };
+}
+
 static int parsearg_op(int opt, bool dryrun)
 {
     switch(opt) {
@@ -47,9 +58,10 @@ static int parsearg_op(int opt, bool dryrun)
 
 static int parseargs(int argc, char *argv[])
 {
+    int ret = 0;
     int opt;
     int option_index = 0;
-    const char *optstring = "SRQV";
+    const char *optstring = "SRQVy";
     static const struct option opts[] =
     {
         { "sync",       no_argument,    0,  'S' },
@@ -58,11 +70,15 @@ static int parseargs(int argc, char *argv[])
         { "version",    no_argument,    0,  'V' },
         { "help",       no_argument,    0,  'h' },
 
+        { "refresh",    no_argument,    0,  OP_REFRESH },
+        { "upgrade",    no_argument,    0,  OP_UPGRADES },
+
         {0, 0, 0, 0}
     };
     
     // parse operational args
-    while((opt = getopt_long(argc, argv, optstring, opts, &option_index)) != -1) {
+    while((opt = getopt_long(argc, argv, optstring, opts, &option_index)) != -1)
+    {
 		if(opt == 0) {
 			continue;
 		} else if(opt == '?') {
@@ -88,6 +104,26 @@ static int parseargs(int argc, char *argv[])
         version();
         exit(EXIT_SUCCESS);
     }
+
+    // parse other args
+    optind = 1;
+    while((opt = getopt_long(argc, argv, optstring, opts, &option_index)) != 1)
+    {
+        if (opt == 0)
+        {
+            continue;
+        } 
+        else if (opt == '?')
+        {
+            return 1;
+        }
+        else if (parsearg_op(opt, true) == 0)
+        {
+            continue;
+        }
+    }
+
+    return ret;
 }
 
 int main(int argc, char *argv[]) 
