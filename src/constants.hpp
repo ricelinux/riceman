@@ -49,6 +49,8 @@ enum {
 };
 
 /* Long Operations */
+/* Note: set to 1000 so that there is a difference 
+   	     between characters and op codes */
 enum {
 	OP_REFRESH = 1000,
 	OP_UPGRADES,
