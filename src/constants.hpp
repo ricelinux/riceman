@@ -56,8 +56,12 @@ enum {
    	     between characters and op codes */
 enum {
 	OP_LONG_MIN = 1000,
+	/* Sync opts */
 	OP_REFRESH,
 	OP_UPGRADES,
+
+	/* Global Opts */
+	OP_COLOR,
 };
 
 /* Log levels */
