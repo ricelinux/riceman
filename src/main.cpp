@@ -3,6 +3,7 @@
 #include "util.hpp"
 
 #include <iostream>
+#include <fmt/format.h>
 #include <getopt.h>
 
 using std::cout, std::endl;
@@ -30,7 +31,7 @@ bool cleanup()
 
 bool parsearg_global(int opt)
 {
-
+    return false;
 }
 
 bool parsearg_remove(int opt)
@@ -96,14 +97,16 @@ bool parseargs(int argc, char *argv[])
     const char *optstring = "SRQVyu";
     static const struct option opts[] =
     {
-        { "sync",       no_argument,    0,  'S' },
-        { "remove",     no_argument,    0,  'R' },
-        { "query",      no_argument,    0,  'Q' },
-        { "version",    no_argument,    0,  'V' },
-        { "help",       no_argument,    0,  'h' },
+        { "sync",       no_argument,        0,  'S' },
+        { "remove",     no_argument,        0,  'R' },
+        { "query",      no_argument,        0,  'Q' },
+        { "version",    no_argument,        0,  'V' },
+        { "help",       no_argument,        0,  'h' },
 
-        { "refresh",    no_argument,    0,  OP_REFRESH },
-        { "upgrade",    no_argument,    0,  OP_UPGRADES },
+        { "refresh",    no_argument,        0,  OP_REFRESH },
+        { "upgrade",    no_argument,        0,  OP_UPGRADES },
+
+        { "color",      required_argument,  0,  OP_COLOR },
 
         {0, 0, 0, 0}
     };
@@ -152,7 +155,7 @@ bool parseargs(int argc, char *argv[])
         {
             return false;
         }
-        else if (parsearg_op(opt, true) == true)
+        else if (parsearg_op(opt, true))
         {
             continue;
         }
@@ -167,7 +170,18 @@ bool parseargs(int argc, char *argv[])
                 break;
         };
 
-        if (ret == false) continue;
+        // if option found, don't check if opt is global opt
+        if (ret) continue;
+        
+        ret = parsearg_global(opt);
+
+        // if parsearg_global fails
+        if (!ret)
+        {
+            // detect if opt is a code or a string
+            if (opt < OP_LONG_MIN) log(LOG_ERROR, fmt::format("invalid option '-{}'\n", (char)opt));
+            else log(LOG_ERROR, fmt::format("invalid option '--{}'\n", std::string{opts[option_index].name}));
+        }
     }
 
     return ret;
