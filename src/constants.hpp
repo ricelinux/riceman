@@ -48,6 +48,12 @@ enum {
 	OP_SYNC,
 };
 
+/* Long Operations */
+enum {
+	OP_REFRESH = 1000,
+	OP_UPGRADES,
+};
+
 /* Log levels */
 enum {
 	LOG_ERROR 		= 1,
