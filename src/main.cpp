@@ -31,7 +31,11 @@ bool cleanup()
 
 bool parsearg_global(int opt)
 {
-    return false;
+    switch(opt)
+    {
+        case OP_COLOR:
+            break;
+    };
 }
 
 bool parsearg_remove(int opt)
