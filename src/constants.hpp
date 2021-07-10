@@ -1,6 +1,9 @@
 #ifndef CONSTANTS_HPP
 #define CONSTANTS_HPP
 
+/* Setup fmt */
+#define FMT_HEADER_ONLY
+
 /* Version */
 #ifndef VERSION
 #define VERSION "???"
@@ -52,7 +55,8 @@ enum {
 /* Note: set to 1000 so that there is a difference 
    	     between characters and op codes */
 enum {
-	OP_REFRESH = 1000,
+	OP_LONG_MIN = 1000,
+	OP_REFRESH,
 	OP_UPGRADES,
 };
 
