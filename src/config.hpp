@@ -16,8 +16,23 @@ typedef struct _riceman_colors
 	std::string err = "";
 	std::string faint = "";
 	std::string nocolor = "";
-
 } RicemanColors;
+
+typedef struct _riceman_sync_opts
+{
+	int upgrade = 0;
+	int refresh = 0;
+} RicemanSyncOpts;
+
+typedef struct _riceman_remove_opts
+{
+	/* to be done when implementing remove functionality */
+} RicemanRemoveOpts;
+
+typedef struct _riceman_query_opts
+{
+	/* to be done when implementing query functionality */
+} RicemanQueryOpts;
 
 typedef struct _riceman_config
 {
@@ -25,13 +40,17 @@ typedef struct _riceman_config
     int loglevel = LOG_ERROR | LOG_WARNING;
     int color = COLOR_UNSET;
     
+	RicemanColors colstr;
+
+	RicemanSyncOpts sync;
+	RicemanQueryOpts query;
+	RicemanRemoveOpts remove;
+
     bool verbose = false;
     bool version = false;
     bool help = false;
 	bool noconfirm = false;
     bool noprogressbar = false;
-    RicemanColors colstr;
-
 } RicemanConfig;
 
 // Make config global
