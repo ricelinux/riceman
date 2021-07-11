@@ -20,6 +20,11 @@ size_t sync_write_file(char* ptr, size_t size, size_t nmemb)
     fwrite(ptr, size, nmemb, file);
 }
 
+double sync_dl_progress(double dltotal, double dlnow, double ultotal, double ulnow)
+{
+    std::cout << dlnow << "/" << dltotal << std::endl;
+}
+
 bool sync_refresh()
 {   
     switch(dir_exists(RICE_LIB_PATH))
@@ -42,8 +47,11 @@ bool sync_refresh()
         curlpp::options::WriteFunction *write_func = new curlpp::options::WriteFunction(&sync_write_file);
         req.setOpt(write_func);
 
+        curlpp::options::ProgressFunction progress_bar{&sync_dl_progress};
         req.setOpt(new curlpp::options::Url(RICE_DB));
-        req.setOpt(new curlpp::options::Verbose(true));
+        req.setOpt(new curlpp::options::NoProgress(0));
+        req.setOpt(progress_bar);
+        //req.setOpt(new curlpp::options::Verbose(true));
 
         req.perform();
         
