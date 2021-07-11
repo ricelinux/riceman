@@ -1,6 +1,7 @@
 #include "constants.hpp"
 #include "config.hpp"
 #include "util.hpp"
+#include "sync.hpp"
 
 #include <fmt/format.h>
 #include <iostream>
@@ -264,4 +265,15 @@ int main(int argc, char *argv[])
     }
 
     // TODO: Parse config file
+
+
+    switch (config->op)
+    {
+        case OP_SYNC:
+            ret = riceman_sync(targets);
+            break;
+        default:
+            log(LOG_ERROR, "no operation specified (use -h for help)\n");
+            ret = true; // true is 1 which is an error exit code
+    }
 }
