@@ -102,6 +102,7 @@ bool parsearg_sync(int opt)
         case OP_UPGRADES:
         case 'u':
             config->sync.upgrade = true;
+            config->needs_root = true;
             break;
         default:
             return false;
