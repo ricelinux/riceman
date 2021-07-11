@@ -20,8 +20,9 @@ typedef struct _riceman_colors
 
 typedef struct _riceman_sync_opts
 {
-	int upgrade = 0;
 	int refresh = 0;
+
+	bool upgrade = false;
 } RicemanSyncOpts;
 
 typedef struct _riceman_remove_opts
@@ -46,6 +47,7 @@ typedef struct _riceman_config
 	RicemanQueryOpts query;
 	RicemanRemoveOpts remove;
 
+	bool needs_root = false;
     bool verbose = false;
     bool version = false;
     bool help = false;
