@@ -4,10 +4,13 @@
 
 #include <fmt/format.h>
 #include <iostream>
+#include <vector>
 #include <getopt.h>
 #include <unistd.h>
 
 using std::cout, std::endl;
+
+std::vector<std::string> targets;
 
 void help(int &op, std::string pname)
 {
@@ -35,16 +38,46 @@ bool parsearg_global(int opt)
     switch(opt)
     {
         case OP_COLOR:
-            if (strcmp("never", optarg) == 0) config->color = COLOR_DISABLED;
-            else if (strcmp("auto", optarg) == 0) config->color == isatty(fileno(stdout)) ? COLOR_ENABLED : COLOR_DISABLED;
-            else if (strcmp("always", optarg) == 0) config->color == COLOR_ENABLED;
+            if (strcmp("never", optarg) == 0)       config->color = COLOR_DISABLED;
+            else if (strcmp("auto", optarg) == 0)   config->color = isatty(fileno(stdout)) ? COLOR_ENABLED : COLOR_DISABLED;
+            else if (strcmp("always", optarg) == 0) config->color = COLOR_ENABLED;
             else {
                 log(LOG_ERROR, fmt::format("invalid argument '{}' for --color", optarg));
                 return false;
             }
-            
+
+            if (config->color == COLOR_ENABLED)
+            {
+                config->colors.colon    = BOLDBLUE "::" BOLD " ";
+                config->colors.title    = BOLD;
+                config->colors.repo     = BOLDMAGENTA;
+                config->colors.version  = BOLDGREEN;
+                config->colors.groups   = BOLDBLUE;
+                config->colors.meta     = BOLDCYAN;
+                config->colors.warn     = BOLDYELLOW;
+                config->colors.err      = BOLDRED;
+                config->colors.faint    = GREY46;
+                config->colors.nocolor  = NOCOLOR;
+            } 
+            else
+            {
+                config->colors.colon    = ":: ";
+                config->colors.title    = "";
+                config->colors.repo     = "";
+                config->colors.version  = "";
+                config->colors.groups   = "";
+                config->colors.meta     = "";
+                config->colors.warn     = "";
+                config->colors.err      = "";
+                config->colors.faint    = "";
+                config->colors.nocolor  = "";
+            }
             break;
+        
+        default:
+            return false;
     };
+    return true;
 }
 
 bool parsearg_remove(int opt)
@@ -195,6 +228,12 @@ bool parseargs(int argc, char *argv[])
             if (opt < OP_LONG_MIN) log(LOG_ERROR, fmt::format("invalid option '-{}'\n", (char)opt));
             else log(LOG_ERROR, fmt::format("invalid option '--{}'\n", std::string{opts[option_index].name}));
         }
+    }
+
+    while(optind < argc)
+    {
+        targets.push_back(strdup(argv[optind]));
+        optind++;
     }
 
     return ret;
