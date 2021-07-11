@@ -2,9 +2,10 @@
 #include "config.hpp"
 #include "util.hpp"
 
-#include <iostream>
 #include <fmt/format.h>
+#include <iostream>
 #include <getopt.h>
+#include <unistd.h>
 
 using std::cout, std::endl;
 
@@ -34,6 +35,14 @@ bool parsearg_global(int opt)
     switch(opt)
     {
         case OP_COLOR:
+            if (strcmp("never", optarg) == 0) config->color = COLOR_DISABLED;
+            else if (strcmp("auto", optarg) == 0) config->color == isatty(fileno(stdout)) ? COLOR_ENABLED : COLOR_DISABLED;
+            else if (strcmp("always", optarg) == 0) config->color == COLOR_ENABLED;
+            else {
+                log(LOG_ERROR, fmt::format("invalid argument '{}' for --color", optarg));
+                return false;
+            }
+            
             break;
     };
 }
