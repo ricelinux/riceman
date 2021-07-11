@@ -37,3 +37,8 @@ const bool log(const int level, const std::string &message)
 
 	return true;
 }
+
+const bool colon_log(const std::string &message)
+{
+	
+}
