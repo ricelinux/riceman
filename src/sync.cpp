@@ -33,8 +33,6 @@ bool sync_refresh()
             break;
     }
 
-    
-
     try 
     {
         ProgressBar progressbar{"rices", '#'};
@@ -45,8 +43,9 @@ bool sync_refresh()
         using namespace std::placeholders;
 
         curlpp::types::ProgressFunctionFunctor progress_functor = std::bind(&ProgressBar::update_progress, &progressbar, _1, _2, _3, _4);
+        
 
-        curlpp::options::WriteFunction *write_func = new curlpp::options::WriteFunction(&sync_write_file);
+        curlpp::options::WriteFunction *write_func = new curlpp::options::WriteFunction{&sync_write_file};
         curlpp::options::ProgressFunction *progress_func = new curlpp::options::ProgressFunction{progress_functor};
         
         req.setOpt(write_func);
@@ -57,16 +56,15 @@ bool sync_refresh()
         //req.setOpt(new curlpp::options::Verbose(true));
 
         req.perform();
-        
     }
     catch ( curlpp::LogicError & e )
 	{
-		std::cout << e.what() << std::endl;
+		log(LOG_ERROR, fmt::format("format error - {}", e.what()));
 	}
 	catch ( curlpp::RuntimeError & e )
 	{
-		std::cout << e.what() << std::endl;
-	}
+        log(LOG_ERROR, fmt::format("runtime error - {}", e.what()));
+    }
 
 }
 
