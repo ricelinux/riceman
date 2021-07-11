@@ -262,4 +262,6 @@ int main(int argc, char *argv[])
         cleanup();
         exit(EXIT_FAILURE);
     }
+
+    // TODO: Parse config file
 }
