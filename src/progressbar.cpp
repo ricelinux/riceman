@@ -11,4 +11,5 @@ ProgressBar::ProgressBar(std::string title, const char pchar)
 int ProgressBar::update_progress(double dltotal, double dlnow, double ultotal, double ulnow)
 {
     std::cout << dlnow << "/" << dltotal << std::endl;
+    return 0;
 }
