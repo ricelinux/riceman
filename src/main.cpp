@@ -96,11 +96,12 @@ bool parsearg_sync(int opt)
     {
         case OP_REFRESH:
         case 'y':
-            config->sync.refresh = 1;
+            ++config->sync.refresh;
+            config->needs_root = true;
             break;
         case OP_UPGRADES:
         case 'u':
-            config->sync.upgrade = 1;
+            config->sync.upgrade = true;
             break;
         default:
             return false;
@@ -250,6 +251,13 @@ int main(int argc, char *argv[])
 
     if (!ret)
     {
+        cleanup();
+        exit(EXIT_FAILURE);
+    }
+
+    if (getuid() > 0 && config->needs_root)
+    {
+        log(LOG_ERROR, "this operation requires root permissions.\n");
         cleanup();
         exit(EXIT_FAILURE);
     }
