@@ -10,11 +10,16 @@ SOURCES := $(wildcard $(SRC)/*.cpp)
 OBJECTS := $(patsubst $(SRC)/%.cpp, $(OBJ)/%.o, $(SOURCES))
 HEADERS := $(wildcard $(SRC)/*.hpp)
 
+LIBS 	:= curlpp
+
+CFLAGS  = $(shell pkg-config --cflags $(LIBS))
+LDFLAGS = $(shell pkg-config --libs $(LIBS))
+
 $(BIN): $(OBJECTS) $(HEADERS)
-	$(CC) -o $(BIN) $(OBJECTS) $(HEADERS)
+	$(CC) -o $(BIN) $(OBJECTS) $(HEADERS) $(LDFLAGS)
 
 $(OBJ)/%.o: $(SRC)/%.cpp $(OBJ)
-	$(CC) -c $< -o $@ -D VERSION=\"$(VERSION)\"
+	$(CC) -c $< -o $@ -D VERSION=\"$(VERSION)\" $(CFLAGS)
 
 $(OBJ):
 	mkdir -p $@
