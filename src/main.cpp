@@ -236,6 +236,8 @@ bool parseargs(int argc, char *argv[])
         optind++;
     }
 
+    // TODO: Verify arguments
+
     return ret;
 }
 
