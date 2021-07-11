@@ -40,5 +40,5 @@ const bool log(const int level, const std::string &message)
 
 void colon_log(const std::string &message)
 {
-	std::cout << config->colors.colon << message << std::endl;
+	std::cout << config->colors.colon << message << config->colors.nocolor << std::endl;
 }
