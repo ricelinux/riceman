@@ -40,7 +40,7 @@ typedef struct _riceman_config
     int loglevel = LOG_ERROR | LOG_WARNING;
     int color = COLOR_UNSET;
     
-	RicemanColors colstr;
+	RicemanColors colors;
 
 	RicemanSyncOpts sync;
 	RicemanQueryOpts query;

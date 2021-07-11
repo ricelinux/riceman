@@ -23,10 +23,10 @@ const bool log(const int level, const std::string &message)
 	switch(level)
 	{
 		case LOG_ERROR:
-			std::cout << config->colstr.err << "error: " << config->colstr.nocolor; 
+			std::cout << config->colors.err << "error: " << config->colors.nocolor; 
 			break;
 		case LOG_WARNING:
-			std::cout << config->colstr.warn << "warning: " << config->colstr.nocolor; 
+			std::cout << config->colors.warn << "warning: " << config->colors.nocolor; 
 			break;
 		case LOG_DEBUG:
 			std::cout << "debug: ";
