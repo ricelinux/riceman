@@ -1,16 +1,19 @@
 #include "util.hpp"
 #include "config.hpp"
 
-#include <dirent.h>
-#include <unistd.h>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 const std::string basename(const std::string &path)
 {
-	const char *last = strrchr(path.c_str(), '/');
-	if(last) {
-		return last + 1;
-	}
-	return path;
+	std::string::size_type namepos = path.rfind('/');
+	
+	/* If rfind returned an error */
+	if (namepos != std::string::npos) ++namepos;
+	else namepos = 0;
+
+	return path.substr(namepos);
 }
 
 /** Check if config allows for certain level of logging and log accordingly
@@ -46,21 +49,18 @@ void colon_log(const std::string &message)
 	std::cout << config->colors.colon << message << config->colors.nocolor << std::endl;
 }
 
-// Answered here: https://stackoverflow.com/a/24544478/8540492
-int dir_exists(const char *path)
+/** Check if the directory exists and to make sure its a directory
+ * @param path The path to a directory or file
+ * 
+ * @returns 1 if a dir and able to read and write to, -1 if not a dir, -2 if doesn't exist
+ */
+int dir_exists(std::string &path)
 {
-	DIR *dirptr;
-
-	if (access ( path, F_OK ) != -1 ) {
-        // file exists
-        if ((dirptr = opendir (path)) != NULL) {
-            closedir (dirptr); /* d exists and is a directory */
-        } else {
-            return -2; /* d exists but is not a directory */
-        }
-    } else {
-        return -1;     /* d does not exist */
-    }
+	
+	if (fs::exists(path))
+	{
+		if (!fs::is_directory(path)) return -1;
+	} else return -2;
 
 	return 1;
 }
