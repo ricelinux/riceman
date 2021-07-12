@@ -54,7 +54,7 @@ void colon_log(const std::string &message)
  * 
  * @returns 1 if a dir and able to read and write to, -1 if not a dir, -2 if doesn't exist
  */
-int dir_exists(std::string &path)
+int dir_exists(const std::string &path)
 {
 	
 	if (fs::exists(path))
