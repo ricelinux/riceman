@@ -79,14 +79,12 @@ bool sync_refresh()
 
 bool riceman_sync(std::vector<std::string> targets)
 {
-    if (config->sync.refresh)
-    {
+    if (config->sync.refresh) {
         colon_log("Synchronize rice database...");
         sync_refresh();
     }
     
-    if (config->sync.upgrade)
-    {
+    if (config->sync.upgrade) {
         
     }
 }

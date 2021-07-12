@@ -56,11 +56,12 @@ void colon_log(const std::string &message)
  */
 int dir_exists(const std::string &path)
 {
-	
-	if (fs::exists(path))
-	{
-		if (!fs::is_directory(path)) return -1;
-	} else return -2;
-
+	if (fs::exists(path)) {
+		if (!fs::is_directory(path)) {
+			return -1;
+		}
+	} else {
+		return -2;
+	}
 	return 1;
 }

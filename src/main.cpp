@@ -29,7 +29,7 @@ void version()
 
 bool cleanup()
 {
-    // TODO: show cursor, stop handling interrupts
+    /* TODO: show cursor, stop handling interrupts */
 
     free(config);
 }
@@ -47,8 +47,7 @@ bool parsearg_global(int opt)
                 return false;
             }
 
-            if (config->color == COLOR_ENABLED)
-            {
+            if (config->color == COLOR_ENABLED) {
                 config->colors.colon    = BOLDBLUE "::" BOLD " ";
                 config->colors.title    = BOLD;
                 config->colors.repo     = BOLDMAGENTA;
@@ -59,9 +58,7 @@ bool parsearg_global(int opt)
                 config->colors.err      = BOLDRED;
                 config->colors.faint    = GREY46;
                 config->colors.nocolor  = NOCOLOR;
-            } 
-            else
-            {
+            } else {
                 config->colors.colon    = ":: ";
                 config->colors.title    = "";
                 config->colors.repo     = "";
@@ -83,12 +80,12 @@ bool parsearg_global(int opt)
 
 bool parsearg_remove(int opt)
 {
-    // TODO: handle remove opts
+    /* TODO: handle remove opts */
 }
 
 bool parsearg_query(int opt)
 {
-    // TODO: handle query opts
+    /* TODO: handle query opts */
 }
 
 bool parsearg_sync(int opt)
@@ -115,7 +112,8 @@ bool parsearg_sync(int opt)
 
 bool parsearg_op(int opt, bool dryrun)
 {
-    switch(opt) {
+    switch(opt) 
+    {
         case 'S':
             if(dryrun) break;
             config->op = (config->op != OP_UNSET ? 0 : OP_SYNC); break;
@@ -163,49 +161,35 @@ bool parseargs(int argc, char *argv[])
     // parse operational args
     while((opt = getopt_long(argc, argv, optstring, opts, &option_index)) != -1)
     {
-		if(opt == 0)
-        {
-			continue;
-		} 
-        else if(opt == '?')
-        {
-			return false;
-		}
+		if(opt == 0) continue;
+        else if(opt == '?') return false;
 		parsearg_op(opt, 0);
 	}
 
-    if (config->op == 0)
-    {
+    if (config->op == 0) {
         log(LOG_ERROR, "too many operations specified");
         return false;
     }
 
-    if (config->help)
-    {
+    if (config->help) {
         help(config->op, basename(argv[0]));
         exit(EXIT_SUCCESS);
     }
 
-    if (config->version)
-    {
+    if (config->version) {
         version();
         exit(EXIT_SUCCESS);
     }
 
-    // parse other args
+    /* parse other args */
     optind = 1;
     while((opt = getopt_long(argc, argv, optstring, opts, &option_index)) != -1)
     {
-        if (opt == 0)
-        {
+        if (opt == 0) {
             continue;
-        } 
-        else if (opt == '?')
-        {
+        } else if (opt == '?') {
             return false;
-        }
-        else if (parsearg_op(opt, true))
-        {
+        } else if (parsearg_op(opt, true)) {
             continue;
         }
 
@@ -219,14 +203,13 @@ bool parseargs(int argc, char *argv[])
                 break;
         };
 
-        // if option found, don't check if opt is global opt
+        /* if option found, don't check if opt is global opt */
         if (ret) continue;
         
         ret = parsearg_global(opt);
 
-        // if parsearg_global fails
-        if (!ret)
-        {
+        /* if parsearg_global fails */
+        if (!ret) {
             // detect if opt is a code or a string
             if (opt < OP_LONG_MIN) log(LOG_ERROR, fmt::format("invalid option '-{}'\n", (char)opt));
             else log(LOG_ERROR, fmt::format("invalid option '--{}'\n", std::string{opts[option_index].name}));
@@ -239,7 +222,7 @@ bool parseargs(int argc, char *argv[])
         optind++;
     }
 
-    // TODO: Verify arguments
+    /* TODO: Verify arguments */
 
     return ret;
 }
@@ -251,20 +234,18 @@ int main(int argc, char *argv[])
     config = new RicemanConfig();
     ret = parseargs(argc, argv);
 
-    if (!ret)
-    {
+    if (!ret) {
         cleanup();
         exit(EXIT_FAILURE);
     }
 
-    if (getuid() > 0 && config->needs_root)
-    {
+    if (getuid() > 0 && config->needs_root) {
         log(LOG_ERROR, "this operation requires root permissions.\n");
         cleanup();
         exit(EXIT_FAILURE);
     }
 
-    // TODO: Parse config file
+    /* TODO: Parse config file */
 
 
     switch (config->op)
@@ -274,6 +255,6 @@ int main(int argc, char *argv[])
             break;
         default:
             log(LOG_ERROR, "no operation specified (use -h for help)\n");
-            ret = true; // true is 1 which is an error exit code
+            ret = true; /* true is 1 which is an error exit code */
     }
 }
