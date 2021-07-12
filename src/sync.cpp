@@ -13,12 +13,13 @@
 #include <fstream>
 #include <cstdlib>
 #include <fmt/format.h>
+#include <errno.h>
+
+FILE *db_file;
 
 size_t sync_write_file(char* ptr, size_t size, size_t nmemb)
 {
-    FILE *file = fopen(RICE_DB_PATH, "w");
-    
-    fwrite(ptr, size, nmemb, file);
+    fwrite(ptr, size, nmemb, db_file);
 }
 
 bool sync_refresh()
@@ -35,6 +36,12 @@ bool sync_refresh()
 
     try 
     {
+        db_file = fopen(RICE_DB_PATH, "w");
+        if(!db_file) {
+            log(LOG_ERROR, strerror(errno));
+            exit(EXIT_FAILURE);
+        }
+
         ProgressBar progressbar{"rices", '#'};
 
         curlpp::Cleanup curl_cleanup;
@@ -56,6 +63,8 @@ bool sync_refresh()
         //req.setOpt(new curlpp::options::Verbose(true));
 
         req.perform();
+
+        fclose(db_file);
     }
     catch ( curlpp::LogicError & e )
 	{
