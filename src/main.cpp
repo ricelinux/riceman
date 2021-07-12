@@ -27,7 +27,7 @@ void version()
          << "the terms of the GNU General Public License." << endl;
 }
 
-bool cleanup()
+void cleanup()
 {
     /* TODO: show cursor, stop handling interrupts */
 
@@ -81,11 +81,13 @@ bool parsearg_global(int opt)
 bool parsearg_remove(int opt)
 {
     /* TODO: handle remove opts */
+    return false;
 }
 
 bool parsearg_query(int opt)
 {
     /* TODO: handle query opts */
+    return false;
 }
 
 bool parsearg_sync(int opt)

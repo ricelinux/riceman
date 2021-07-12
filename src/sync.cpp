@@ -20,6 +20,7 @@ FILE *db_file;
 size_t sync_write_file(char* ptr, size_t size, size_t nmemb)
 {
     fwrite(ptr, size, nmemb, db_file);
+    return 0;
 }
 
 bool sync_refresh()
@@ -75,6 +76,7 @@ bool sync_refresh()
         log(LOG_ERROR, fmt::format("runtime error - {}", e.what()));
     }
 
+    return true;
 }
 
 bool riceman_sync(std::vector<std::string> targets)
@@ -87,4 +89,6 @@ bool riceman_sync(std::vector<std::string> targets)
     if (config->sync.upgrade) {
         
     }
+
+    return true;
 }
