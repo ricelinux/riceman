@@ -4,16 +4,23 @@
 #include "util.hpp"
 #include "progressbar.hpp"
 
+#include <iostream>
+#include <fstream>
+#include <cstdlib>
+#include <filesystem>
+
 #include <curlpp/cURLpp.hpp>
 #include <curlpp/Easy.hpp>
 #include <curlpp/Options.hpp>
 #include <curlpp/Exception.hpp>
+
 #include <sys/stat.h>
-#include <iostream>
-#include <fstream>
-#include <cstdlib>
+#include <cryptopp/cryptlib.h>
+#include <cryptopp/sha.h>
 #include <fmt/format.h>
 #include <errno.h>
+
+namespace fs = std::filesystem;
 
 FILE *db_file;
 
@@ -21,6 +28,15 @@ size_t sync_write_file(char* ptr, size_t size, size_t nmemb)
 {
     fwrite(ptr, size, nmemb, db_file);
     return 0;
+}
+
+std::string sync_hash(std::string &path)
+{
+    if (fs::exists(path) && !fs::is_directory(path)) {
+        CryptoPP::SHA256 db_hash;
+    } else {
+        return NULL;
+    }
 }
 
 bool sync_refresh()
@@ -59,7 +75,7 @@ bool sync_refresh()
         req.setOpt(write_func);
         req.setOpt(progress_func);
         
-        req.setOpt(new curlpp::options::Url(RICE_DB));
+        req.setOpt(new curlpp::options::Url(RICE_REPO_DB));
         req.setOpt(new curlpp::options::NoProgress(0));
         //req.setOpt(new curlpp::options::Verbose(true));
 
