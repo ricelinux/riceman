@@ -10,7 +10,7 @@ SOURCES := $(wildcard $(SRC)/*.cpp)
 OBJECTS := $(patsubst $(SRC)/%.cpp, $(OBJ)/%.o, $(SOURCES))
 HEADERS := $(wildcard $(SRC)/*.hpp)
 
-LIBS 	:= curlpp
+LIBS 	:= curlpp libcryptopp
 
 CFLAGS  = $(shell pkg-config --cflags $(LIBS))
 LDFLAGS = $(shell pkg-config --libs $(LIBS))
