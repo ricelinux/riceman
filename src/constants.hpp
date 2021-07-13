@@ -10,11 +10,16 @@
 #endif
 
 /* Repository Info */
+#define RICE_DB_NAME "rices.db"
+#define RICE_DB_SUM_NAME RICE_DB_NAME ".sha256sum"
+
 #define RICE_REPO "https://ricelinux.github.io/ricelinux-rices"
-#define RICE_DB_NAME "/rices.db"
-#define RICE_DB RICE_REPO RICE_DB_NAME
+#define RICE_REPO_DB RICE_REPO "/" RICE_DB_NAME
+#define RICE_REPO_DB_SUM RICE_REPO "/" RICE_DB_SUM_NAME
+
 #define RICE_LIB_PATH "/var/lib/riceman"
-#define RICE_DB_PATH RICE_LIB_PATH RICE_DB_NAME
+#define RICE_DB_PATH RICE_LIB_PATH "/" RICE_DB_NAME
+#define RICE_DB_SUM_PATH RICE_LIB_PATH "/" RICE_DB_SUM_NAME
 
 /* Colors */
 #define NOCOLOR       "\033[0m"
