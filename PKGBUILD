@@ -18,8 +18,7 @@ backup=()
 options=()
 install=
 changelog=
-source=('git+https://github.com/ricelinux/riceman.git'
-		'git+https://github.com/jpbarrette/curlpp.git')
+source=('git+https://github.com/ricelinux/riceman.git')
 noextract=()
 md5sums=('SKIP')
 validpgpkeys=()
@@ -32,7 +31,7 @@ pkgver() {
 prepare() {
 	cd "$pkgname"
 	git submodule update --init --recursive
-	
+
 	cd deps/curlpp
 	cmake .
 	make
