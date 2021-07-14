@@ -31,9 +31,7 @@ pkgver() {
 
 prepare() {
 	cd "$pkgname"
-	git submodule init
-	git config https://github.com/jpbarrette/curlpp $srcdir/deps/curlpp
-	git submodule update
+	git submodule update --init --recursive
 }
 
 build() {
