@@ -22,10 +22,9 @@ LIBS 	:= libcryptopp libcurl
 CFLAGS  := $(shell pkg-config --cflags $(LIBS)) -Ideps/curlpp/include
 LDFLAGS := $(shell pkg-config --libs $(LIBS))
 
+default: $(BIN)
+
 $(BIN): $(OBJECTS) $(CURLPP_OBJECTS) $(HEADERS)
-	echo ----------------------------------------
-	echo $(CURLPP_OBJECTS)
-	echo ----------------------------------------
 	$(CC) -o $(BIN) $(OBJECTS) $(CURLPP_OBJECTS) $(HEADERS) $(LDFLAGS)
 
 $(OBJ)/%.o: $(SRC)/%.cpp $(OBJ)
@@ -49,8 +48,8 @@ $(CURLPP_INTERNAL_OBJ):
 install: $(BIN)
 	install -Dm755 $(BIN) /usr/bin/$(BIN)
 	install -Dm644 README.md /usr/share/doc/$(BIN)
-	install -Dm644 deps/curlpp/libcurlpp.so.1 /usr/lib/libcurlpp.so.1
 
 clean:
 	-rm -rf build
 	-git submodule deinit -f .
+	-git submodule update --init --recursive
