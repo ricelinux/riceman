@@ -32,9 +32,10 @@ deps/curlpp:
 $(OBJ):
 	mkdir -p $@
 
-install:
+install: $(BIN)
 	install -Dm755 $(BIN) /usr/bin/$(BIN)
 	install -Dm644 README.md /usr/share/doc/$(BIN)
+	install -Dm644 deps/curlpp/libcurlpp.so.1 /usr/lib/libcurlpp.so.1
 
 clean:
 	-rm -rf build

@@ -36,4 +36,5 @@ build() {
 package() {
 	cd "$pkgname"
 	install -Dm755 ./riceman "$pkgdir/usr/bin/riceman"
+	install -Dm644 deps/curlpp/libcurlpp.so.1 /usr/lib/libcurlpp.so.1
 }
