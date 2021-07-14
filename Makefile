@@ -24,6 +24,7 @@ $(OBJ)/%.o: $(SRC)/%.cpp $(OBJ)
 	$(CC) -c $< -o $@ -D VERSION=\"$(VERSION)\" $(CFLAGS)
 
 deps/curlpp:
+	git submodule update --init --recursive
 	cd deps/curlpp; \
 	cmake .; \
 	make;
@@ -38,4 +39,3 @@ install:
 clean:
 	-rm -rf build
 	-git submodule deinit -f .
-	-git submodule update --init --recursive
