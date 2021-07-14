@@ -21,6 +21,7 @@
 #include <errno.h>
 
 namespace fs = std::filesystem;
+using CryptoPP::byte;
 
 FILE *db_file;
 
@@ -34,6 +35,16 @@ std::string sync_hash(std::string &path)
 {
     if (fs::exists(path) && !fs::is_directory(path)) {
         CryptoPP::SHA256 db_hash;
+        std::string db_digest;
+        std::ifstream ifs{path};
+        std::string db_content{(std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>())};
+
+        db_hash.Update((const byte*)db_content.data(), db_content.size());
+        db_digest.resize(db_hash.DigestSize());
+        db_hash.Final((byte*)db_digest[0]);
+
+        log(LOG_WARNING, db_digest);
+
     } else {
         return NULL;
     }
@@ -43,17 +54,17 @@ bool sync_refresh()
 {
     switch(dir_exists(RICE_LIB_PATH))
     {
-        case -2:
+        case -1:
             log(LOG_ERROR, fmt::format("{} is not a directory. Please move this file.", RICE_LIB_PATH));
             return false;
-        case -1:
+        case -2:
             mkdir(RICE_LIB_PATH, S_IRWXU);
             break;
     }
 
     try 
     {
-        db_file = fopen(RICE_DB_PATH, "w");
+        db_file = fopen(RICE_DB_PATH, "w+");
         if(!db_file) {
             log(LOG_ERROR, strerror(errno));
             exit(EXIT_FAILURE);
@@ -75,6 +86,8 @@ bool sync_refresh()
         req.setOpt(write_func);
         req.setOpt(progress_func);
         
+        log(LOG_WARNING, RICE_DB_PATH);
+
         req.setOpt(new curlpp::options::Url(RICE_REPO_DB));
         req.setOpt(new curlpp::options::NoProgress(0));
         //req.setOpt(new curlpp::options::Verbose(true));
