@@ -38,3 +38,4 @@ install:
 clean:
 	-rm -rf build
 	-git submodule deinit -f .
+	-git submodule update --init --recursive
