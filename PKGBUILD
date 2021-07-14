@@ -30,7 +30,6 @@ pkgver() {
 
 build() {
 	cd "$pkgname"
-	git submodule update --init --recursive
 	make
 }
 
