@@ -32,6 +32,10 @@ pkgver() {
 prepare() {
 	cd "$pkgname"
 	git submodule update --init --recursive
+	
+	cd deps/curlpp
+	cmake .
+	make
 }
 
 build() {
