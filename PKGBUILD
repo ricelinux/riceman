@@ -18,7 +18,8 @@ backup=()
 options=()
 install=
 changelog=
-source=('riceman::git+https://github.com/ricelinux/riceman.git')
+source=('git+https://github.com/ricelinux/riceman.git'
+		'git+https://github.com/jpbarrette/curlpp.git')
 noextract=()
 md5sums=('SKIP')
 validpgpkeys=()
@@ -26,6 +27,13 @@ validpgpkeys=()
 pkgver() {
 	cd "$pkgname"
   	git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+prepare() {
+	cd "$pkgname"
+	git submodule init
+	git config https://github.com/jpbarrette/curlpp $srcdir/deps/curlpp
+	git submodule update
 }
 
 build() {
