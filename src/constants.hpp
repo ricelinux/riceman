@@ -1,6 +1,8 @@
 #ifndef CONSTANTS_HPP
 #define CONSTANTS_HPP
 
+#define TO_STRING(s) #s
+
 /* Setup fmt */
 #define FMT_HEADER_ONLY
 
@@ -74,9 +76,10 @@ enum {
 
 /* Log levels */
 enum {
-	LOG_ERROR 		= 1,
-	LOG_WARNING		= (1 << 1),
-	LOG_DEBUG		= (1 << 2),
+	LOG_ALL 		= 1,
+	LOG_ERROR 		= (1 << 1),
+	LOG_WARNING		= (1 << 2),
+	LOG_DEBUG		= (1 << 3)
 };
 
 /* Color Option Level */
@@ -86,4 +89,4 @@ enum {
 	COLOR_DISABLED,
 };
 
-#endif // CONSTANTS_HPP
+#endif

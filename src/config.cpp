@@ -1,3 +1,7 @@
 #include "config.hpp"
 
-RicemanConfig* config = NULL;
+#include "constants.hpp"
+
+RicemanConfig::RicemanConfig()
+    : op{OP_UNSET}, loglevel{LOG_ALL | LOG_ERROR | LOG_WARNING}, color{COLOR_UNSET}
+{}

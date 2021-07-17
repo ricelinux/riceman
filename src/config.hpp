@@ -1,7 +1,6 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include "constants.hpp"
 #include <string>
 
 typedef struct _riceman_colors {
@@ -31,10 +30,17 @@ typedef struct _riceman_query_opts {
 	/* to be done when implementing query functionality */
 } RicemanQueryOpts;
 
-typedef struct _riceman_config {
-    int op = OP_UNSET;
-    int loglevel = LOG_ERROR | LOG_WARNING;
-    int color = COLOR_UNSET;
+class RicemanConfig
+{
+    public:
+
+    RicemanConfig();
+
+    bool enableColors();
+    
+	int op;
+    int loglevel;
+    int color;
     
 	RicemanColors colors;
 
@@ -42,15 +48,13 @@ typedef struct _riceman_config {
 	RicemanQueryOpts query;
 	RicemanRemoveOpts remove;
 
-	bool needs_root = false;
-    bool verbose = false;
-    bool version = false;
-    bool help = false;
-	bool noconfirm = false;
-    bool noprogressbar = false;
-} RicemanConfig;
+	bool needs_root;
+    bool verbose;
+    bool version;
+    bool help;
+	bool noconfirm;
+    bool noprogressbar;
+    
+};
 
-/* Make config global */
-extern RicemanConfig *config;
-
-#endif // CONFIG_HPP
+#endif
