@@ -19,7 +19,7 @@ CURLPP_SOURCES := $(wildcard $(CURLPP_SRC)/*.cpp) $(wildcard $(CURLPP_SRC)/inter
 CURLPP_OBJECTS := $(patsubst $(CURLPP_SRC)/%.cpp, $(CURLPP_OBJ)/%.o, $(CURLPP_SOURCES))
 
 LIBS 	:= libcryptopp libcurl
-CFLAGS  := $(shell pkg-config --cflags $(LIBS)) -Ideps/curlpp/include
+CFLAGS  := $(shell pkg-config --cflags $(LIBS)) -Ideps/curlpp/include -Ideps/argparse
 LDFLAGS := $(shell pkg-config --libs $(LIBS))
 
 default: $(BIN)
@@ -28,7 +28,7 @@ $(BIN): $(OBJECTS) $(CURLPP_OBJECTS) $(HEADERS)
 	$(CC) -o $(BIN) $(OBJECTS) $(CURLPP_OBJECTS) $(HEADERS) $(LDFLAGS)
 
 $(OBJ)/%.o: $(SRC)/%.cpp $(OBJ)
-	$(CC) -c $< -o $@ -D VERSION=\"$(VERSION)\" $(CFLAGS)
+	$(CC) -c $< -o $@ -D VERSION="$(VERSION)" $(CFLAGS)
 
 $(CURLPP_OBJ)/%.o: $(CURLPP_SRC)/%.cpp $(CURLPP_OBJ)
 	$(CC) -c $< -o $@ $(CFLAGS)
