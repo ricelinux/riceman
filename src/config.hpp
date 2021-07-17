@@ -36,7 +36,7 @@ class RicemanConfig
 
     RicemanConfig();
 
-    bool enableColors();
+    bool show_colors(bool state);
     
 	int op;
     int loglevel;
@@ -49,9 +49,6 @@ class RicemanConfig
 	RicemanRemoveOpts remove;
 
 	bool needs_root;
-    bool verbose;
-    bool version;
-    bool help;
 	bool noconfirm;
     bool noprogressbar;
     
