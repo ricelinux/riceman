@@ -1,42 +1,73 @@
 #include "constants.hpp"
+#include "types.hpp"
 #include "config.hpp"
 #include "utils.hpp"
 
 #include <argparse/argparse.hpp>
+#include <fmt/format.h>
 
 using argparse::ArgumentParser;
 
 RicemanConfig config;
 Utils utils{config};
 
-bool set_config(ArgumentParser &argparser)
+static const struct option<int> op_opts[] =
 {
+    OP_OPT('S', "sync",     OP_SYNC,    "syncs rices"),
+    OP_OPT('R', "remove",   OP_REMOVE,  "removes rices"),
+    OP_OPT('Q', "query",    OP_QUERY,   "queries rices")
+};
+
+bool set_op(ArgumentParser &argparser)
+{
+    int argval = OP_UNSET;
     try {
-        /* Parse ops */
+        for(int i = 0; i < STRUCT_LEN(op_opts); i++) {
+            /* If arg is set (either implicitly or not) */
+            if ((argval = argparser.get<int>(op_opts[i].shortopt)) != 0) {
+                if (config.op != OP_UNSET) return false;
+                config.op = argval;
+            }
+        }
     } catch (const std::runtime_error& err) {
         utils.log(LOG_ERROR, err.what());
         exit(EXIT_FAILURE);
+    } catch (const std::logic_error& err) {
+        utils.log(LOG_ERROR, err.what());
+        exit(EXIT_FAILURE);
+    }
+    return true;
+    if (config.op == OP_SYNC) {
+        utils.log(LOG_ALL, "you are so sussy");
     }
 }
+
+
 
 int main(int argc, char *argv[])
 {   
     ArgumentParser argparser{"riceman", TO_STRING(VERSION)};
+    bool ret;
 
-    argparser.add_argument("-V", "--version")
-        .default_value(false)
-        .help("displays the version of riceman");
-    
-    argparser.add_argument("-S", "--sync")
-        .help("sync rices");
-
+    for (int i = 0; i < STRUCT_LEN(op_opts); i++) {
+        argparser.add_argument(op_opts[i].shortopt, op_opts[i].longopt)
+            .implicit_value(op_opts[i].implicitval)
+            .default_value(op_opts[i].defaultval);
+    }
 
     try {
         argparser.parse_args(argc, argv);
     } catch (const std::runtime_error& err) {
         utils.log(LOG_ERROR, err.what());
         exit(EXIT_FAILURE);
+    } catch (const std::logic_error& err) {
+        utils.log(LOG_ERROR, err.what());
+        exit(EXIT_FAILURE);
     }
-
-    set_config(argparser);
+    
+    /* If attempting to set operation fails */
+    if (!set_op(argparser)) {
+        utils.log(LOG_ERROR, "too many arguments specified");
+        exit(EXIT_FAILURE);
+    }
 }
