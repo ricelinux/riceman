@@ -6,7 +6,7 @@ RicemanConfig::RicemanConfig()
     : op{OP_UNSET}, loglevel{LOG_ALL | LOG_ERROR | LOG_WARNING}, color{COLOR_UNSET}
 {}
 
-bool RicemanConfig::show_colors(bool state)
+void RicemanConfig::show_colors(bool &state)
 {
     if (state) {
         colors.colon    = BOLDBLUE "::" BOLD " ";
