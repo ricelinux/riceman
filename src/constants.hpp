@@ -1,7 +1,14 @@
 #ifndef CONSTANTS_HPP
 #define CONSTANTS_HPP
 
+
+
+/* Macros */
 #define TO_STRING(s) #s
+#define STRUCT_LEN(s) sizeof(s) / sizeof(s[0])
+
+#define OPT(shortopt, longopt, defaultval, implicitval, help) { std::string{'-', shortopt}, "--" longopt, defaultval, implicitval, help }
+#define OP_OPT(shortopt, longopt, implicitval, help) OPT(shortopt, longopt, false, implicitval, help)
 
 /* Setup fmt */
 #define FMT_HEADER_ONLY
