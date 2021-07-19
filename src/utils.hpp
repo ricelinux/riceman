@@ -14,8 +14,6 @@ class Utils
     const std::string basename(const std::string &path);
     int dir_exists(const std::string &path);
 
-    private:
-
     RicemanConfig &config;
 };
 
