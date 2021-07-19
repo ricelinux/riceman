@@ -79,6 +79,9 @@ int main(int argc, char *argv[])
         case OP_SYNC:
             ophandler = new SyncHandler(argparser, config, utils);
             break;
+        default:
+            utils.log(LOG_ERROR, "no operation specified");
+            exit(EXIT_FAILURE);
     }
 
     ophandler->run();
