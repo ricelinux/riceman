@@ -37,9 +37,6 @@ bool set_op(ArgumentParser &argparser)
         exit(EXIT_FAILURE);
     }
     return true;
-    if (config.op == OP_SYNC) {
-        utils.log(LOG_ALL, "you are so sussy");
-    }
 }
 
 
@@ -70,4 +67,6 @@ int main(int argc, char *argv[])
         utils.log(LOG_ERROR, "too many arguments specified");
         exit(EXIT_FAILURE);
     }
+
+
 }
