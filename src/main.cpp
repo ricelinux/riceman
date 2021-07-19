@@ -1,7 +1,11 @@
 #include "constants.hpp"
 #include "types.hpp"
+
 #include "config.hpp"
 #include "utils.hpp"
+
+#include "operation.hpp"
+#include "sync.hpp"
 
 #include <argparse/argparse.hpp>
 #include <fmt/format.h>
@@ -64,9 +68,18 @@ int main(int argc, char *argv[])
     
     /* If attempting to set operation fails */
     if (!set_op(argparser)) {
-        utils.log(LOG_ERROR, "too many arguments specified");
+        utils.log(LOG_ERROR, "too many operations specified");
         exit(EXIT_FAILURE);
     }
 
+    OperationHandler* ophandler;
 
+    switch(config.op)
+    {
+        case OP_SYNC:
+            ophandler = new SyncHandler(argparser, config, utils);
+            break;
+    }
+
+    ophandler->run();
 }
