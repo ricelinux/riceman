@@ -1,3 +1,6 @@
+#ifndef OPTION_HPP
+#define OPTION_HPP
+
 #include <string>
 
 #define OPT(shortopt, longopt, defaultval, implicitval, help) { std::string{'-', shortopt}, "--" longopt, defaultval, implicitval, help }
@@ -11,3 +14,5 @@ struct option {
     const T implicitval;
     const std::string help;
 };
+
+#endif // OPTION_HPP
