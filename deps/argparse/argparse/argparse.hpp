@@ -762,6 +762,14 @@ private:
     throw std::logic_error("No value provided");
   }
 
+  int get_length() const {
+    if (!mValues.empty()) {
+      return mValues.size();
+    } else {
+      return 0;
+    }
+  }
+
   /*
    * Get argument value given a type.
    * @pre The object has no default value.
@@ -917,6 +925,10 @@ public:
   template <typename T = std::string>
   T get(std::string_view aArgumentName) const {
     return (*this)[aArgumentName].get<T>();
+  }
+
+  int get_length(std::string_view aArgumentName) const {
+    return (*this)[aArgumentName].get_length();
   }
 
   /* Getter for options without default values.
