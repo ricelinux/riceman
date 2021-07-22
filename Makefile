@@ -20,7 +20,7 @@ CURLPP_OBJECTS := $(patsubst $(CURLPP_SRC)/%.cpp, $(CURLPP_OBJ)/%.o, $(CURLPP_SO
 
 LIBS 	:= libcryptopp libcurl
 CFLAGS  := $(shell pkg-config --cflags $(LIBS)) -Ideps/curlpp/include -Ideps/argparse
-LDFLAGS := $(shell pkg-config --libs $(LIBS))
+LDFLAGS := $(shell pkg-config --libs $(LIBS)) -Ideps/argparse
 
 default: $(BIN)
 
