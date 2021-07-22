@@ -54,3 +54,8 @@ const bool Utils::log(const int level, const std::string &message)
 
 	return true;
 }
+
+const bool Utils::log(const int level, const int &message)
+{
+	return log(level, std::to_string(message));
+}
