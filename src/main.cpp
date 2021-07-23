@@ -56,8 +56,8 @@ int main(int argc, char *argv[])
     ArgumentParser argparser{"riceman", TO_STRING(VERSION)};
     bool ret;
 
-    ADD_COMPOUND_ARGUMENTS(argparser, op_opts);
-    ADD_COMPOUND_ARGUMENTS(argparser, SyncHandler::op_modifiers);
+    ADD_ARGUMENTS(argparser, op_opts);
+    ADD_ARGUMENTS(argparser, SyncHandler::op_modifiers);
 
     try {
         argparser.parse_args(argc, argv);
