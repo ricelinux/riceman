@@ -19,6 +19,7 @@ for (int i = 0; i < STRUCT_LEN(opts); i++) { \
         .nargs(0) \
         .append() \
         .implicit_value(opts[i].implicitval) \
+        .default_value(opts[i].defaultval) \
         .help(opts[i].help); \
 }
 
