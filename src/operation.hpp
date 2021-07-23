@@ -21,4 +21,4 @@ class OperationHandler
     Utils &utils;
 };
 
-#endif
+#endif // OPERATION_HPP

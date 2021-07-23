@@ -93,4 +93,4 @@ enum {
 	COLOR_DISABLED,
 };
 
-#endif
+#endif // CONSTANTS_HPP

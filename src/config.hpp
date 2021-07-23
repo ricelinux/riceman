@@ -54,4 +54,4 @@ class RicemanConfig
     
 };
 
-#endif
+#endif // CONFIG_HPP
