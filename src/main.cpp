@@ -22,6 +22,11 @@ static const struct option<int> op_opts[] =
     OP_OPT('Q', "query",    OP_QUERY,   "queries rices"),
 };
 
+/** Set the config's operation and manage error cases
+ * @param argparser the ArgumentParser
+ * 
+ * @returns true if successfully set, false if bad format
+ */
 bool set_op(ArgumentParser &argparser)
 {
     int argval = OP_UNSET;
@@ -29,6 +34,7 @@ bool set_op(ArgumentParser &argparser)
         for(int i = 0; i < STRUCT_LEN(op_opts); i++) {
             /* If arg is set (either implicitly or not) */
             if ((argval = argparser.get<int>(op_opts[i].shortopt)) != 0) {
+                if (argparser.get_length(op_opts[i].shortopt) > 1) return false;
                 if (config.op != OP_UNSET) return false;
                 config.op = argval;
             }
@@ -50,7 +56,7 @@ int main(int argc, char *argv[])
     ArgumentParser argparser{"riceman", TO_STRING(VERSION)};
     bool ret;
 
-    ADD_ARGUMENTS(argparser, op_opts);
+    ADD_COMPOUND_ARGUMENTS(argparser, op_opts);
     ADD_COMPOUND_ARGUMENTS(argparser, SyncHandler::op_modifiers);
 
     try {
@@ -75,6 +81,10 @@ int main(int argc, char *argv[])
     {
         case OP_SYNC:
             ophandler = new SyncHandler(argparser, config, utils);
+            break;
+        case OP_REMOVE:
+            break;
+        case OP_QUERY:
             break;
         default:
             utils.log(LOG_ERROR, "no operation specified");
