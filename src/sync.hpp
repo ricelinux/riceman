@@ -13,6 +13,7 @@ class SyncHandler: public OperationHandler
 
     static const int s_op_modifiers = 1;
     static const struct option<int> op_modifiers[s_op_modifiers];
+    static const struct option<int> compound_op_modifiers[s_op_modifiers];
 
     private:
 

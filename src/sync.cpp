@@ -2,11 +2,16 @@
 #include "constants.hpp"
 
 /* Init statics */
-const struct option<int> SyncHandler::op_modifiers[] = { 
-    OPT('y', "refresh", 0, 1, "refreshes downloaded databases")
+const struct option<int> SyncHandler::op_modifiers[] = {
+    OPT('u', "upgrade", 0, 1, "upgrades installed rices"),
+};
+
+const struct option<int> SyncHandler::compound_op_modifiers[] = { 
+    OPT('y', "refresh", 0, 1, "refreshes downloaded databases"),
 };
 unsigned short SyncHandler::refresh = 0;
 
+/* Main Code */
 SyncHandler::SyncHandler(argparse::ArgumentParser &argparser, RicemanConfig &config, Utils &utils) 
 : OperationHandler(argparser, config, utils)
 {
