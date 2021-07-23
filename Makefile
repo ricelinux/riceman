@@ -24,8 +24,8 @@ LDFLAGS := $(shell pkg-config --libs $(LIBS)) -Ideps/argparse
 
 default: $(BIN)
 
-$(BIN): $(OBJECTS) $(HEADERS) # $(CURLPP_OBJECTS)
-	$(CC) -o $(BIN) $(OBJECTS) $(HEADERS) $(LDFLAGS)
+$(BIN): $(OBJECTS) $(HEADERS) $(CURLPP_OBJECTS)
+	$(CC) -o $(BIN) $(OBJECTS) $(CURLPP_OBJECTS) $(HEADERS) $(LDFLAGS)
 
 $(OBJ)/%.o: $(SRC)/%.cpp $(OBJ)
 	$(CC) -c $< -o $@ -D VERSION="$(VERSION)" $(CFLAGS)
