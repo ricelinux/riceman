@@ -9,13 +9,6 @@
 #define ADD_ARGUMENTS(argparser, opts) \
 for (int i = 0; i < STRUCT_LEN(opts); i++) { \
     argparser.add_argument(opts[i].shortopt, opts[i].longopt) \
-        .implicit_value(opts[i].implicitval) \
-        .default_value(opts[i].defaultval) \
-        .help(opts[i].help); \
-}
-#define ADD_COMPOUND_ARGUMENTS(argparser, opts) \
-for (int i = 0; i < STRUCT_LEN(opts); i++) { \
-    argparser.add_argument(opts[i].shortopt, opts[i].longopt) \
         .nargs(0) \
         .append() \
         .implicit_value(opts[i].implicitval) \
