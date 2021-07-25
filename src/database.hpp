@@ -25,6 +25,8 @@ class Database
     const std::string hash_sha256(std::string input);
     const bool local_exists();
     const bool create_local();
+
+    bool progress_callback(size_t downloadTotal, size_t downloadNow, size_t uploadTotal, size_t uploadNow);
 };
 
 #endif // DATABASE_HPP

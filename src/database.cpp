@@ -44,7 +44,12 @@ const bool Database::local_exists()
 
 const bool Database::update()
 {
-    cpr::Response r = cpr::Get(cpr::Url(remote_uri));
+
+    using namespace std::placeholders;
+
+    cpr::Response r = cpr::Get(cpr::Url{remote_uri},
+                      cpr::ProgressCallback(std::bind(&Database::progress_callback, this, _1, _2, _3, _4)));
+    
 
     std::ofstream stream;
     stream.open(local_path, std::fstream::out);
@@ -86,4 +91,10 @@ const std::string Database::get_local_hash()
     ss << file.rdbuf();
 
     return hash_sha256(ss.str());
+}
+
+bool Database::progress_callback(size_t downloadTotal, size_t downloadNow, size_t uploadTotal, size_t uploadNow)
+{
+    std::cout << downloadNow << "/" << downloadTotal << std::endl;
+    return true;
 }
