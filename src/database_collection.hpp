@@ -1,20 +1,22 @@
-#ifndef DATABASE_COLLECTION
-#define DATABASE_COLLECTION
+#ifndef DATABASE_COLLECTION_HPP
+#define DATABASE_COLLECTION_HPP
 
 #include "database.hpp"
 
+#include <vector>
+
 class DatabaseCollection
 {
-    private:
-
-    Database databases[];
-
     public:
+    DatabaseCollection();
 
     Database& get(std::string file_name);
     Database& add(Database &db);
     Database& add(std::string local_path, std::string remote_uri);
 
+    std::vector<Database> db_list;
+
+
 };
 
-#endif
+#endif // DATABASE_COLLECTION_HPP
