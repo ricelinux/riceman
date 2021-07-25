@@ -19,8 +19,9 @@ CURLPP_SOURCES := $(wildcard $(CURLPP_SRC)/*.cpp) $(wildcard $(CURLPP_SRC)/inter
 CURLPP_OBJECTS := $(patsubst $(CURLPP_SRC)/%.cpp, $(CURLPP_OBJ)/%.o, $(CURLPP_SOURCES))
 
 LIBS 	:= libcryptopp libcurl
-CFLAGS  := $(shell pkg-config --cflags $(LIBS)) -Ideps/curlpp/include -Ideps/argparse
-LDFLAGS := $(shell pkg-config --libs $(LIBS)) -Ideps/argparse
+INCFLAGS := -Ideps/curlpp/include -Ideps/argparse
+CFLAGS  := $(shell pkg-config --cflags $(LIBS)) $(INCFLAGS)
+LDFLAGS := $(shell pkg-config --libs $(LIBS)) $(INCFLAGS)
 
 default: $(BIN)
 
