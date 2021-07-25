@@ -3,12 +3,15 @@
 #include "config.hpp"
 #include "utils.hpp"
 
+#include "database_collection.hpp"
 #include "option.hpp"
 #include "operation.hpp"
 #include "sync.hpp"
 
 #include "argparse/argparse.hpp"
 #include <fmt/format.h>
+
+#include <curlpp/cURLpp.hpp>
 
 using argparse::ArgumentParser;
 
@@ -49,11 +52,16 @@ bool set_op(ArgumentParser &argparser)
     return true;
 }
 
-
-
 int main(int argc, char *argv[])
 {   
+    curlpp::Cleanup cleaner;
+    
+    OperationHandler* ophandler;
     ArgumentParser argparser{"riceman", TO_STRING(VERSION)};
+    DatabaseCollection databases;
+
+    databases.add(LOCAL_RICE_DB, REMOTE_RICE_DB);
+    
     bool ret;
 
     ADD_ARGUMENTS(argparser, op_opts);
@@ -75,12 +83,10 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    OperationHandler* ophandler;
-
     switch(config.op)
     {
         case OP_SYNC:
-            ophandler = new SyncHandler(argparser, config, utils);
+            ophandler = new SyncHandler(argparser, config, utils, databases);
             break;
         case OP_REMOVE:
             break;
