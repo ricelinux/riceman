@@ -8,17 +8,19 @@ class SyncHandler: public OperationHandler
 {
     public:
 
-    SyncHandler(argparse::ArgumentParser &parser, RicemanConfig &conf, Utils &util);
+    SyncHandler(argparse::ArgumentParser &parser, RicemanConfig &conf, Utils &util, DatabaseCollection &databases);
     bool run();
 
-    static const int s_op_modifiers = 1;
+    static const int s_op_modifiers = 2;
     static const struct option<int> op_modifiers[s_op_modifiers];
-    static const struct option<int> compound_op_modifiers[s_op_modifiers];
 
     private:
 
-    /* Public Operation Modifiers */
-    static unsigned short refresh;
+    bool refresh_rices(unsigned short &level);
+
+    /* Operation Modifiers */
+    unsigned short refresh;
+    bool upgrade;
 };
 
-#endif
+#endif // SYNC_HPP
