@@ -82,6 +82,7 @@ int main(int argc, char *argv[])
     switch(config.op)
     {
         case OP_SYNC:
+            NEEDS_ROOT(utils)
             ophandler = new SyncHandler(argparser, config, utils, databases);
             break;
         case OP_REMOVE:

@@ -1,7 +1,11 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
+#include <unistd.h>
+
 #include "config.hpp"
+
+#define NEEDS_ROOT(utils) if (geteuid() != 0) { utils.log(LOG_ERROR, "you must be root to perform this operation"); exit(EXIT_FAILURE); }
 
 class Utils
 {
