@@ -11,8 +11,6 @@
 #include "argparse/argparse.hpp"
 #include <fmt/format.h>
 
-#include <curlpp/cURLpp.hpp>
-
 using argparse::ArgumentParser;
 
 RicemanConfig config;
@@ -53,9 +51,7 @@ bool set_op(ArgumentParser &argparser)
 }
 
 int main(int argc, char *argv[])
-{   
-    curlpp::Cleanup cleaner;
-    
+{
     OperationHandler* ophandler;
     ArgumentParser argparser{"riceman", TO_STRING(VERSION)};
     DatabaseCollection databases;
@@ -98,4 +94,6 @@ int main(int argc, char *argv[])
     }
 
     ophandler->run();
+
+    return EXIT_SUCCESS;
 }

@@ -32,16 +32,5 @@ bool SyncHandler::run()
 /* Backend code */
 bool SyncHandler::refresh_rices(unsigned short &level)
 {
-    std::vector<Database> &db_list = databases.db_list;
-
-    for(int i = 0; i < db_list.size(); i++)
-    {
-        Database &db = db_list[i];
-
-        if (level == 1) {
-
-        } else {
-            utils.log(LOG_ALL, db.get_remote_hash());
-        }
-    }
+    
 }

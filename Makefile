@@ -4,10 +4,8 @@ SRC := src
 OBJ := build
 BIN := riceman
 SUB := deps
-CURLPP_SRC := $(SUB)/curlpp/src/curlpp
-CURLPP_OBJ := $(OBJ)/curlpp
-CURLPP_INTERNAL_SRC := $(CURLPP_SRC)/internal
-CURLPP_INTERNAL_OBJ := $(CURLPP_OBJ)/internal
+CPR_SRC := $(SUB)/cpr/cpr
+CPR_OBJ := $(OBJ)/cpr
 
 VERSION := $(shell git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g')
 
@@ -15,35 +13,32 @@ SOURCES := $(wildcard $(SRC)/*.cpp)
 OBJECTS := $(patsubst $(SRC)/%.cpp, $(OBJ)/%.o, $(SOURCES))
 HEADERS := $(wildcard $(SRC)/*.hpp)
 
-CURLPP_SOURCES := $(wildcard $(CURLPP_SRC)/*.cpp) $(wildcard $(CURLPP_SRC)/internal/*.cpp)
-CURLPP_OBJECTS := $(patsubst $(CURLPP_SRC)/%.cpp, $(CURLPP_OBJ)/%.o, $(CURLPP_SOURCES))
+CPR_SOURCES := $(wildcard $(CPR_SRC)/*.cpp) $(wildcard $(CPR_SRC)/internal/*.cpp)
+CPR_OBJECTS := $(patsubst $(CPR_SRC)/%.cpp, $(CPR_OBJ)/%.o, $(CPR_SOURCES))
 
 LIBS 	:= libcryptopp libcurl
-INCFLAGS := -Ideps/curlpp/include -Ideps/argparse
-CFLAGS  := $(shell pkg-config --cflags $(LIBS)) $(INCFLAGS)
-LDFLAGS := $(shell pkg-config --libs $(LIBS)) $(INCFLAGS)
+INCFLAGS := -Ideps/cpr/include -Ideps/argparse
+CFLAGS  := $(shell pkg-config --cflags $(LIBS))
+LDFLAGS := $(shell pkg-config --libs $(LIBS))
 
 default: $(BIN)
 
-$(BIN): $(OBJECTS) $(HEADERS) $(CURLPP_OBJECTS)
-	$(CC) -o $(BIN) $(OBJECTS) $(CURLPP_OBJECTS) $(HEADERS) $(LDFLAGS)
+$(BIN): $(OBJECTS) $(HEADERS) $(CPR_OBJECTS)
+	$(CC) -o $(BIN) $(OBJECTS) $(CPR_OBJECTS) $(HEADERS) $(LDFLAGS) $(INCFLAGS)
 
 $(OBJ)/%.o: $(SRC)/%.cpp $(OBJ)
-	$(CC) -c $< -o $@ -D VERSION="$(VERSION)" $(CFLAGS)
+	$(CC) -c $< -o $@ -D VERSION="$(VERSION)" $(CFLAGS) $(INCFLAGS)
 
-$(CURLPP_OBJ)/%.o: $(CURLPP_SRC)/%.cpp $(CURLPP_OBJ)
-	$(CC) -c $< -o $@ $(CFLAGS)
-
-$(CURLPP_INTERNAL_OBJ)/%.o: $(CURLPP_INTERNAL_SRC)/%.cpp $(CURLPP_INTERNAL_OBJ)
-	$(CC) -c $< -o $@ $(CFLAGS)
+$(CPR_OBJ)/%.o: $(CPR_SRC)/%.cpp $(CPR_OBJ)
+	$(CC) -c $< -o $@ $(CFLAGS) -Ideps/cpr/include
 
 $(OBJ):
 	mkdir -p $@
 
-$(CURLPP_OBJ):
+$(CPR_OBJ):
 	mkdir -p $@
 
-$(CURLPP_INTERNAL_OBJ):
+$(CPR_INTERNAL_OBJ):
 	mkdir -p $@
 
 install: $(BIN)
