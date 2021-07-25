@@ -2,11 +2,17 @@
 
 DatabaseCollection::DatabaseCollection() {};
 
-Database& DatabaseCollection::get(std::string file_name)
+Database& DatabaseCollection::get(std::string &file_name)
 {
     for(int i = 0; i < db_list.size(); i++) {
         if (db_list[i].local_path.compare(file_name) == 0) return db_list[i];
     }
+    throw std::runtime_error{"database not found"};
+}
+
+Database& DatabaseCollection::get(int &index)
+{
+    return db_list[index];
 }
 
 Database& DatabaseCollection::add(Database &db)

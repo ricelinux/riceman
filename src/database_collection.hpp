@@ -10,7 +10,8 @@ class DatabaseCollection
     public:
     DatabaseCollection();
 
-    Database& get(std::string file_name);
+    Database& get(std::string &file_name);
+    Database& get(int &index);
     Database& add(Database &db);
     Database& add(std::string local_path, std::string remote_uri);
 

@@ -32,5 +32,28 @@ bool SyncHandler::run()
 /* Backend code */
 bool SyncHandler::refresh_rices(unsigned short &level)
 {
-    
+    for(int i = 0; i < databases.db_list.size(); i++) {
+        Database &db = databases.get(i);
+
+        std::string local_hash;
+        std::string remote_hash;
+
+        remote_hash = db.get_remote_hash();
+
+        try {
+            local_hash = db.get_local_hash();
+        } catch (std::runtime_error err) {
+            utils.log(LOG_ERROR, err.what());
+            exit(EXIT_FAILURE);
+        }
+        
+        if (local_hash.compare(remote_hash) != 0 || level == 2) {
+            if (!db.update()) {
+                utils.log(LOG_ERROR, "failed to update database");
+                exit(EXIT_FAILURE);
+            }
+        } else {
+            utils.log(LOG_ALL, "Database up to date!");
+        }
+    }
 }
