@@ -36,7 +36,7 @@ class RicemanConfig
 
     RicemanConfig();
 
-    void show_colors(bool &state);
+    void show_colors(bool state);
     
 	int op;
     int loglevel;
