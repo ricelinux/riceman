@@ -4,7 +4,6 @@
 
 
 /* Macros */
-#define TO_STRING(s) #s
 #define STRUCT_LEN(s) sizeof(s) / sizeof(s[0])
 
 /* Setup fmt */
