@@ -21,8 +21,8 @@ Database& DatabaseCollection::add(Database &db)
     return db;
 }
 
-Database& DatabaseCollection::add(std::string local_path, std::string remote_uri)
+Database& DatabaseCollection::add(std::string name, std::string remote_uri)
 {
-    Database *db = new Database{local_path, remote_uri};
+    Database *db = new Database{name, remote_uri};
     return add(*db);
 }
