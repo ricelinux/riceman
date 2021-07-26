@@ -53,7 +53,7 @@ bool set_op(ArgumentParser &argparser)
 int main(int argc, char *argv[])
 {
     OperationHandler* ophandler;
-    ArgumentParser argparser{"riceman", TO_STRING(VERSION)};
+    ArgumentParser argparser{"riceman", VERSION};
     DatabaseCollection databases;
 
     databases.add("rices", REMOTE_RICE_DB);

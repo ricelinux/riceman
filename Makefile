@@ -25,7 +25,7 @@ $(BIN): $(OBJECTS) $(HEADERS) $(CPR_OBJECTS)
 	$(CC) -o $(BIN) $(OBJECTS) $(CPR_OBJECTS) $(HEADERS) $(LDFLAGS) $(INCFLAGS)
 
 $(OBJ)/%.o: $(SRC)/%.cpp | $(OBJ)
-	$(CC) -c $< -o $@ -D VERSION="$(VERSION)" $(CFLAGS) $(INCFLAGS)
+	$(CC) -c $< -o $@ -D VERSION=\"$(VERSION)\" $(CFLAGS) $(INCFLAGS)
 
 $(CPR_OBJ)/%.o: $(CPR_SRC)/%.cpp | $(CPR_OBJ)
 	$(CC) -c $< -o $@ $(CFLAGS) -Ideps/cpr/include
