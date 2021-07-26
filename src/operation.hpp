@@ -1,5 +1,4 @@
-#ifndef OPERATION_HPP
-#define OPERATION_HPP
+#pragma once
 
 #include "config.hpp"
 #include "utils.hpp"
@@ -22,5 +21,3 @@ class OperationHandler
     Utils &utils;
     DatabaseCollection &databases;
 };
-
-#endif // OPERATION_HPP

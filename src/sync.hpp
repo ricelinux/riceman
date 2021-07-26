@@ -1,5 +1,4 @@
-#ifndef SYNC_HPP
-#define SYNC_HPP
+#pragma once
 
 #include "option.hpp"
 #include "operation.hpp"
@@ -22,5 +21,3 @@ class SyncHandler: public OperationHandler
     unsigned short refresh;
     bool upgrade;
 };
-
-#endif // SYNC_HPP

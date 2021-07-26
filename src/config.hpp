@@ -1,5 +1,4 @@
-#ifndef CONFIG_HPP
-#define CONFIG_HPP
+#pragma once
 
 #include <string>
 
@@ -53,5 +52,3 @@ class RicemanConfig
     bool noprogressbar;
     
 };
-
-#endif // CONFIG_HPP

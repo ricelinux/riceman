@@ -1,5 +1,4 @@
-#ifndef UTILS_HPP
-#define UTILS_HPP
+#pragma once
 
 #include <unistd.h>
 
@@ -21,5 +20,3 @@ class Utils
 
     RicemanConfig &config;
 };
-
-#endif // UTILS_HPP

@@ -1,7 +1,4 @@
-#ifndef CONSTANTS_HPP
-#define CONSTANTS_HPP
-
-
+#pragma once
 
 /* Macros */
 #define STRUCT_LEN(s) sizeof(s) / sizeof(s[0])
@@ -91,5 +88,3 @@ enum {
 	COLOR_ENABLED,
 	COLOR_DISABLED,
 };
-
-#endif // CONSTANTS_HPP

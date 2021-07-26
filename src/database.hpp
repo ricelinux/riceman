@@ -1,5 +1,4 @@
-#ifndef DATABASE_HPP
-#define DATABASE_HPP
+#pragma once
 
 #include <string>
 #include <fstream>
@@ -36,5 +35,3 @@ class Database
     int progress_start;
     int progress_len;
 };
-
-#endif // DATABASE_HPP

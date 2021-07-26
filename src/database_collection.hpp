@@ -1,5 +1,4 @@
-#ifndef DATABASE_COLLECTION_HPP
-#define DATABASE_COLLECTION_HPP
+#pragma once
 
 #include "database.hpp"
 
@@ -19,5 +18,3 @@ class DatabaseCollection
 
 
 };
-
-#endif // DATABASE_COLLECTION_HPP

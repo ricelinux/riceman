@@ -1,5 +1,4 @@
-#ifndef OPTION_HPP
-#define OPTION_HPP
+#pragma once
 
 #include <string>
 
@@ -24,5 +23,3 @@ struct option {
     const T implicitval;
     const std::string help;
 };
-
-#endif // OPTION_HPP
