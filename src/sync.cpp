@@ -42,10 +42,9 @@ bool SyncHandler::refresh_rices(unsigned short &level)
         std::string local_hash;
         std::string remote_hash;
 
-        remote_hash = db.get_remote_hash();
-
         try {
             local_hash = db.get_local_hash();
+            remote_hash = db.get_remote_hash();
         } catch (std::runtime_error err) {
             std::cout << "\n";
             utils.log(LOG_ERROR, err.what());

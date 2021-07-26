@@ -88,6 +88,7 @@ const std::string Database::hash_sha256(std::string input)
 const std::string Database::get_remote_hash()
 {    
     cpr::Response r = cpr::Get(cpr::Url(remote_hash_uri));
+    if (r.error) throw std::runtime_error{r.error.message};
     r.text.erase(std::remove(r.text.begin(), r.text.end(), '\n'), r.text.end());
     return r.text;
 }
