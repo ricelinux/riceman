@@ -53,7 +53,8 @@ bool set_op(ArgumentParser &argparser)
 int main(int argc, char *argv[])
 {
     OperationHandler* ophandler;
-    ArgumentParser argparser{"riceman", VERSION};
+    /* I can't pass in escaped string macros without VSCode Makefile Tools getting mad */
+    ArgumentParser argparser{"riceman", "v1.0.0"};
     DatabaseCollection databases;
 
     databases.add("rices", REMOTE_RICE_DB);

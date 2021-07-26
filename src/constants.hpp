@@ -11,7 +11,7 @@
 
 /* Version */
 #ifndef VERSION
-#define VERSION "???"
+#define VERSION "v1.0.0"
 #endif
 
 /* Repository Info */
