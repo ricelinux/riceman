@@ -42,9 +42,8 @@ const bool Database::local_exists()
     return std::filesystem::exists(local_path);
 }
 
-const bool Database::update()
+const bool Database::refresh()
 {
-
     using namespace std::placeholders;
 
     cpr::Response r = cpr::Get(cpr::Url{remote_uri},

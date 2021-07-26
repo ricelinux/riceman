@@ -15,7 +15,7 @@ class Database
 
     const std::string get_remote_hash();
     const std::string get_local_hash();
-    const bool update();
+    const bool refresh();
 
     const std::string local_path;
     const std::string remote_uri;
