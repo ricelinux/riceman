@@ -58,7 +58,7 @@ bool SyncHandler::refresh_rices(unsigned short &level)
                 exit(EXIT_FAILURE);
             }
         } else {
-            std::cout << " is up to date";
+            std::cout << " is up to date\n";
         }
     }
 }
