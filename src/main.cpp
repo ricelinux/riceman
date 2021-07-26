@@ -56,7 +56,8 @@ int main(int argc, char *argv[])
     ArgumentParser argparser{"riceman", TO_STRING(VERSION)};
     DatabaseCollection databases;
 
-    databases.add(LOCAL_RICE_DB, REMOTE_RICE_DB);
+    databases.add("rices", REMOTE_RICE_DB);
+    config.show_colors(true);
     
     bool ret;
 
