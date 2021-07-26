@@ -21,15 +21,13 @@ INCFLAGS := -Ideps/cpr/include -Ideps/argparse
 CFLAGS  := $(shell pkg-config --cflags $(LIBS))
 LDFLAGS := $(shell pkg-config --libs $(LIBS))
 
-default: $(BIN)
-
 $(BIN): $(OBJECTS) $(HEADERS) $(CPR_OBJECTS)
 	$(CC) -o $(BIN) $(OBJECTS) $(CPR_OBJECTS) $(HEADERS) $(LDFLAGS) $(INCFLAGS)
 
-$(OBJ)/%.o: $(SRC)/%.cpp $(OBJ)
+$(OBJ)/%.o: $(SRC)/%.cpp | $(OBJ)
 	$(CC) -c $< -o $@ -D VERSION="$(VERSION)" $(CFLAGS) $(INCFLAGS)
 
-$(CPR_OBJ)/%.o: $(CPR_SRC)/%.cpp $(CPR_OBJ)
+$(CPR_OBJ)/%.o: $(CPR_SRC)/%.cpp | $(CPR_OBJ)
 	$(CC) -c $< -o $@ $(CFLAGS) -Ideps/cpr/include
 
 $(OBJ):
