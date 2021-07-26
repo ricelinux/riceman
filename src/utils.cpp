@@ -44,6 +44,7 @@ const bool Utils::log(const int level, const std::string &message)
 			std::cout << "debug: ";
 			break;
         case LOG_ALL:
+			std::cout << config.colors.nocolor;
             /* Nothing done here */
             break;
         default:
@@ -62,5 +63,5 @@ const bool Utils::log(const int level, const int &message)
 
 void Utils::colon_log(const std::string &message)
 {
-	std::cout << config.colors.colon << message << std::endl;
+	std::cout << config.colors.colon << message << config.colors.nocolor << std::endl;
 }
