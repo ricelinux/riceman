@@ -46,7 +46,11 @@ const bool Database::local_exists()
     return std::filesystem::exists(local_path);
 }
 
-const bool Database::refresh()
+/** Downloads a fresh copy of the database
+ * 
+ * @returns -1 if request fails, -2 if write fails, 1 if successful
+ */
+const short Database::refresh()
 {
     using namespace std::placeholders;
 
@@ -55,12 +59,14 @@ const bool Database::refresh()
                       cpr::ProgressCallback(std::bind(&Database::progress_callback, this, _1, _2, _3, _4)));
     std::cout << std::endl;
 
+    if (r.error) return -1;
+
     std::ofstream stream;
     stream.open(local_path, std::fstream::out);
-    if (!stream.is_open()) return false;
+    if (!stream.is_open()) return -2;
 
     stream.write(r.text.c_str(), r.text.length());
-    return true;
+    return 1;
 }
 
 const std::string Database::hash_sha256(std::string input)

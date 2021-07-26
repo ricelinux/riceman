@@ -53,12 +53,20 @@ bool SyncHandler::refresh_rices(unsigned short &level)
         }
         
         if (local_hash.compare(remote_hash) != 0 || level == 2) {
-            if (!db.refresh()) {
-                utils.log(LOG_ERROR, "\nfailed to update database");
-                exit(EXIT_FAILURE);
+            switch(db.refresh()) {
+                case -2:
+                    utils.log(LOG_ERROR, "failed to write database to file");
+                    exit(EXIT_FAILURE);
+                    break;
+                case -1:
+                    utils.log(LOG_ERROR, "failed to download database");
+                    exit(EXIT_FAILURE);
+                    break;
             }
         } else {
             std::cout << " is up to date\n";
         }
     }
+
+    return true;
 }
