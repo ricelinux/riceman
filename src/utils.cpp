@@ -59,3 +59,8 @@ const bool Utils::log(const int level, const int &message)
 {
 	return log(level, std::to_string(message));
 }
+
+void Utils::colon_log(const std::string &message)
+{
+	std::cout << config.colors.colon << message << std::endl;
+}
