@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include <iostream> //TODO: remove this
+#include <iostream>
 
 using CryptoPP::byte, CryptoPP::SHA256;
 
