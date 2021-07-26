@@ -114,7 +114,7 @@ void Database::print_base_progress_bar(char progresschar, int percent)
     
     for(int i = 0; i < bar_width - 7; ++i) std::cout << progresschar;
     std::cout << "] ";
-    for (int i = 0; i < 3 - digit_count(percent); ++i) std::cout << " ";
+    LOG_SPACES(3 - digit_count(percent))
     std::cout << percent << "%";
     progress_start = (window.ws_col - bar_width) + 1;
     progress_len = bar_width - 7;
@@ -140,7 +140,7 @@ bool Database::progress_callback(size_t downloadTotal, size_t downloadNow, size_
     std::cout << "] ";
 
     double percentage_completed = floor((downloadNow / (downloadTotal == 0 ? 1 : downloadTotal)) * 100);
-    for(int i = 0; i < 3 - digit_count(percentage_completed); ++i) std::cout << " ";
+    LOG_SPACES(3 - digit_count(percentage_completed))
 
     std::cout << percentage_completed << "%";
 
