@@ -65,3 +65,9 @@ void Utils::colon_log(const std::string &message)
 {
 	std::cout << config.colors.colon << message << config.colors.nocolor << std::endl;
 }
+
+void Utils::show_cursor(const bool status)
+{
+	if (status) std::cout << "\033[?25h";
+	else std::cout << "\033[?25l";
+}

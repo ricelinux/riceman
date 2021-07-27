@@ -33,6 +33,8 @@ bool SyncHandler::run()
 bool SyncHandler::refresh_rices(unsigned short &level)
 {
     utils.colon_log("Synchronizing rice databases...");
+
+    utils.show_cursor(false);
     
     for(int i = 0; i < databases.db_list.size(); i++) {
         Database &db = databases.get(i);
@@ -66,6 +68,8 @@ bool SyncHandler::refresh_rices(unsigned short &level)
             std::cout << " is up to date\n";
         }
     }
+
+    utils.show_cursor(true);
 
     return true;
 }

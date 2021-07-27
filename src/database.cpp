@@ -17,6 +17,8 @@
 using CryptoPP::byte, CryptoPP::SHA256;
 
 namespace fs = std::filesystem;
+typedef std::chrono::high_resolution_clock Clock;
+typedef std::chrono::milliseconds milliseconds;
 
 Database::Database(std::string name, std::string remoteuri)
 : db_name{name}, local_path{fmt::format("{}/{}{}", LOCAL_RICE_BASE_URI, name, ".db")}, remote_uri{remoteuri}, remote_hash_uri{fmt::format("{}.sha256sum", remoteuri)}
@@ -55,6 +57,7 @@ const short Database::refresh()
     using namespace std::placeholders;
 
     print_base_progress_bar('-', 0);
+    start_time = Clock::now();
     cpr::Response r = cpr::Get(cpr::Url{remote_uri},
                       cpr::ProgressCallback(std::bind(&Database::progress_callback, this, _1, _2, _3, _4)));
     std::cout << std::endl;
@@ -127,18 +130,19 @@ void Database::print_base_progress_bar(char progresschar, int percent)
     progress_len = bar_width - 7;
 }
 
-bool Database::progress_callback(size_t downloadTotal, size_t downloadNow, size_t uploadTotal, size_t uploadNow)
+bool Database::progress_callback(size_t dtotal, size_t dnow, size_t utotal, size_t unow)
 {
-    set_column(progress_start - 18);
-    LOG_SPACES(5 - digit_count(downloadTotal));
-    std::cout << downloadTotal << " B";
-    LOG_SPACES(5 - digit_count(downloadNow));
-    std::cout << downloadNow << " B/s [";
+    milliseconds millis = std::chrono::duration_cast<milliseconds>(Clock::now() - start_time);
+    double rate = (double)dnow / millis.count();
 
-    int completed_num = floor(progress_len * (downloadNow / downloadTotal == 0 ? 1 : downloadTotal));
+    set_column(progress_start - 26);
+
+    std::cout << format_module(dnow) << format_module(rate * 1000) << "/s [";
+
+    int completed_num = floor(progress_len * ((double)dnow / (double)(dtotal == 0 ? 1 : dtotal)));
 
     for (int i = 0; i < progress_len; ++i) {
-        if (downloadTotal != 0) {
+        if (dtotal != 0) {
             if (i <= completed_num) std::cout << "#";
             else std::cout << "-";
         } else std::cout << "-";
@@ -146,15 +150,19 @@ bool Database::progress_callback(size_t downloadTotal, size_t downloadNow, size_
 
     std::cout << "] ";
 
-    double percentage_completed = floor((downloadNow / (downloadTotal == 0 ? 1 : downloadTotal)) * 100);
-    LOG_SPACES(3 - digit_count(percentage_completed))
+    double percentage_completed = trunc(((double)dnow / (double)(dtotal == 0 ? 1 : dtotal)) * 100);
+    if (percentage_completed < 10) {
+        std::cout << "  ";
+    } else if (percentage_completed < 100) {
+        std::cout << " ";
+    }
 
     std::cout << percentage_completed << "%";
 
     return true;
 }
 
-const int Database::digit_count(int &num)
+const int Database::digit_count(double num)
 {
     int digits = 0;
     while (num > 0) {
@@ -164,12 +172,26 @@ const int Database::digit_count(int &num)
     return digits == 0 ? 1 : digits;
 }
 
-const size_t Database::digit_count(size_t num)
+std::string Database::format_module(double bytes)
 {
-    int digits = 0;
-    while (num > 0) {
-        ++digits;
-        num = num / 10;
+    std::string unit{"B"};
+    std::string spaces{};
+    if (bytes > 1000000000) { // THE FUTURE IS NOW OLD MAN
+        bytes /= 1000000000;
+        unit = "GiB";
+    } else if (bytes > 1000000) {
+        bytes /= 1000000;
+        unit = "MiB";
+    } else if (bytes > 1000) {
+        bytes /= 1000;
+        unit = "KiB";        
     }
-    return digits == 0 ? 1 : digits;
+
+    std::string bytes_string = fmt::format("{:.1f}", bytes);
+
+    int module_length = unit.length() + bytes_string.length();
+    for(int i = 0; i < 10 - module_length; ++i) {
+        spaces.append(" ");
+    }
+    return fmt::format("{0}{1} {2}", spaces, bytes_string, unit);
 }
