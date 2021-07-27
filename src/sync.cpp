@@ -34,7 +34,8 @@ bool SyncHandler::refresh_rices(unsigned short &level)
 {
     utils.colon_log("Synchronizing rice databases...");
 
-    utils.show_cursor(false);
+    Utils::show_cursor(false);
+    Utils::handle_signals(true);
     
     for(int i = 0; i < databases.db_list.size(); i++) {
         Database &db = databases.get(i);
@@ -69,7 +70,8 @@ bool SyncHandler::refresh_rices(unsigned short &level)
         }
     }
 
-    utils.show_cursor(true);
+    Utils::show_cursor(true);
+    Utils::handle_signals(false);
 
     return true;
 }

@@ -2,6 +2,7 @@
 #include "constants.hpp"
 
 #include <iostream>
+#include <csignal>
 
 Utils::Utils(RicemanConfig &conf)
     : config{conf} {};
@@ -70,4 +71,21 @@ void Utils::show_cursor(const bool status)
 {
 	if (status) std::cout << "\033[?25h";
 	else std::cout << "\033[?25l";
+}
+
+void Utils::handle_signals(const bool status)
+{
+	if (status) {
+		signal(SIGINT, Utils::handle_sigint);
+	} else {
+		signal(SIGINT, NULL);
+	}
+	
+}
+
+void Utils::handle_sigint(int signum)
+{
+	show_cursor(true);
+	std::cout << "error: interrupt received" << std::endl;
+	exit(signum);
 }
