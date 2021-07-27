@@ -58,6 +58,7 @@ const short Database::refresh()
 
     print_base_progress_bar('-', 0);
     start_time = Clock::now();
+
     cpr::Response r = cpr::Get(cpr::Url{remote_uri},
                       cpr::ProgressCallback(std::bind(&Database::progress_callback, this, _1, _2, _3, _4)));
     std::cout << std::endl;
