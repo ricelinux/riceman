@@ -22,7 +22,7 @@ CFLAGS  := $(shell pkg-config --cflags $(LIBS))
 LDFLAGS := $(shell pkg-config --libs $(LIBS))
 
 $(BIN): $(OBJECTS) $(HEADERS) $(CPR_OBJECTS)
-	$(CC) -o $(BIN) $(OBJECTS) $(CPR_OBJECTS) $(HEADERS) $(LDFLAGS) $(INCFLAGS)
+	$(CC) -o $(BIN) $(OBJECTS) $(CPR_OBJECTS) $(LDFLAGS) $(INCFLAGS)
 
 $(OBJ)/%.o: $(SRC)/%.cpp | $(OBJ)
 	$(CC) -c $< -o $@ -D VERSION=\"$(VERSION)\" $(CFLAGS) $(INCFLAGS)
