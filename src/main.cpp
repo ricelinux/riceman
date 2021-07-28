@@ -62,6 +62,8 @@ int main(int argc, char *argv[])
     ADD_ARGUMENTS(argparser, op_opts);
     ADD_ARGUMENTS(argparser, SyncHandler::op_modifiers);
 
+    argparser.add_argument("targets").remaining();
+
     try {
         argparser.parse_args(argc, argv);
     } catch (const std::runtime_error& err) {
