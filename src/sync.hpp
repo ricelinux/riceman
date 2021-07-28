@@ -15,9 +15,13 @@ class SyncHandler: public OperationHandler
 
     private:
 
-    bool refresh_rices(unsigned short &level);
+    bool refresh_rices();
+    bool install_rices();
+
+    std::vector<std::string> targets;
 
     /* Operation Modifiers */
     unsigned short refresh;
     bool upgrade;
+    bool install;
 };

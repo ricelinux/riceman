@@ -8,29 +8,32 @@ const struct option<int> SyncHandler::op_modifiers[SyncHandler::s_op_modifiers] 
 };
 
 SyncHandler::SyncHandler(argparse::ArgumentParser &parser, RicemanConfig &conf, Utils &util, DatabaseCollection &database_col) 
-: OperationHandler(parser, conf, util, database_col)
+: OperationHandler(parser, conf, util, database_col), install{true}
 {
     if (argparser.is_used("--refresh")) {
         refresh = argparser.get_length("--refresh");
+        install = false;
     }
     if (argparser.is_used("--upgrade")) {
         upgrade = argparser.get<int>("--upgrade");
+        install = false;
+    }
+    if (argparser.is_used("targets")) {
+        targets = argparser.get<std::vector<std::string>>("targets");
     }
 }
 
 bool SyncHandler::run()
 {
-    if (refresh) refresh_rices(refresh);
-
-    if (upgrade) {
-        utils.log(LOG_ALL, "Upgrading all rices.");
-    }
+    if (refresh) refresh_rices();
+    if (upgrade) utils.log(LOG_ALL, "Upgrading all rices.");
+    if (install) install_rices();
 
     return true;
 }
 
 /* Backend code */
-bool SyncHandler::refresh_rices(unsigned short &level)
+bool SyncHandler::refresh_rices()
 {
     utils.colon_log("Synchronizing rice databases...");
 
@@ -54,7 +57,7 @@ bool SyncHandler::refresh_rices(unsigned short &level)
             exit(EXIT_FAILURE);
         }
         
-        if (local_hash.compare(remote_hash) != 0 || level == 2) {
+        if (local_hash.compare(remote_hash) != 0 || refresh == 2) {
             switch(db.refresh()) {
                 case -2:
                     utils.log(LOG_ERROR, "failed to write database to file");
@@ -72,6 +75,22 @@ bool SyncHandler::refresh_rices(unsigned short &level)
 
     Utils::show_cursor(true);
     Utils::handle_signals(false);
+
+    return true;
+}
+
+bool SyncHandler::install_rices()
+{
+    if (targets.size() == 0) {
+        utils.log(LOG_ERROR, "no targets specified");
+        exit(EXIT_FAILURE);
+    }
+
+    for (int i = 0; i < targets.size(); ++i)
+    {
+        std::string &target = targets[i];
+        
+    }
 
     return true;
 }
