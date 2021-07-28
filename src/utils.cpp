@@ -35,6 +35,7 @@ const bool Utils::log(const int level, const std::string &message)
 	
 	switch(level)
 	{
+		case LOG_FATAL:
 		case LOG_ERROR:
 			std::cout << config.colors.err << "error: " << config.colors.nocolor; 
 			break;
@@ -53,6 +54,12 @@ const bool Utils::log(const int level, const std::string &message)
 	}
 
 	std::cout << message << std::endl;
+
+	if (level == LOG_FATAL) {
+		show_cursor(true);
+		handle_signals(false);
+		exit(EXIT_FAILURE);
+	}
 
 	return true;
 }

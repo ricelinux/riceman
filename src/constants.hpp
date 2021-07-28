@@ -64,9 +64,10 @@ enum {
 /* Log levels */
 enum {
 	LOG_ALL 		= 1,
-	LOG_ERROR 		= (1 << 1),
-	LOG_WARNING		= (1 << 2),
-	LOG_DEBUG		= (1 << 3)
+	LOG_FATAL		= (1 << 1),
+	LOG_ERROR 		= (1 << 2),
+	LOG_WARNING		= (1 << 3),
+	LOG_DEBUG		= (1 << 4)
 };
 
 /* Color Option Level */

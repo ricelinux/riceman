@@ -38,10 +38,9 @@ bool set_op(ArgumentParser &argparser)
             }
         }
     } catch (const std::runtime_error& err) {
-        utils.log(LOG_ERROR, err.what());
-        exit(EXIT_FAILURE);
+        utils.log(LOG_FATAL, err.what());
     } catch (const std::logic_error& err) {
-        utils.log(LOG_ERROR, err.what());
+        utils.log(LOG_FATAL, err.what());
         exit(EXIT_FAILURE);
     }
     return true;
@@ -67,17 +66,14 @@ int main(int argc, char *argv[])
     try {
         argparser.parse_args(argc, argv);
     } catch (const std::runtime_error& err) {
-        utils.log(LOG_ERROR, err.what());
-        exit(EXIT_FAILURE);
+        utils.log(LOG_FATAL, err.what());
     } catch (const std::logic_error& err) {
-        utils.log(LOG_ERROR, err.what());
-        exit(EXIT_FAILURE);
+        utils.log(LOG_FATAL, err.what());
     }
     
     /* If attempting to set operation fails */
     if (!set_op(argparser)) {
-        utils.log(LOG_ERROR, "too many operations specified");
-        exit(EXIT_FAILURE);
+        utils.log(LOG_FATAL, "too many operations specified");
     }
 
     switch(config.op)
@@ -91,8 +87,7 @@ int main(int argc, char *argv[])
         case OP_QUERY:
             break;
         default:
-            utils.log(LOG_ERROR, "no operation specified");
-            exit(EXIT_FAILURE);
+            utils.log(LOG_FATAL, "no operation specified");
     }
 
     ophandler->run();

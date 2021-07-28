@@ -53,19 +53,16 @@ bool SyncHandler::refresh_rices()
             remote_hash = db.get_remote_hash();
         } catch (std::runtime_error err) {
             std::cout << "\n";
-            utils.log(LOG_ERROR, err.what());
-            exit(EXIT_FAILURE);
+            utils.log(LOG_FATAL, err.what());
         }
         
         if (local_hash.compare(remote_hash) != 0 || refresh == 2) {
             switch(db.refresh()) {
                 case -2:
-                    utils.log(LOG_ERROR, "failed to write database to file");
-                    exit(EXIT_FAILURE);
+                    utils.log(LOG_FATAL, "failed to write database to file");
                     break;
                 case -1:
-                    utils.log(LOG_ERROR, "failed to download database");
-                    exit(EXIT_FAILURE);
+                    utils.log(LOG_FATAL, "failed to download database");
                     break;
             }
         } else {
@@ -82,8 +79,7 @@ bool SyncHandler::refresh_rices()
 bool SyncHandler::install_rices()
 {
     if (targets.size() == 0) {
-        utils.log(LOG_ERROR, "no targets specified");
-        exit(EXIT_FAILURE);
+        utils.log(LOG_FATAL, "no targets specified");
     }
 
     for (int i = 0; i < targets.size(); ++i)

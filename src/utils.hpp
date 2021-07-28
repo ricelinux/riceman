@@ -4,7 +4,7 @@
 
 #include "config.hpp"
 
-#define NEEDS_ROOT(utils) if (geteuid() != 0) { utils.log(LOG_ERROR, "you must be root to perform this operation"); exit(EXIT_FAILURE); }
+#define NEEDS_ROOT(utils) if (geteuid() != 0) { utils.log(LOG_FATAL, "you must be root to perform this operation"); }
 
 class Utils
 {
