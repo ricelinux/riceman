@@ -61,19 +61,6 @@ enum {
 	OP_SYNC,
 };
 
-/* Long Operations */
-/* Note: set to 1000 so that there is a difference 
-   	     between characters and op codes */
-enum {
-	OP_LONG_MIN = 1000,
-	/* Sync opts */
-	OP_REFRESH,
-	OP_UPGRADES,
-
-	/* Global Opts */
-	OP_COLOR,
-};
-
 /* Log levels */
 enum {
 	LOG_ALL 		= 1,
