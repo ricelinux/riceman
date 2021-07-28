@@ -1,5 +1,7 @@
 #pragma once
 
+#include "progressbar.hpp"
+
 #include <string>
 #include <fstream>
 #include <cryptopp/sha.h>
@@ -25,15 +27,13 @@ class Database
     const std::string hash_sha256(std::string input);
     const bool local_exists();
     const bool create_local();
-    const int digit_count(double num);
 
-    std::string format_module(double bytes);
-    void set_column(int col);
-    void print_base_progress_bar(char progresschar, int percent);
     bool progress_callback(size_t downloadTotal, size_t downloadNow, size_t uploadTotal, size_t uploadNow);
 
     int progress_start;
     int progress_len;
 
     std::chrono::high_resolution_clock::time_point start_time;
+
+    ProgressBar *progress_bar;
 };
