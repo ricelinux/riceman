@@ -8,7 +8,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-ProgressBar::ProgressBar(const std::string &title, double percent_length)
+ProgressBar::ProgressBar(const std::string &title, double percent_length): title{title}
 {
     struct winsize window;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
@@ -16,41 +16,47 @@ ProgressBar::ProgressBar(const std::string &title, double percent_length)
     std::cout << "\r " << title;
 
     /* NOTE: the 7 is the length of the '[]', percent symbol, space after progress, and percent */
-
     progress_length = std::trunc(window.ws_col * percent_length) - 7;
     progress_start_pos = (window.ws_col - progress_length) - 7;
+    window_width = window.ws_col;
 
     update("", 0);
 }
 
 void ProgressBar::update(std::string prefix, double percentage)
 {
+    /* Trim leading white space */
+    prefix.erase(0, prefix.find_first_not_of(" "));
+
     /* Reset position */
     std::cout << "\r";
-
-    /* print prefix text, set position to start of progress bar */
-    set_column(progress_start_pos - prefix.length());
-    std::cout << prefix;
-    set_column(progress_start_pos);
     
-    /* print progress bar */
-    int completed_char_count = std::trunc(progress_length * percentage);
+    if (prefix.length() + title.length() > window_width) {
+        std::cout << prefix;
+    } else {
+        /* print prefix text, set position to start of progress bar */
+        set_column(progress_start_pos - prefix.length());
+        std::cout << prefix;
+        set_column(progress_start_pos);
+        
+        /* print progress bar */
+        int completed_char_count = std::trunc(progress_length * percentage);
 
-    std::cout << "[";
-    for (int i = 0; i < progress_length; ++i) {
-        if (i <= completed_char_count) std::cout << "#";
-        else std::cout << "-";
+        std::cout << "[";
+        for (int i = 0; i < progress_length; ++i) {
+            if (i <= completed_char_count) std::cout << "#";
+            else std::cout << "-";
+        }
+        std::cout << "] "; 
+
+        percentage *= 100;
+
+        /* print percentage */
+        if (percentage < 10) std::cout << "  ";
+        else if (percentage < 100) std::cout << " ";
+
+        std::cout << percentage << "%";
     }
-    std::cout << "] "; 
-
-    percentage *= 100;
-
-    /* print percentage */
-    if (percentage < 10) std::cout << "  ";
-    else if (percentage < 100) std::cout << " ";
-
-    std::cout << percentage << "%";
-
 }
 
 void ProgressBar::set_column(int col)

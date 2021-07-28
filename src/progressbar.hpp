@@ -15,7 +15,10 @@ class ProgressBar
 
     void set_column(int col);
 
-    int progress_start_pos;
+    unsigned int progress_start_pos;
     int progress_length;
+    unsigned short window_width;
+
+    const std::string &title;
 
 };
