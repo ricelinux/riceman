@@ -1,11 +1,8 @@
 #include "constants.hpp"
 
-#include "config.hpp"
 #include "utils.hpp"
 
 #include "database_collection.hpp"
-#include "option.hpp"
-#include "operation.hpp"
 #include "sync.hpp"
 
 #include "argparse/argparse.hpp"
