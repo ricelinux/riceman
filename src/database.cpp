@@ -49,6 +49,7 @@ const bool Database::local_exists()
 }
 
 /** Downloads a fresh copy of the database
+ * @param expected_hash the hash to be used for verifying the downloaded database
  * 
  * @returns -1 if request fails -2 if write fails, -3 if integrity check fails, 1 if successful
  */
@@ -58,9 +59,8 @@ const short Database::refresh(std::string expected_hash)
 
     progress_bar = new ProgressBar(db_name, 0.4);
     start_time = Clock::now();
+    cpr::Response r = cpr::Get(cpr::Url{remote_uri}, cpr::ProgressCallback(std::bind(&Database::progress_callback, this, _1, _2, _3, _4)));
 
-    cpr::Response r = cpr::Get(cpr::Url{remote_uri},
-                      cpr::ProgressCallback(std::bind(&Database::progress_callback, this, _1, _2, _3, _4)));
     std::cout << std::endl;
 
     delete progress_bar;

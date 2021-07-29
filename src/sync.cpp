@@ -45,8 +45,6 @@ bool SyncHandler::refresh_rices()
     for(int i = 0; i < databases.db_list.size(); i++) {
         Database &db = databases.get(i);
 
-        std::cout << " " << db.db_name; 
-
         std::string local_hash;
         std::string remote_hash;
 
@@ -62,6 +60,7 @@ bool SyncHandler::refresh_rices()
             switch(db.refresh(remote_hash)) {
                 case -3:
                     utils.log(LOG_FATAL, fmt::format("download of '{}' database corrupted.\n       temporary database still present in {} for debugging.", db.db_name, LOCAL_RICE_BASE_URI));
+                    break;
                 case -2:
                     utils.log(LOG_FATAL, "failed to write database to file");
                     break;
@@ -70,7 +69,7 @@ bool SyncHandler::refresh_rices()
                     break;
             }
         } else {
-            std::cout << " is up to date\n";
+            std::cout << " " << db.db_name << " is up to date\n";
         }
     }
 
@@ -86,10 +85,8 @@ bool SyncHandler::install_rices()
         utils.log(LOG_FATAL, "no targets specified");
     }
 
-    for (int i = 0; i < targets.size(); ++i)
-    {
+    for (int i = 0; i < targets.size(); ++i) {
         std::string &target = targets[i];
-        
     }
 
     return true;
