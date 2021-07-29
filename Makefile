@@ -1,4 +1,4 @@
-CC = g++
+CC = clang
 
 SRC := src
 OBJ := build
@@ -18,8 +18,8 @@ CPR_OBJECTS := $(patsubst $(CPR_SRC)/%.cpp, $(CPR_OBJ)/%.o, $(CPR_SOURCES))
 
 LIBS 	:= libcryptopp libcurl
 INCFLAGS := -Ideps/cpr/include -Ideps/argparse
-CFLAGS  := $(shell pkg-config --cflags $(LIBS))
-LDFLAGS := $(shell pkg-config --libs $(LIBS))
+CFLAGS  := $(shell pkg-config --cflags $(LIBS)) -std=c++17
+LDFLAGS := $(shell pkg-config --libs $(LIBS)) -lstdc++ -lm
 
 $(BIN): $(OBJECTS) $(HEADERS) $(CPR_OBJECTS)
 	$(CC) -o $(BIN) $(OBJECTS) $(CPR_OBJECTS) $(LDFLAGS) $(INCFLAGS)
