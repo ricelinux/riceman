@@ -21,7 +21,7 @@ typedef std::chrono::high_resolution_clock Clock;
 typedef std::chrono::milliseconds milliseconds;
 
 Database::Database(std::string name, std::string remoteuri)
-: db_name{name}, local_path{fmt::format("{}/{}{}", LOCAL_RICE_BASE_URI, name, ".db")}, remote_uri{remoteuri}, remote_hash_uri{fmt::format("{}.sha256sum", remoteuri)}
+: db_name{name}, local_path{fmt::format("{}/{}.db", LOCAL_RICE_BASE_URI, name)}, remote_uri{remoteuri}, remote_hash_uri{fmt::format("{}.sha256sum", remoteuri)}, local_tmp_path{fmt::format("{}.tmp", local_path)}
 {}
 
 const bool Database::create_local()
@@ -50,9 +50,9 @@ const bool Database::local_exists()
 
 /** Downloads a fresh copy of the database
  * 
- * @returns -1 if request fails, -2 if write fails, 1 if successful
+ * @returns -1 if request fails -2 if write fails, -3 if integrity check fails, 1 if successful
  */
-const short Database::refresh()
+const short Database::refresh(std::string expected_hash)
 {
     using namespace std::placeholders;
 
@@ -67,11 +67,17 @@ const short Database::refresh()
 
     if (r.error) return -1;
 
+    /* Save data to temp file */
     std::ofstream stream;
-    stream.open(local_path, std::fstream::out);
+    stream.open(local_tmp_path, std::fstream::out);
     if (!stream.is_open()) return -2;
-
     stream.write(r.text.c_str(), r.text.length());
+    stream.close();
+
+    /* Verify newly downloaded DB */
+    if (get_local_hash(local_tmp_path).compare(expected_hash) == 0) fs::rename(local_tmp_path, local_path);
+    else return -3; /* Integrity check failed */
+
     return 1;
 }
 
@@ -101,8 +107,13 @@ const std::string Database::get_remote_hash()
 
 const std::string Database::get_local_hash()
 {
-    if (!local_exists() && !create_local()) throw std::runtime_error{fmt::format("unable to access {}", local_path)};
-    std::ifstream file{local_path};
+    return get_local_hash(local_path);
+}
+
+const std::string Database::get_local_hash(std::string path)
+{
+    if (!local_exists() && !create_local()) throw std::runtime_error{fmt::format("unable to access {}", path)};
+    std::ifstream file{path};
     std::ostringstream ss;
 
     ss << file.rdbuf();
