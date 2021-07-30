@@ -13,7 +13,7 @@ SOURCES := $(wildcard $(SRC)/*.cpp)
 OBJECTS := $(patsubst $(SRC)/%.cpp, $(OBJ)/%.o, $(SOURCES))
 HEADERS := $(wildcard $(SRC)/*.hpp)
 
-CPR_SOURCES := $(wildcard $(CPR_SRC)/*.cpp) $(wildcard $(CPR_SRC)/internal/*.cpp)
+CPR_SOURCES := $(wildcard $(CPR_SRC)/*.cpp)
 CPR_OBJECTS := $(patsubst $(CPR_SRC)/%.cpp, $(CPR_OBJ)/%.o, $(CPR_SOURCES))
 
 LIBS 	:= libcryptopp libcurl fmt
