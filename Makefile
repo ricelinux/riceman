@@ -16,10 +16,16 @@ HEADERS := $(wildcard $(SRC)/*.hpp)
 CPR_SOURCES := $(wildcard $(CPR_SRC)/*.cpp) $(wildcard $(CPR_SRC)/internal/*.cpp)
 CPR_OBJECTS := $(patsubst $(CPR_SRC)/%.cpp, $(CPR_OBJ)/%.o, $(CPR_SOURCES))
 
-LIBS 	:= libcryptopp libcurl
+LIBS 	:= libcryptopp libcurl fmt
 INCFLAGS := -Ideps/cpr/include -Ideps/argparse
 CFLAGS  := $(shell pkg-config --cflags $(LIBS)) -std=c++17
 LDFLAGS := $(shell pkg-config --libs $(LIBS)) -lstdc++ -lm
+
+debug: CFLAGS += -O0
+debug: $(BIN)
+
+release: CFLAGS += -Os
+release: $(BIN)
 
 $(BIN): $(OBJECTS) $(HEADERS) $(CPR_OBJECTS)
 	$(CC) -o $(BIN) $(OBJECTS) $(CPR_OBJECTS) $(LDFLAGS) $(INCFLAGS)
