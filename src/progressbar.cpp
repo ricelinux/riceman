@@ -60,6 +60,11 @@ void ProgressBar::update(std::string prefix, double percentage)
     }
 }
 
+void ProgressBar::done()
+{
+    std::cout << std::endl;
+}
+
 bool ProgressBar::progress_callback_download(size_t dtotal, size_t dnow, size_t utotal, size_t unow)
 {
     milliseconds millis = std::chrono::duration_cast<milliseconds>(Clock::now() - start_time);
