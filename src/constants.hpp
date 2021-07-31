@@ -19,8 +19,10 @@
 
 #define LOCAL_BASE_DIR "/var/lib/riceman"
 #define LOCAL_DB_DIR LOCAL_BASE_DIR "/database" 
-#define LOCAL_RICES_DIR LOCAL_BASE_DIR "/rices"
+#define LOCAL_TOML_DIR LOCAL_BASE_DIR "/rices"
 #define LOCAL_DB LOCAL_DB_DIR "/" DB_NAME
+
+#define LOCAL_RICES_DIR "/usr/share/rices"
 
 /* Colors */
 #define NOCOLOR       "\033[0m"
