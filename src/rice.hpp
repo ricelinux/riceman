@@ -6,13 +6,6 @@
 
 #include <git2.h>
 
-#define CREATE_DIRECTORY(path) \
-    if (fs::exists(path) && !fs::is_directory(path)) fs::remove(path); \
-    if (!fs::exists(path)) { \
-        fs::create_directory(path); \
-        fs::permissions(path, fs::perms::owner_all | fs::perms::group_exec | fs::perms::group_read | fs::perms::others_read | fs::perms::others_exec); \
-    }
-
 namespace fs = std::filesystem;
 
 typedef struct Dependency {
@@ -38,8 +31,7 @@ class Rice
     std::vector<Dependency> dependencies; 
 
     private:
-
-    void download_toml();
+    
     void clone_progress(const git_transfer_progress *stats, void *payload);
 
 };
