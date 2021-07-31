@@ -1,19 +1,26 @@
 #pragma once
 
 #include "progressbar.hpp"
+#include "rice.hpp"
 
 #include <string>
 #include <fstream>
 #include <cryptopp/sha.h>
 #include <cryptopp/hex.h>
 
-#define LOG_SPACES(count) for(int i = 0; i < count; ++i) std::cout << " ";
+#define CREATE_DIRECTORY(path) \
+    if (fs::exists(path) && !fs::is_directory(path)) fs::remove(path); \
+    if (!fs::exists(path)) { \
+        fs::create_directory(path); \
+        fs::permissions(path, fs::perms::owner_all | fs::perms::group_exec | fs::perms::group_read | fs::perms::others_read | fs::perms::others_exec); \
+    }
 
 class Database
 {
     public:
     Database(std::string name, std::string remoteuri);
 
+    Rice get_rice(std::string name);
     const std::string get_remote_hash();
     const std::string get_local_hash();
     const std::string get_local_hash(std::string path);
@@ -27,15 +34,12 @@ class Database
 
     private:
     const std::string hash_sha256(std::string input);
-    const bool local_exists();
     const bool create_local();
-
     bool progress_callback(size_t downloadTotal, size_t downloadNow, size_t uploadTotal, size_t uploadNow);
 
     int progress_start;
     int progress_len;
-
     std::chrono::high_resolution_clock::time_point start_time;
-
     ProgressBar *progress_bar;
+    std::vector<Rice> rices;
 };

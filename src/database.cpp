@@ -21,16 +21,53 @@ typedef std::chrono::high_resolution_clock Clock;
 typedef std::chrono::milliseconds milliseconds;
 
 Database::Database(std::string name, std::string remoteuri)
-: db_name{name}, local_path{fmt::format("{}/{}.db", LOCAL_RICE_BASE_URI, name)}, remote_uri{remoteuri}, remote_hash_uri{fmt::format("{}.sha256sum", remoteuri)}, local_tmp_path{fmt::format("{}.tmp", local_path)}
-{}
+: db_name{name}, local_path{fmt::format("{}/{}.db", LOCAL_DB_DIR, name)}, remote_uri{remoteuri}, remote_hash_uri{fmt::format("{}.sha256sum", remoteuri)}, local_tmp_path{fmt::format("{}.tmp", local_path)}
+{    
+    std::ifstream file{local_path};
+    if (file.is_open()) {
+        for(std::string line; std::getline(file, line); ) {
+            std::stringstream line_stream{line};
+            std::string rice_data[6];
+            std::vector<Dependency> deps;
+            int valuei = 0;
+            
+            for(std::string value; std::getline(line_stream, value, ','); ) {
+                rice_data[valuei] = value;
+                ++valuei;
+            }
+
+            std::stringstream deps_stream{rice_data[5]};
+            for(std::string dependency; std::getline(deps_stream, dependency, ';'); ) {
+                int slash_loc = dependency.find("/");
+                bool aur;
+                std::string type = dependency.substr(0, slash_loc);
+                if (type.compare("pacman") == 0) aur = false;
+                else if (type.compare("aur") == 0) aur = true;
+                else throw std::runtime_error{fmt::format("unexpected dependecy type found in theme '{}'", rice_data[0])};
+
+                deps.push_back({
+                    aur,
+                    dependency.substr(slash_loc + 1, dependency.length())
+                });
+            }
+            
+            const std::string info_file{fmt::format("{}/{}.toml", LOCAL_RICES_DIR, rice_data[1])};
+            bool installed = true;
+
+            if (!fs::exists(info_file) || !fs::is_regular_file(info_file)) installed = false;
+
+            rices.push_back(Rice(rice_data[0], rice_data[1], rice_data[2], rice_data[3], rice_data[4], deps, installed));
+        }
+    } 
+    /* If not open, don't throw error because it could be newly added or recently removed */
+    file.close();
+}
 
 const bool Database::create_local()
 {
-    if (fs::exists(LOCAL_RICE_BASE_URI) && !fs::is_directory(LOCAL_RICE_BASE_URI)) fs::remove(LOCAL_RICE_BASE_URI);
-    if (!fs::exists(LOCAL_RICE_BASE_URI)) {
-        fs::create_directory(LOCAL_RICE_BASE_URI);
-        fs::permissions(LOCAL_RICE_BASE_URI, fs::perms::owner_all | fs::perms::group_exec | fs::perms::group_read | fs::perms::others_read | fs::perms::others_exec);
-    }
+    CREATE_DIRECTORY(LOCAL_BASE_DIR);
+    CREATE_DIRECTORY(LOCAL_DB_DIR);
+    CREATE_DIRECTORY(LOCAL_RICES_DIR);
 
     std::ofstream stream;
 
@@ -41,11 +78,6 @@ const bool Database::create_local()
     fs::permissions(local_path, fs::perms::owner_read | fs::perms::owner_write | fs::perms::group_read | fs::perms::others_read);
     
     return true;
-}
-
-const bool Database::local_exists()
-{
-    return std::filesystem::exists(local_path);
 }
 
 /** Downloads a fresh copy of the database
@@ -107,18 +139,19 @@ const std::string Database::get_remote_hash()
 
 const std::string Database::get_local_hash()
 {
+    if (!fs::exists(local_path) && !create_local()) throw std::runtime_error{fmt::format("unable to access {}", local_path)};
     return get_local_hash(local_path);
 }
 
 const std::string Database::get_local_hash(std::string path)
-{
-    if (!local_exists() && !create_local()) throw std::runtime_error{fmt::format("unable to access {}", path)};
+{    
     std::ifstream file{path};
-    std::ostringstream ss;
+    if (file.is_open()) {
+        std::ostringstream ss;
+        ss << file.rdbuf();
 
-    ss << file.rdbuf();
-
-    return hash_sha256(ss.str());
+        return hash_sha256(ss.str());
+    } else throw std::runtime_error{fmt::format("unable to read '{}'", path)};
 }
 
 bool Database::progress_callback(size_t dtotal, size_t dnow, size_t utotal, size_t unow)
@@ -131,4 +164,9 @@ bool Database::progress_callback(size_t dtotal, size_t dnow, size_t utotal, size
     progress_bar->update(prefix, percentage);
 
     return true;
+}
+
+Rice Database::get_rice(std::string name)
+{
+    
 }
