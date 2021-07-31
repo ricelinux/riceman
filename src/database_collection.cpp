@@ -5,7 +5,7 @@
 DatabaseCollection::DatabaseCollection() {
     Utils::create_directory(LOCAL_BASE_DIR);
     Utils::create_directory(LOCAL_DB_DIR);
-    Utils::create_directory(LOCAL_TOML_DIR);
+    Utils::create_directory(LOCAL_CONFIG_DIR);
     Utils::create_directory(LOCAL_RICES_DIR);
 };
 
