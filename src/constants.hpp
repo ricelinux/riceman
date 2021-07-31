@@ -15,6 +15,7 @@
 #define DB_NAME "rices.db"
 
 #define REMOTE_BASE_URI "https://ricelinux.github.io/ricelinux-rices"
+#define REMOTE_RICES_URI REMOTE_BASE_URI "/rices" 
 #define REMOTE_DB REMOTE_BASE_URI "/" DB_NAME
 
 #define LOCAL_BASE_DIR "/var/lib/riceman"		
