@@ -2,7 +2,6 @@
 #include "constants.hpp"
 #include "utils.hpp"
 
-#include <sstream>
 #include <iostream>
 
 #include <fmt/format.h>
@@ -13,7 +12,8 @@
 
 Database::Database(std::string name, std::string remoteuri)
 : db_name{name}, local_path{fmt::format("{}/{}.db", LOCAL_DB_DIR, name)}, remote_uri{remoteuri}, remote_hash_uri{fmt::format("{}/rices.db.sha256sum", remoteuri)}, local_tmp_path{fmt::format("{}.tmp", local_path)}, remote_db{fmt::format("{}/rices.db", remoteuri)}
-{    
+{
+    create_local();
     std::ifstream file{local_path};
     if (file.is_open()) {
         for(std::string line; std::getline(file, line); ) {
@@ -56,15 +56,11 @@ Database::Database(std::string name, std::string remoteuri)
 
 const bool Database::create_local()
 {
-    CREATE_DIRECTORY(LOCAL_BASE_DIR);
-    CREATE_DIRECTORY(LOCAL_DB_DIR);
-    CREATE_DIRECTORY(LOCAL_RICES_DIR);
-
     std::ofstream stream;
 
-    stream.open(local_path, std::fstream::out);
+    stream.open(local_path, std::fstream::app);
     if (!stream.is_open()) return false;
-    stream.write("", 0);
+    stream.close();
 
     fs::permissions(local_path, fs::perms::owner_read | fs::perms::owner_write | fs::perms::group_read | fs::perms::others_read);
     
@@ -86,12 +82,7 @@ const short Database::refresh(std::string expected_hash)
 
     if (r.error) return -1;
 
-    /* Save data to temp file */
-    std::ofstream stream;
-    stream.open(local_tmp_path, std::fstream::out);
-    if (!stream.is_open()) return -2;
-    stream.write(r.text.c_str(), r.text.length());
-    stream.close();
+    if (!Utils::write_file_content(local_tmp_path, r.text)) return -2;
 
     /* Verify newly downloaded DB */
     if (Utils::hash_file(local_tmp_path).compare(expected_hash) == 0) fs::rename(local_tmp_path, local_path);
