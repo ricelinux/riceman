@@ -94,7 +94,7 @@ void Utils::handle_sigint(int signum)
 	exit(signum);
 }
 
-const std::string get_file_content(const std::string &path)
+const std::string Utils::get_file_content(const std::string &path)
 {
 	std::ifstream file{path};
     if (file.is_open()) {
@@ -105,7 +105,7 @@ const std::string get_file_content(const std::string &path)
     } else throw std::runtime_error{fmt::format("unable to read '{}'", path)};
 }
 
-const std::string get_uri_content(const std::string &uri)
+const std::string Utils::get_uri_content(const std::string &uri)
 {
 	cpr::Response r = cpr::Get(cpr::Url(uri));
     if (r.error) throw std::runtime_error{r.error.message};
@@ -113,7 +113,7 @@ const std::string get_uri_content(const std::string &uri)
     return r.text;
 }
 
-const std::string hash_sha256(const std::string &content)
+const std::string Utils::hash_sha256(const std::string &content)
 {
 	SHA256 hash;
     byte digest[SHA256::DIGESTSIZE];
@@ -129,7 +129,7 @@ const std::string hash_sha256(const std::string &content)
     return output;
 }
 
-const std::string hash_file(const std::string &path)
+const std::string Utils::hash_file(const std::string &path)
 {
 	return hash_sha256(get_file_content(path));
 }
