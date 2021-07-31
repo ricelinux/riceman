@@ -59,7 +59,7 @@ bool SyncHandler::refresh_rices()
         if (local_hash.compare(remote_hash) != 0 || refresh == 2) {
             switch(db.refresh(remote_hash)) {
                 case -3:
-                    utils.log(LOG_FATAL, fmt::format("download of '{}' database corrupted.\n       temporary database still present in {} for debugging.", db.db_name, LOCAL_RICE_BASE_URI));
+                    utils.log(LOG_FATAL, fmt::format("download of '{}' database corrupted.\n       temporary database still present in {} for debugging.", db.db_name, LOCAL_DB_DIR));
                     break;
                 case -2:
                     utils.log(LOG_FATAL, "failed to write database to file");
