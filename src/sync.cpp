@@ -49,8 +49,8 @@ bool SyncHandler::refresh_rices()
         std::string remote_hash;
 
         try {
-            local_hash = db.get_local_hash();
-            remote_hash = db.get_remote_hash();
+            local_hash = Utils::hash_file(db.local_path);
+            remote_hash = Utils::get_uri_content(db.remote_hash_uri);
         } catch (std::runtime_error err) {
             std::cout << "\n";
             utils.log(LOG_FATAL, err.what());
@@ -79,14 +79,32 @@ bool SyncHandler::refresh_rices()
     return true;
 }
 
+/** This method first verifies the targets, then installs the installable rices, 
+ *  and finally outputs an error at the end containing the rices unable to be installed
+ */
 bool SyncHandler::install_rices()
 {
     if (targets.size() == 0) {
         utils.log(LOG_FATAL, "no targets specified");
     }
 
+    std::vector<std::string> incorrect_rice_names; 
+
+    /* Verify to-be-installed rices */
     for (int i = 0; i < targets.size(); ++i) {
         std::string &target = targets[i];
+        try {
+            Rice rice = databases.get_rice(target);
+            
+            try {
+                rice.install();
+            } catch (std::runtime_error err) {
+                utils.log(LOG_FATAL, err.what());
+            }
+            
+        } catch (std::runtime_error err) {
+            incorrect_rice_names.push_back(target);
+        }
     }
 
     return true;
