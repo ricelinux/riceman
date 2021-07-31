@@ -23,6 +23,7 @@ class Database
     const std::string local_path;
     const std::string local_tmp_path;
     const std::string remote_uri;
+    const std::string remote_db;
     const std::string remote_hash_uri;
 
     private:

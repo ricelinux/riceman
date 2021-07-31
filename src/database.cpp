@@ -19,7 +19,7 @@ typedef std::chrono::high_resolution_clock Clock;
 typedef std::chrono::milliseconds milliseconds;
 
 Database::Database(std::string name, std::string remoteuri)
-: db_name{name}, local_path{fmt::format("{}/{}.db", LOCAL_DB_DIR, name)}, remote_uri{remoteuri}, remote_hash_uri{fmt::format("{}.sha256sum", remoteuri)}, local_tmp_path{fmt::format("{}.tmp", local_path)}
+: db_name{name}, local_path{fmt::format("{}/{}.db", LOCAL_DB_DIR, name)}, remote_uri{remoteuri}, remote_hash_uri{fmt::format("{}.sha256sum", remoteuri)}, local_tmp_path{fmt::format("{}.tmp", local_path)}, remote_db{fmt::format("{}/rices.db", remoteuri)}
 {    
     std::ifstream file{local_path};
     if (file.is_open()) {
@@ -89,7 +89,7 @@ const short Database::refresh(std::string expected_hash)
 
     progress_bar = new ProgressBar(db_name, 0.4);
     start_time = Clock::now();
-    cpr::Response r = cpr::Get(cpr::Url{remote_uri}, cpr::ProgressCallback(std::bind(&Database::progress_callback, this, _1, _2, _3, _4)));
+    cpr::Response r = cpr::Get(cpr::Url{remote_db}, cpr::ProgressCallback(std::bind(&Database::progress_callback, this, _1, _2, _3, _4)));
 
     std::cout << std::endl;
 
