@@ -20,6 +20,7 @@ class Rice
     const std::string description;
     const std::string version;
     const std::string window_manager;
+    const std::string file_path;
     std::vector<Dependency> dependencies; 
 
 };
