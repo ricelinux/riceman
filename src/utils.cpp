@@ -1,6 +1,8 @@
 #include "utils.hpp"
 #include "constants.hpp"
 
+#include <sstream>
+
 Utils::Utils(RicemanConfig &conf)
     : config{conf} {};
 
@@ -94,15 +96,34 @@ void Utils::handle_sigint(int signum)
 	exit(signum);
 }
 
-const std::string Utils::get_file_content(const std::string &path)
+std::string Utils::get_file_content(const std::string &path)
 {
 	std::ifstream file{path};
     if (file.is_open()) {
         std::ostringstream ss;
         ss << file.rdbuf();
-
+		file.close();
         return ss.str();
     } else throw std::runtime_error{fmt::format("unable to read '{}'", path)};
+}
+
+const bool Utils::write_file_content(const std::string &path, const std::string &content)
+{
+	std::ofstream stream;
+    stream.open(path, std::fstream::out);
+    if (!stream.is_open()) return false;
+    stream.write(content.c_str(), content.length());
+    stream.close();
+	return true;
+}
+
+void Utils::create_directory(const std::string &path)
+{
+	if (fs::exists(path) && !fs::is_directory(path)) fs::remove(path);
+    if (!fs::exists(path)) {
+        fs::create_directory(path);
+        fs::permissions(path, fs::perms::owner_all | fs::perms::group_exec | fs::perms::group_read | fs::perms::others_read | fs::perms::others_exec);
+    }
 }
 
 const std::string Utils::get_uri_content(const std::string &uri)

@@ -3,6 +3,7 @@
 #include "config.hpp"
 
 #include <fstream>
+#include <filesystem>
 #include <sstream>
 #include <iostream>
 #include <csignal>
@@ -18,6 +19,8 @@
 
 using CryptoPP::byte, CryptoPP::SHA256;
 
+namespace fs = std::filesystem;
+
 class Utils
 {
     public:
@@ -30,8 +33,9 @@ class Utils
     static void show_cursor(const bool status);
     static void handle_signals(const bool status);
     static const std::string basename(const std::string &path);
-    static const std::string get_file_content(const std::string &path);
+    static std::string get_file_content(const std::string &path);
     static const bool write_file_content(const std::string &path, const std::string &content);
+    static void create_directory(const std::string &path);
     static const std::string get_uri_content(const std::string &uri);
     static const std::string hash_sha256(const std::string &content);
     static const std::string hash_file(const std::string &path);
