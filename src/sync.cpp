@@ -12,6 +12,8 @@ const struct option<int> SyncHandler::op_modifiers[SyncHandler::s_op_modifiers] 
 SyncHandler::SyncHandler(argparse::ArgumentParser &parser, RicemanConfig &conf, Utils &util, DatabaseCollection &database_col) 
 : OperationHandler(parser, conf, util, database_col), install{true}
 {
+    git_libgit2_init();
+    
     if (argparser.is_used("--refresh")) {
         refresh = argparser.get_length("--refresh");
         install = false;
