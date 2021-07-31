@@ -21,6 +21,7 @@ ProgressBar::ProgressBar(const std::string &title, double percent_length): title
     window_width = window.ws_col;
 
     update("", 0);
+    start_time = Clock::now();
 }
 
 void ProgressBar::update(std::string prefix, double percentage)
@@ -57,6 +58,18 @@ void ProgressBar::update(std::string prefix, double percentage)
 
         std::cout << percentage << "%";
     }
+}
+
+bool ProgressBar::progress_callback_download(size_t dtotal, size_t dnow, size_t utotal, size_t unow)
+{
+    milliseconds millis = std::chrono::duration_cast<milliseconds>(Clock::now() - start_time);
+    double rate = (double)dnow / millis.count();
+    double percentage = trunc((double)dnow / (double)(dtotal == 0 ? 1 : dtotal));
+    std::string prefix = fmt::format("{} {}/s ", ProgressBar::format_prefix_module(dnow), ProgressBar::format_prefix_module(rate * 1000));
+    
+    update(prefix, percentage);
+
+    return true;
 }
 
 void ProgressBar::set_column(int col)
