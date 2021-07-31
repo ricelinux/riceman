@@ -42,7 +42,7 @@ Database::Database(std::string name, std::string remoteuri)
                 });
             }
             
-            const std::string info_file{fmt::format("{}/{}.toml", LOCAL_RICES_DIR, rice_data[1])};
+            const std::string info_file{fmt::format("{}/{}.toml", LOCAL_CONFIG_DIR, rice_data[1])};
             bool installed = true;
 
             if (!fs::exists(info_file) || !fs::is_regular_file(info_file)) installed = false;

@@ -20,7 +20,7 @@
 
 #define LOCAL_BASE_DIR "/var/lib/riceman"		
 #define LOCAL_DB_DIR LOCAL_BASE_DIR "/database" /* Where all databases are written */
-#define LOCAL_TOML_DIR LOCAL_BASE_DIR "/rices"	/* Where all rice .toml's are written */
+#define LOCAL_CONFIG_DIR LOCAL_BASE_DIR "/rices"	/* Where all rice .toml's are written */
 
 #define LOCAL_RICES_DIR "/usr/share/rices"
 
