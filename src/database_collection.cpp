@@ -1,6 +1,12 @@
 #include "database_collection.hpp"
+#include "utils.hpp"
+#include "constants.hpp"
 
-DatabaseCollection::DatabaseCollection() {};
+DatabaseCollection::DatabaseCollection() {
+    Utils::create_directory(LOCAL_BASE_DIR);
+    Utils::create_directory(LOCAL_DB_DIR);
+    Utils::create_directory(LOCAL_RICES_DIR);
+};
 
 Database& DatabaseCollection::get(std::string &file_name)
 {
