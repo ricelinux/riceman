@@ -17,10 +17,9 @@
 #define REMOTE_BASE_URI "https://ricelinux.github.io/ricelinux-rices"
 #define REMOTE_DB REMOTE_BASE_URI "/" DB_NAME
 
-#define LOCAL_BASE_DIR "/var/lib/riceman"
-#define LOCAL_DB_DIR LOCAL_BASE_DIR "/database" 
-#define LOCAL_TOML_DIR LOCAL_BASE_DIR "/rices"
-#define LOCAL_DB LOCAL_DB_DIR "/" DB_NAME
+#define LOCAL_BASE_DIR "/var/lib/riceman"		
+#define LOCAL_DB_DIR LOCAL_BASE_DIR "/database" /* Where all databases are written */
+#define LOCAL_TOML_DIR LOCAL_BASE_DIR "/rices"	/* Where all rice .toml's are written */
 
 #define LOCAL_RICES_DIR "/usr/share/rices"
 
