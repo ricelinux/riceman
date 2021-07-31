@@ -7,7 +7,7 @@ arch=("x86_64")
 url="https://github.com/ricelinux/riceman"
 license=('GPL')
 depends=('curl' 'crypto++' 'fmt' 'libgit2')
-makedepends=('clang' 'git' 'cmake' 'make')
+makedepends=('clang' 'git' 'cmake' 'make' 'cpptoml')
 provides=('riceman')
 source=('git+https://github.com/ricelinux/riceman.git#commit=edb81944f8b03038d198fb18055e8d100977b5c9')
 noextract=()
