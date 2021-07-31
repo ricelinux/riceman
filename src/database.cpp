@@ -80,12 +80,9 @@ const short Database::refresh(std::string expected_hash)
 {
     using namespace std::placeholders;
 
-    progress_bar = new ProgressBar(db_name, 0.4);
-    cpr::Response r = cpr::Get(cpr::Url{remote_db}, cpr::ProgressCallback(std::bind(&ProgressBar::progress_callback_download, progress_bar, _1, _2, _3, _4)));
-
-    std::cout << std::endl;
-
-    delete progress_bar;
+    ProgressBar progress_bar{db_name, 0.4};
+    cpr::Response r = cpr::Get(cpr::Url{remote_db}, cpr::ProgressCallback(std::bind(&ProgressBar::progress_callback_download, &progress_bar, _1, _2, _3, _4)));
+    progress_bar.done();
 
     if (r.error) return -1;
 

@@ -23,7 +23,6 @@ class Database
 
     private:
     const bool create_local();
-
-    ProgressBar *progress_bar;
+    
     std::vector<Rice> rices;
 };
