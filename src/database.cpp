@@ -3,7 +3,6 @@
 
 #include <fstream>
 #include <sstream>
-#include <filesystem>
 
 #include <cpr/cpr.h>
 #include <fmt/format.h>
@@ -16,7 +15,6 @@
 
 using CryptoPP::byte, CryptoPP::SHA256;
 
-namespace fs = std::filesystem;
 typedef std::chrono::high_resolution_clock Clock;
 typedef std::chrono::milliseconds milliseconds;
 
@@ -166,7 +164,10 @@ bool Database::progress_callback(size_t dtotal, size_t dnow, size_t utotal, size
     return true;
 }
 
-Rice Database::get_rice(std::string name)
+Rice& Database::get_rice(std::string name)
 {
-    
+    for (int i = 0; i < rices.size(); ++i) {
+        if (rices[i].name.compare(name) == 0) return rices[i];
+    }
+    throw std::runtime_error{""}; /* No need to waste processing on formatting an error message since it won't be displayed */
 }
