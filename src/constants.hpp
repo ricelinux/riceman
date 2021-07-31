@@ -12,16 +12,15 @@
 #endif
 
 /* Repository Info */
-#define RICE_DB_NAME "rices.db"
-#define RICE_DB_SUM_NAME RICE_DB_NAME ".sha256sum"
+#define DB_NAME "rices.db"
 
-#define REMOTE_RICE_BASE_URI "https://ricelinux.github.io/ricelinux-rices"
-#define REMOTE_RICE_DB REMOTE_RICE_BASE_URI "/" RICE_DB_NAME
-#define REMOTE_RICE_DB_HASH REMOTE_RICE_BASE_URI "/" RICE_DB_SUM_NAME
+#define REMOTE_BASE_URI "https://ricelinux.github.io/ricelinux-rices"
+#define REMOTE_DB REMOTE_BASE_URI "/" DB_NAME
 
-#define LOCAL_RICE_BASE_URI "/var/lib/riceman"
-#define LOCAL_RICE_DB LOCAL_RICE_BASE_URI "/" RICE_DB_NAME
-#define LOCAL_RICE_DB_HASH LOCAL_RICE_BASE_URI "/" RICE_DB_SUM_NAME
+#define LOCAL_BASE_DIR "/var/lib/riceman"
+#define LOCAL_DB_DIR LOCAL_BASE_DIR "/database" 
+#define LOCAL_RICES_DIR LOCAL_BASE_DIR "/rices"
+#define LOCAL_DB LOCAL_DB_DIR "/" DB_NAME
 
 /* Colors */
 #define NOCOLOR       "\033[0m"
