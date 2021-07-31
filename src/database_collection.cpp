@@ -25,3 +25,14 @@ Database& DatabaseCollection::add(std::string name, std::string remote_uri)
 {
     return add(*(new Database{name, remote_uri}));
 }
+
+Rice& DatabaseCollection::get_rice(std::string name)
+{
+    for (int i = 0; i < db_list.size(); ++i) {
+        try {
+            return db_list[i].get_rice(name);
+        } catch (std::runtime_error err) {/* Can't find rice in current database */};
+    }
+
+    throw std::runtime_error{""}; /* No need to waste processing on formatting an error message since it won't be displayed */
+}
