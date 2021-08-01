@@ -37,14 +37,50 @@ static void checkout_progress(const char *path, size_t cur, size_t tot, void *pa
 	std::cout << pd->completed_steps << "/" << pd->total_steps << std::endl;
 }
 
+void Rice::handle_libgit_error(int &error)
+{
+    const git_error *err = git_error_last();
+    if (err) throw std::runtime_error{fmt::format("{} (error code {})", err->message, err->klass)};
+    else throw std::runtime_error{fmt::format("unknown libgit2 error occurred (error code {})", error)};  
+    git_error_clear();
+}
+
+const bool Rice::repo_exists(const std::string &path, git_repository **repo)
+{
+    if (!fs::exists(path) || !fs::is_directory(path)) return false;
+
+    int error = git_repository_open_ext(repo, path.c_str(), GIT_REPOSITORY_OPEN_NO_SEARCH, NULL);
+
+    return error >= 0;
+}
+
+const std::string Rice::get_head_hash(git_repository *repo)
+{
+    int error;
+    git_object *commit;
+    char commit_hash[40];
+    const git_oid *commit_oid;
+    
+    error = git_revparse_single(&commit, repo, "HEAD");
+    if (error < 0) handle_libgit_error(error);
+    if (git_object_type(commit) == GIT_OBJECT_COMMIT) {
+        commit_oid = git_commit_id((git_commit*)commit);
+        git_oid_tostr(commit_hash, 40, commit_oid);
+        git_object_free(commit);
+
+        return commit_hash;
+    }
+    
+    /* This should never happen */
+    throw std::runtime_error{"incorrect git object type for 'HEAD'"};
+}
+
 void Rice::cred_acquire(git_credential **out, const char *url, const char *username_from_url, unsigned int allowed_types, void *payload) {
     return throw std::runtime_error{fmt::format("'{}' requires additional authentication", url)};
 }
 
 void Rice::install()
 {
-    git_libgit2_init();
-
     /* Download rice's toml */
     using namespace std::placeholders;
     ProgressBar clone_progress_bar{"cloning rice repo", 0.4};
@@ -63,25 +99,26 @@ void Rice::install()
     if (git_repo_uri.length() == 0) throw std::runtime_error{fmt::format("git repository uri not specified in '{}' config", name)};
     if (git_commit_hash.length() == 0) throw std::runtime_error{fmt::format("git commit hash not specified in '{}' config", name)};
 
-    /* Clone git repo */
-    progress_data pd = {{0}};
-    git_repository *repo = nullptr;
-    git_clone_options clone_opts = GIT_CLONE_OPTIONS_INIT;
-    git_checkout_options checkout_opts = GIT_CHECKOUT_OPTIONS_INIT;
-    
-    checkout_opts.checkout_strategy = GIT_CHECKOUT_SAFE;
-	checkout_opts.progress_cb = checkout_progress;
-	checkout_opts.progress_payload = &pd;
-	clone_opts.checkout_opts = checkout_opts;
-	clone_opts.fetch_opts.callbacks.sideband_progress = sideband_progress;
-	clone_opts.fetch_opts.callbacks.transfer_progress = &fetch_progress;
-	clone_opts.fetch_opts.callbacks.credentials = (git_credential_acquire_cb)Rice::cred_acquire;
-	clone_opts.fetch_opts.callbacks.payload = &pd;
+    /* Check if git repo exists, verify commit hash */
+    git_repository *repo = NULL;
+    if (!repo_exists(git_path, &repo)) {
+        /* Clone git repo */
+        progress_data pd = {{0}};
+        git_clone_options clone_opts = GIT_CLONE_OPTIONS_INIT;
+        git_checkout_options checkout_opts = GIT_CHECKOUT_OPTIONS_INIT;
+        
+        checkout_opts.checkout_strategy = GIT_CHECKOUT_SAFE;
+        checkout_opts.progress_cb = checkout_progress;
+        checkout_opts.progress_payload = &pd;
+        clone_opts.checkout_opts = checkout_opts;
+        clone_opts.fetch_opts.callbacks.sideband_progress = sideband_progress;
+        clone_opts.fetch_opts.callbacks.transfer_progress = &fetch_progress;
+        clone_opts.fetch_opts.callbacks.credentials = (git_credential_acquire_cb)Rice::cred_acquire;
+        clone_opts.fetch_opts.callbacks.payload = &pd;
 
-    int clone_error = git_clone(&repo, git_repo_uri.c_str(), git_path.c_str(), &clone_opts);
-    if (clone_error != 0) {
-        const git_error *err = git_error_last();
-		if (err) throw std::runtime_error{fmt::format("{} (error code {})", err->message, err->klass)};
-		else throw std::runtime_error{fmt::format("error cloning git repository", clone_error)};
+        int error = git_clone(&repo, git_repo_uri.c_str(), git_path.c_str(), &clone_opts);
+        if (error < 0) handle_libgit_error(error);
     }
+
+    
 }

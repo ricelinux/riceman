@@ -49,6 +49,10 @@ class Rice
 
     private:
     
+    const bool repo_exists(const std::string &path, git_repository **repo);
+    const std::string get_head_hash(git_repository *repo);
+    void handle_libgit_error(int &error);
+
     static void clone_progress(const progress_data *pd);
     static void cred_acquire(git_credential **out,
 		const char *url,
