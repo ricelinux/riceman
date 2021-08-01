@@ -83,8 +83,7 @@ void Rice::install()
 {
     /* Download rice's toml */
     using namespace std::placeholders;
-    ProgressBar clone_progress_bar{"cloning rice repo", 0.4};
-    ProgressBar progress_bar{fmt::format("downloading rice config", name, version), 0.4};
+    ProgressBar progress_bar{"downloading rice config", 0.4};
     cpr::Response r = cpr::Get(cpr::Url{fmt::format("{}/{}.toml", REMOTE_RICES_URI, id)}, cpr::ProgressCallback{std::bind(&ProgressBar::progress_callback_download, &progress_bar, _1, _2, _3, _4)});
     progress_bar.done();
 
@@ -120,5 +119,4 @@ void Rice::install()
         if (error < 0) handle_libgit_error(error);
     }
 
-    
 }
