@@ -1,12 +1,4 @@
 #include "rice.hpp"
-#include "progressbar.hpp"
-#include "constants.hpp"
-#include "utils.hpp"
-
-#include <fmt/format.h>
-#include <cpr/cpr.h>
-#include <git2.h>
-#include <cpptoml.h>
 
 Rice::Rice(std::string name, std::string id, std::string description, std::string version, std::string window_manager, std::vector<Dependency> dependencies, bool installed)
 : name{name}, id{id}, description{description}, version{version}, window_manager{window_manager}, dependencies{dependencies}, installed{installed}, toml_path{fmt::format("{}/{}.toml", LOCAL_CONFIG_DIR, id)}, git_path{fmt::format("{}/{}", LOCAL_RICES_DIR, id)}
@@ -25,8 +17,9 @@ static int fetch_progress(const git_indexer_progress *stats, void *payload)
 {
 	progress_data *pd = (progress_data*)payload;
 	pd->fetch_progress = *stats;
-	std::cout << pd->completed_steps << "/" << pd->total_steps << std::endl;
-	return 0;
+	std::cout << "Fetch progress: " << pd->fetch_progress.received_objects << "/" << pd->fetch_progress.total_objects << std::endl;
+    std::cout << "Delta progress: " << pd->fetch_progress.indexed_deltas << "/" << pd->fetch_progress.total_deltas << std::endl;
+    return 0;
 }
 static void checkout_progress(const char *path, size_t cur, size_t tot, void *payload)
 {
@@ -34,7 +27,7 @@ static void checkout_progress(const char *path, size_t cur, size_t tot, void *pa
 	pd->completed_steps = cur;
 	pd->total_steps = tot;
 	pd->path = path;
-	std::cout << pd->completed_steps << "/" << pd->total_steps << std::endl;
+	std::cout << cur << "/" << tot << std::endl;
 }
 
 void Rice::handle_libgit_error(int &error)
@@ -83,9 +76,11 @@ void Rice::install()
 {
     /* Download rice's toml */
     using namespace std::placeholders;
-    ProgressBar progress_bar{"downloading rice config", 0.4};
-    cpr::Response r = cpr::Get(cpr::Url{fmt::format("{}/{}.toml", REMOTE_RICES_URI, id)}, cpr::ProgressCallback{std::bind(&ProgressBar::progress_callback_download, &progress_bar, _1, _2, _3, _4)});
-    progress_bar.done();
+    progress_bar = new ProgressBar{"downloading rice config", 0.4};
+    cpr::Response r = cpr::Get(cpr::Url{fmt::format("{}/{}.toml", REMOTE_RICES_URI, id)}, cpr::ProgressCallback{std::bind(&ProgressBar::progress_callback_download, progress_bar, _1, _2, _3, _4)});
+    progress_bar->done();
+
+    delete progress_bar;
 
     if (!Utils::write_file_content(toml_path, r.text)) throw std::runtime_error{fmt::format("unable to write to '{}'", toml_path)};
 
@@ -99,6 +94,8 @@ void Rice::install()
     if (git_commit_hash.length() == 0) throw std::runtime_error{fmt::format("git commit hash not specified in '{}' config", name)};
 
     /* Check if git repo exists, verify commit hash */
+    progress_bar = new ProgressBar{"cloning repository", 0.4};
+
     git_repository *repo = NULL;
     if (!repo_exists(git_path, &repo)) {
         /* Clone git repo */
@@ -118,5 +115,8 @@ void Rice::install()
         int error = git_clone(&repo, git_repo_uri.c_str(), git_path.c_str(), &clone_opts);
         if (error < 0) handle_libgit_error(error);
     }
+
+    progress_bar->done();
+    delete progress_bar;
 
 }
