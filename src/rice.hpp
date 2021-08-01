@@ -1,10 +1,17 @@
 #pragma once
 
+#include "progressbar.hpp"
+#include "constants.hpp"
+#include "utils.hpp"
+
+#include <fmt/format.h>
+#include <cpr/cpr.h>
+#include <git2.h>
+#include <cpptoml.h>
+
 #include <string>
 #include <vector>
 #include <filesystem>
-
-#include <git2.h>
 
 namespace fs = std::filesystem;
 
@@ -59,5 +66,7 @@ class Rice
 		const char *username_from_url,
 		unsigned int allowed_types,
 		void *payload);
+
+    ProgressBar *progress_bar;
 
 };
