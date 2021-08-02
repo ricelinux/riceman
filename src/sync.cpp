@@ -97,7 +97,7 @@ bool SyncHandler::install_rices()
         std::string &target = targets[i];
         try {
             Rice rice = databases.get_rice(target);
-            
+            utils.colon_log("Installing rices...");
             try {
                 rice.install();
             } catch (std::runtime_error err) {
