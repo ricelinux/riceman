@@ -62,7 +62,14 @@ void ProgressBar::update(std::string prefix, double percentage)
 
 void ProgressBar::done()
 {
-    std::cout << std::endl;
+    set_column(progress_start_pos);
+
+    /* print completed bar */
+    std::cout << "[";
+    for (int i = 0; i < progress_length; ++i) {
+        std::cout << "#";
+    }
+    std::cout << "] 100%" << std::endl;
 }
 
 bool ProgressBar::progress_callback_download(size_t dtotal, size_t dnow, size_t utotal, size_t unow)
