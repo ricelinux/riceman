@@ -1,37 +1,31 @@
 #include "rice.hpp"
 
+// Needs to be defined here because of static functions
+ProgressBar *progress_bar;
+
 Rice::Rice(std::string name, std::string id, std::string description, std::string version, std::string window_manager, std::vector<Dependency> dependencies, bool installed)
 : name{name}, id{id}, description{description}, version{version}, window_manager{window_manager}, dependencies{dependencies}, installed{installed}, toml_path{fmt::format("{}/{}.toml", LOCAL_CONFIG_DIR, id)}, git_path{fmt::format("{}/{}", LOCAL_RICES_DIR, id)}
 {}
 
-static int sideband_progress(const char *str, int len, void *payload)
-{
-	(void)payload; /* unused */
-
-	printf("remote: %.*s", len, str);
-	fflush(stdout);
-	return 0;
-}
-
-static int fetch_progress(const git_indexer_progress *stats, void *payload)
-{
-	progress_data *pd = (progress_data*)payload;
-	pd->fetch_progress = *stats;
-	std::cout << "Fetch progress: " << pd->fetch_progress.received_objects << "/" << pd->fetch_progress.total_objects << std::endl;
-    std::cout << "Delta progress: " << pd->fetch_progress.indexed_deltas << "/" << pd->fetch_progress.total_deltas << std::endl;
+int Rice::fetch_progress(const git_indexer_progress *stats, void *payload)
+{   
+    progress_bar->update("", ((double)stats->indexed_deltas+(double)stats->received_objects) / ((double)stats->total_deltas+(double)stats->total_objects));
     return 0;
 }
-static void checkout_progress(const char *path, size_t cur, size_t tot, void *payload)
+void Rice::checkout_progress(const char *path, size_t cur, size_t tot, void *payload)
 {
-	progress_data *pd = (progress_data*)payload;
-	pd->completed_steps = cur;
-	pd->total_steps = tot;
-	pd->path = path;
-	std::cout << cur << "/" << tot << std::endl;
+    if (cur == 0) {
+        progress_bar->done();
+        delete progress_bar;
+
+        progress_bar = new ProgressBar{"checking out commit", 0.4};
+    }
+    progress_bar->update("", cur / (tot + 1));
 }
 
-void Rice::handle_libgit_error(int &error)
+void Rice::handle_libgit_error(int error)
 {
+    if (error >= 0) return;
     const git_error *err = git_error_last();
     if (err) throw std::runtime_error{fmt::format("{} (error code {})", err->message, err->klass)};
     else throw std::runtime_error{fmt::format("unknown libgit2 error occurred (error code {})", error)};  
@@ -49,13 +43,12 @@ const bool Rice::repo_exists(const std::string &path, git_repository **repo)
 
 const std::string Rice::get_head_hash(git_repository *repo)
 {
-    int error;
     git_object *commit;
     char commit_hash[40];
     const git_oid *commit_oid;
     
-    error = git_revparse_single(&commit, repo, "HEAD");
-    if (error < 0) handle_libgit_error(error);
+    handle_libgit_error(git_revparse_single(&commit, repo, "HEAD"));
+
     if (git_object_type(commit) == GIT_OBJECT_COMMIT) {
         commit_oid = git_commit_id((git_commit*)commit);
         git_oid_tostr(commit_hash, 40, commit_oid);
@@ -104,19 +97,35 @@ void Rice::install()
         git_checkout_options checkout_opts = GIT_CHECKOUT_OPTIONS_INIT;
         
         checkout_opts.checkout_strategy = GIT_CHECKOUT_SAFE;
-        checkout_opts.progress_cb = checkout_progress;
+        checkout_opts.progress_cb = Rice::checkout_progress;
         checkout_opts.progress_payload = &pd;
         clone_opts.checkout_opts = checkout_opts;
-        clone_opts.fetch_opts.callbacks.sideband_progress = sideband_progress;
-        clone_opts.fetch_opts.callbacks.transfer_progress = &fetch_progress;
+        clone_opts.fetch_opts.callbacks.transfer_progress = Rice::fetch_progress;
         clone_opts.fetch_opts.callbacks.credentials = (git_credential_acquire_cb)Rice::cred_acquire;
         clone_opts.fetch_opts.callbacks.payload = &pd;
 
-        int error = git_clone(&repo, git_repo_uri.c_str(), git_path.c_str(), &clone_opts);
-        if (error < 0) handle_libgit_error(error);
+        handle_libgit_error(git_clone(&repo, git_repo_uri.c_str(), git_path.c_str(), &clone_opts));
+
+        /* Checkout repo with hash */
+        git_commit *commit;
+        git_oid commit_oid;
+        git_checkout_options final_checkout_opts = GIT_CHECKOUT_OPTIONS_INIT;
+        final_checkout_opts.checkout_strategy = GIT_CHECKOUT_SAFE;
+        
+
+        handle_libgit_error(git_oid_fromstr(&commit_oid, git_commit_hash.c_str()));
+        handle_libgit_error(git_commit_lookup(&commit, repo, &commit_oid));
+        handle_libgit_error(git_checkout_tree(repo, (const git_object *)commit, &final_checkout_opts));
+
+        /* Update HEAD */
+        handle_libgit_error(git_repository_set_head_detached(repo, &commit_oid));
+
+        git_commit_free(commit);
+
     }
 
     progress_bar->done();
     delete progress_bar;
+    
 
 }
