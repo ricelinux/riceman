@@ -56,7 +56,7 @@ void ProgressBar::update(std::string prefix, double percentage)
         if (percentage < 10) std::cout << "  ";
         else if (percentage < 100) std::cout << " ";
 
-        std::cout << percentage << "%";
+        std::cout << fmt::format("{:.0f}%", percentage);
     }
 }
 
