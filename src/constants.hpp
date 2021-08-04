@@ -59,7 +59,6 @@
 #define CURSOR_HIDE "\x1B[?25l"
 #define CURSOR_SHOW "\x1B[?25h"
 
-
 /* Operations */
 enum {
 	OP_UNSET = 1,
@@ -67,20 +66,4 @@ enum {
 	OP_UPGRADE,
 	OP_QUERY,
 	OP_SYNC,
-};
-
-/* Log levels */
-enum {
-	LOG_ALL 		= 0b00001,
-	LOG_FATAL		= 0b00010,
-	LOG_ERROR 		= 0b00100,
-	LOG_WARNING		= 0b01000,
-	LOG_DEBUG		= 0b10000,
-};
-
-/* Color Option Level */
-enum {
-	COLOR_UNSET = 1,
-	COLOR_ENABLED,
-	COLOR_DISABLED,
 };

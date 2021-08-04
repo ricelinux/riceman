@@ -11,6 +11,21 @@
 
 #define NEEDS_ROOT(utils) if (geteuid() != 0) { utils.log(LOG_FATAL, "you must be root to perform this operation"); }
 
+/* Declare log level enum */
+enum {
+	LOG_ALL 		= 0b00001,
+	LOG_FATAL		= 0b00010,
+	LOG_ERROR 		= 0b00100,
+	LOG_WARNING		= 0b01000,
+	LOG_DEBUG		= 0b10000,
+};
+
+/* Declare color states enum */
+enum {
+    COLOR_UNSET = 1,
+    COLOR_ENABLED,
+    COLOR_DISABLED,
+};
 class Utils
 {
     public:
@@ -36,4 +51,5 @@ class Utils
     private:
 
     static void handle_sigint(int signum);
+
 };

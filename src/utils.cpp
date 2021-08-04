@@ -10,7 +10,6 @@
 #include <fmt/format.h>
 
 namespace fs = std::filesystem;
-
 using CryptoPP::byte, CryptoPP::SHA256;
 
 Utils::Utils(RicemanConfig &conf)
