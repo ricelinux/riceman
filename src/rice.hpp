@@ -69,10 +69,10 @@ class Rice
 
     std::chrono::high_resolution_clock::time_point start_time;
 
-    const static short enum {
+    enum {
         NOT_INSTALLED  = 0b00,
         TOML_INSTALLED = 0b01,
         GIT_INSTALLED  = 0b10,
         BOTH_INSTALLED = 0b11,
-    }
+    };
 };
