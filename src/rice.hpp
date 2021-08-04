@@ -36,12 +36,11 @@ class Rice
         std::string description, 
         std::string version, 
         std::string window_manager,
-        std::vector<Dependency> dependencies, 
-        bool installed);
+        std::vector<Dependency> dependencies);
 
     void install();
 
-    bool installed;
+    int install_state;
     const std::string name;
     const std::string id;
     const std::string description;
@@ -70,4 +69,10 @@ class Rice
 
     std::chrono::high_resolution_clock::time_point start_time;
 
+    const static short enum {
+        NOT_INSTALLED  = 0b00,
+        TOML_INSTALLED = 0b01,
+        GIT_INSTALLED  = 0b10,
+        BOTH_INSTALLED = 0b11,
+    }
 };
