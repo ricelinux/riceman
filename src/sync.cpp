@@ -100,20 +100,29 @@ bool SyncHandler::install_rices()
         }
     }
 
-    /* Install all available rices */
+    /** Install all available rices **/
     utils.colon_log("Installing rices...");
     utils.rice_log(rices);
+    utils.colon_log("Proceed with installation? [Y/n] ", false);
+    
+    const char confirm = std::getchar();
+    if (confirm != '\n' && confirm != 'y' && confirm != 'Y') utils.log(LOG_FATAL, "install aborted");
 
-    /* If there are invalid rice names specified */
-    if (incorrect_rice_names.size() == 0) return true;
+    for (int i = 0; i < rices.size(); ++i) {
+        try {
+            rices[i].install();
+        } catch (std::runtime_error err) {
+            throw std::runtime_error{fmt::format("failed to install '{}'", rices[i].name)};
+        }
+    }
 
     /* Deal with invalid rice names */
+    if (incorrect_rice_names.size() == 0) return true;
+    
     utils.log(LOG_ERROR, fmt::format("target not found:"), false);
-
     for(int i = 0; i < incorrect_rice_names.size(); ++i) {
         utils.log(LOG_ALL, " " + incorrect_rice_names[i], false);
     }
-
     std::cout << std::endl;
 
     return true;
