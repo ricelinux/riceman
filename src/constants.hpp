@@ -19,10 +19,14 @@
 #define REMOTE_DB REMOTE_BASE_URI "/" DB_NAME
 
 #define LOCAL_BASE_DIR "/var/lib/riceman"		
-#define LOCAL_DB_DIR LOCAL_BASE_DIR "/database" /* Where all databases are written */
+#define LOCAL_DB_DIR LOCAL_BASE_DIR "/database"		/* Where all databases are written */
 #define LOCAL_CONFIG_DIR LOCAL_BASE_DIR "/rices"	/* Where all rice .toml's are written */
 
 #define LOCAL_RICES_DIR "/usr/share/rices"
+
+/* Display server session paths */
+#define XSESSIONS_PATH "/usr/share/xsessions"
+#define WSESSIONS_PATH "/usr/share/wayland-sessions"
 
 /* Colors */
 #define NOCOLOR       "\033[0m"
