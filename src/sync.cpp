@@ -108,11 +108,14 @@ bool SyncHandler::install_rices()
     const char confirm = std::getchar();
     if (confirm != '\n' && confirm != 'y' && confirm != 'Y') utils.log(LOG_FATAL, "install aborted");
 
+    Utils::show_cursor(false);
+    Utils::handle_signals(true);
+
     for (int i = 0; i < rices.size(); ++i) {
         try {
             rices[i].install();
         } catch (std::runtime_error err) {
-            throw std::runtime_error{fmt::format("failed to install '{}'", rices[i].name)};
+            utils.log(LOG_FATAL, err.what());
         }
     }
 
@@ -124,6 +127,9 @@ bool SyncHandler::install_rices()
         utils.log(LOG_ALL, " " + incorrect_rice_names[i], false);
     }
     std::cout << std::endl;
+
+    Utils::show_cursor(true);
+    Utils::handle_signals(false);
 
     return true;
 }

@@ -5,6 +5,7 @@
 #include <chrono>
 
 #include <git2.h>
+#include <cpptoml.h>
 
 typedef struct Dependency {
     bool aur;
@@ -21,8 +22,10 @@ class Rice
         std::string new_version, 
         std::string window_manager,
         std::vector<Dependency> dependencies);
-
-    void install();
+        
+    void install_toml();
+    void install_git();
+    void install_desktop();
 
     int install_state;
     const std::string name;
@@ -52,7 +55,7 @@ class Rice
 		void *payload);
 
     std::chrono::high_resolution_clock::time_point start_time;
-
+    std::shared_ptr<cpptoml::table> rice_config;
     enum {
         NOT_INSTALLED  = 0b000,
         TOML_INSTALLED = 0b001,

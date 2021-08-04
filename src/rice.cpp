@@ -5,7 +5,6 @@
 
 #include <fmt/format.h>
 #include <cpr/cpr.h>
-#include <cpptoml.h>
 
 #include <filesystem>
 
@@ -15,7 +14,9 @@ namespace fs = std::filesystem;
 ProgressBar *progress_bar;
 
 Rice::Rice(std::string name, std::string id, std::string description, std::string new_version, std::string window_manager, std::vector<Dependency> dependencies)
-: name{name}, id{id}, description{description}, version{new_version}, window_manager{window_manager}, dependencies{dependencies}, toml_path{fmt::format("{}/{}.toml", LOCAL_CONFIG_DIR, id)}, git_path{fmt::format("{}/{}", LOCAL_RICES_DIR, id)}, install_state{NOT_INSTALLED}
+: name{name}, id{id}, description{description}, version{new_version}, window_manager{window_manager},
+    dependencies{dependencies}, toml_path{fmt::format("{}/{}.toml", LOCAL_CONFIG_DIR, id)}, 
+    git_path{fmt::format("{}/{}", LOCAL_RICES_DIR, id)}, install_state{NOT_INSTALLED}
 {
     /* If .toml and git are installed */
     if (fs::exists(toml_path) && fs::is_regular_file(toml_path)) install_state = install_state | TOML_INSTALLED;
@@ -24,7 +25,7 @@ Rice::Rice(std::string name, std::string id, std::string description, std::strin
     /* If rice is up-to-date */
     if (install_state != BOTH_INSTALLED) return;
 
-    auto rice_config = cpptoml::parse_file(toml_path);
+    rice_config = cpptoml::parse_file(toml_path);
     
     std::string old_version = rice_config->get_qualified_as<std::string>("theme.version").value_or("");
     if (new_version.length() == 0) throw std::runtime_error{fmt::format("theme version not specified in '{}' config", name)};
@@ -95,12 +96,8 @@ void Rice::cred_acquire(git_credential **out, const char *url, const char *usern
     return throw std::runtime_error{fmt::format("'{}' requires additional authentication", url)};
 }
 
-void Rice::install()
+void Rice::install_toml()
 {
-    Utils::show_cursor(false);
-    Utils::handle_signals(true);
-
-    /* Download rice's toml */
     using namespace std::placeholders;
     progress_bar = new ProgressBar{"downloading rice config", 0.4};
     cpr::Response r = cpr::Get(cpr::Url{fmt::format("{}/{}.toml", REMOTE_RICES_URI, id)}, cpr::ProgressCallback{std::bind(&ProgressBar::progress_callback_download, progress_bar, _1, _2, _3, _4)});
@@ -111,14 +108,17 @@ void Rice::install()
     if (!Utils::write_file_content(toml_path, r.text)) throw std::runtime_error{fmt::format("unable to write to '{}'", toml_path)};
 
     /* Parse TOML (called cpptoml::parse_file in constructor and here because file is re-downloaded here) */
-    auto rice_config = cpptoml::parse_file(toml_path);
+    rice_config = cpptoml::parse_file(toml_path);
     
     git_repo_uri = rice_config->get_qualified_as<std::string>("git.repo").value_or("");
     git_commit_hash = rice_config->get_qualified_as<std::string>("git.commit").value_or("");
 
     if (git_repo_uri.length() == 0) throw std::runtime_error{fmt::format("git repository uri not specified in '{}' config", name)};
     if (git_commit_hash.length() == 0) throw std::runtime_error{fmt::format("git commit hash not specified in '{}' config", name)};
+}
 
+void Rice::install_git()
+{
     /* Check if git repo exists, verify commit hash */
     progress_bar = new ProgressBar{"cloning repository", 0.4};
 
@@ -156,7 +156,10 @@ void Rice::install()
     /* Stop progress bar */
     progress_bar->done();
     delete progress_bar;
-    
+}
+
+void Rice::install_desktop()
+{
     /** Create .desktop file in either /usr/share/xsessions or /usr/share/wayland-sessions **/
     progress_bar = new ProgressBar{"writing desktop file", 0.4};
 
@@ -186,7 +189,4 @@ void Rice::install()
 
     Utils::write_file_content(fmt::format("{}/{}.desktop", session_path, id), file_content);
     progress_bar->done();
-
-    Utils::show_cursor(true);
-    Utils::handle_signals(false);
 }
