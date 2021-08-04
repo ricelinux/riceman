@@ -1,9 +1,9 @@
 #pragma once
 
 #include "progressbar.hpp"
+#include "utils.hpp"
 #include "rice.hpp"
 #include "constants.hpp"
-#include "utils.hpp"
 
 #include <fmt/format.h>
 

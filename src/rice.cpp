@@ -1,10 +1,11 @@
 #include "rice.hpp"
+#include "utils.hpp"
 
 // Needs to be defined here because of static functions
 ProgressBar *progress_bar;
 
 Rice::Rice(std::string name, std::string id, std::string description, std::string new_version, std::string window_manager, std::vector<Dependency> dependencies)
-: name{name}, id{id}, description{description}, version{version}, window_manager{window_manager}, dependencies{dependencies}, toml_path{fmt::format("{}/{}.toml", LOCAL_CONFIG_DIR, id)}, git_path{fmt::format("{}/{}", LOCAL_RICES_DIR, id)}, install_state{NOT_INSTALLED}
+: name{name}, id{id}, description{description}, version{new_version}, window_manager{window_manager}, dependencies{dependencies}, toml_path{fmt::format("{}/{}.toml", LOCAL_CONFIG_DIR, id)}, git_path{fmt::format("{}/{}", LOCAL_RICES_DIR, id)}, install_state{NOT_INSTALLED}
 {
     /* If .toml and git are installed */
     if (fs::exists(toml_path) && fs::is_regular_file(toml_path)) install_state = install_state | TOML_INSTALLED;
