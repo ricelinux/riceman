@@ -7,8 +7,8 @@ Rice::Rice(std::string name, std::string id, std::string description, std::strin
 : name{name}, id{id}, description{description}, version{version}, window_manager{window_manager}, dependencies{dependencies}, toml_path{fmt::format("{}/{}.toml", LOCAL_CONFIG_DIR, id)}, git_path{fmt::format("{}/{}", LOCAL_RICES_DIR, id)}, install_state{NOT_INSTALLED}
 {
     /* If .toml and git are installed */
-    if (!fs::exists(toml_path) && !fs::is_regular_file(toml_path)) install_state = install_state | TOML_INSTALLED;
-    if (!fs::exists(git_path) && !fs::is_directory(git_path)) install_state = install_state | GIT_INSTALLED;
+    if (fs::exists(toml_path) && fs::is_regular_file(toml_path)) install_state = install_state | TOML_INSTALLED;
+    if (fs::exists(git_path) && fs::is_directory(git_path)) install_state = install_state | GIT_INSTALLED;
 }
 
 int Rice::fetch_progress(const git_indexer_progress *stats, void *payload)
