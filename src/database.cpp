@@ -41,13 +41,8 @@ Database::Database(std::string name, std::string remoteuri)
                     dependency.substr(slash_loc + 1, dependency.length())
                 });
             }
-            
-            const std::string info_file{fmt::format("{}/{}.toml", LOCAL_CONFIG_DIR, rice_data[1])};
-            bool installed = true;
 
-            if (!fs::exists(info_file) || !fs::is_regular_file(info_file)) installed = false;
-
-            rices.push_back(Rice(rice_data[0], rice_data[1], rice_data[2], rice_data[3], rice_data[4], deps, installed));
+            rices.push_back(Rice(rice_data[0], rice_data[1], rice_data[2], rice_data[3], rice_data[4], deps));
         }
     } 
     /* If not open, don't throw error because it could be newly added or recently removed */
