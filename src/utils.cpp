@@ -6,8 +6,6 @@
 #include <iostream>
 #include <csignal>
 
-#include <unistd.h>
-
 #include <cpr/cpr.h>
 #include <fmt/format.h>
 

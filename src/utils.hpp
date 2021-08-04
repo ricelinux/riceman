@@ -4,6 +4,8 @@
 #include "constants.hpp"
 #include "rice.hpp"
 
+#include <unistd.h>
+
 #include <cryptopp/sha.h>
 #include <cryptopp/hex.h>
 
