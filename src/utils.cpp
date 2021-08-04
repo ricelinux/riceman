@@ -28,7 +28,7 @@ const std::string Utils::basename(const std::string &path)
  * 
  * @return A boolean, true if logged, false if not logged
  */
-const bool Utils::log(const int level, const std::string &message, const bool line_break = true)
+const bool Utils::log(const int level, const std::string &message, const bool line_break)
 {
 	if ((config.loglevel & level) == 0) return false;
 	
@@ -65,7 +65,7 @@ const bool Utils::log(const int level, const std::string &message, const bool li
 	return true;
 }
 
-const bool Utils::log(const int level, const int &message, const bool line_break = true)
+const bool Utils::log(const int level, const int &message, const bool line_break)
 {
 	return log(level, std::to_string(message), line_break);
 }
