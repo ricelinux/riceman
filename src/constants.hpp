@@ -58,7 +58,7 @@
 
 
 /* Operations */
-enum {
+const enum {
 	OP_UNSET = 1,
 	OP_REMOVE,
 	OP_UPGRADE,
@@ -67,7 +67,7 @@ enum {
 };
 
 /* Log levels */
-enum {
+const enum {
 	LOG_ALL 		= 1,
 	LOG_FATAL		= (1 << 1),
 	LOG_ERROR 		= (1 << 2),
@@ -76,7 +76,7 @@ enum {
 };
 
 /* Color Option Level */
-enum {
+const enum {
 	COLOR_UNSET = 1,
 	COLOR_ENABLED,
 	COLOR_DISABLED,
