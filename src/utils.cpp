@@ -79,9 +79,10 @@ const bool Utils::log(const int level, const int &message, const bool line_break
 	return log(level, std::to_string(message), line_break);
 }
 
-void Utils::colon_log(const std::string &message)
+void Utils::colon_log(const std::string &message, const bool line_break)
 {
-	std::cout << config.colors.colon << message << config.colors.nocolor << std::endl;
+	std::cout << config.colors.colon << message << config.colors.nocolor;
+	if (line_break) std::cout << std::endl;
 }
 
 void Utils::rice_log(const std::vector<Rice> &rices)
