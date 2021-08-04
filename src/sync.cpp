@@ -90,24 +90,32 @@ bool SyncHandler::install_rices()
         utils.log(LOG_FATAL, "no targets specified");
     }
 
+    std::vector<Rice> rices;
     std::vector<std::string> incorrect_rice_names; 
 
     /* Verify to-be-installed rices */
     for (int i = 0; i < targets.size(); ++i) {
         std::string &target = targets[i];
         try {
-            Rice rice = databases.get_rice(target);
-            utils.colon_log("Installing rices...");
-            try {
-                rice.install();
-            } catch (std::runtime_error err) {
-                utils.log(LOG_FATAL, err.what());
-            }
-            
+            rices.push_back(databases.get_rice(target));
         } catch (std::runtime_error err) {
             incorrect_rice_names.push_back(target);
         }
     }
+
+    /* Install all available rices */
+
+    /* If there are invalid rice names specified */
+    if (incorrect_rice_names.size() == 0) return true;
+
+    /* Deal with invalid rice names */
+    utils.log(LOG_ERROR, fmt::format("target not found:"), false);
+
+    for(int i = 0; i < incorrect_rice_names.size(); ++i) {
+        utils.log(LOG_ALL, " " + incorrect_rice_names[i], false);
+    }
+
+    std::cout << std::endl;
 
     return true;
 }
