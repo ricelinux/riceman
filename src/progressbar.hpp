@@ -2,12 +2,6 @@
 
 #include <string>
 #include <chrono>
-#include <iostream>
-#include <cmath>
-
-#include <fmt/format.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
 
 typedef std::chrono::high_resolution_clock Clock;
 typedef std::chrono::milliseconds milliseconds;

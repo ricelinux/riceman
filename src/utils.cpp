@@ -1,5 +1,20 @@
 #include "utils.hpp"
 
+#include <fstream>
+#include <filesystem>
+#include <sstream>
+#include <iostream>
+#include <csignal>
+
+#include <unistd.h>
+
+#include <cpr/cpr.h>
+#include <fmt/format.h>
+
+namespace fs = std::filesystem;
+
+using CryptoPP::byte, CryptoPP::SHA256;
+
 Utils::Utils(RicemanConfig &conf)
     : config{conf} {};
 

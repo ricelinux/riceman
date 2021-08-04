@@ -1,7 +1,5 @@
 #pragma once
 
-#include "constants.hpp"
-
 #include <string>
 
 typedef struct _riceman_colors {

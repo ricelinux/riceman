@@ -1,19 +1,8 @@
 #pragma once
 
-#include "progressbar.hpp"
-#include "utils.hpp"
 #include "rice.hpp"
-#include "constants.hpp"
 
-#include <fmt/format.h>
-
-#include <sys/ioctl.h>
-#include <stdio.h>
-#include <unistd.h>
-
-#include <iostream>
 #include <string>
-#include <fstream>
 
 class Database
 {

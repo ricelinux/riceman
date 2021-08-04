@@ -4,24 +4,10 @@
 #include "constants.hpp"
 #include "rice.hpp"
 
-#include <fstream>
-#include <filesystem>
-#include <sstream>
-#include <iostream>
-#include <csignal>
-
-#include <unistd.h>
-
-#include <cpr/cpr.h>
-#include <fmt/format.h>
 #include <cryptopp/sha.h>
 #include <cryptopp/hex.h>
 
 #define NEEDS_ROOT(utils) if (geteuid() != 0) { utils.log(LOG_FATAL, "you must be root to perform this operation"); }
-
-using CryptoPP::byte, CryptoPP::SHA256;
-
-namespace fs = std::filesystem;
 
 class Utils
 {

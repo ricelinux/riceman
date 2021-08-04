@@ -1,25 +1,10 @@
 #pragma once
 
-#include "progressbar.hpp"
-#include "constants.hpp"
-
-#include <fmt/format.h>
-#include <cpr/cpr.h>
-#include <git2.h>
-#include <cpptoml.h>
-
 #include <string>
 #include <vector>
-#include <filesystem>
+#include <chrono>
 
-namespace fs = std::filesystem;
-
-typedef struct progress_data {
-	git_indexer_progress fetch_progress;
-	size_t completed_steps;
-	size_t total_steps;
-	const char *path;
-} progress_data;
+#include <git2.h>
 
 typedef struct Dependency {
     bool aur;

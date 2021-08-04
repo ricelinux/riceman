@@ -1,5 +1,15 @@
 #include "rice.hpp"
 #include "utils.hpp"
+#include "progressbar.hpp"
+#include "constants.hpp"
+
+#include <fmt/format.h>
+#include <cpr/cpr.h>
+#include <cpptoml.h>
+
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 // Needs to be defined here because of static functions
 ProgressBar *progress_bar;
@@ -115,17 +125,14 @@ void Rice::install()
     git_repository *repo = NULL;
     if (!repo_exists(git_path, &repo)) {
         /* Clone git repo */
-        progress_data pd = {{0}};
         git_clone_options clone_opts = GIT_CLONE_OPTIONS_INIT;
         git_checkout_options checkout_opts = GIT_CHECKOUT_OPTIONS_INIT;
-        
+
         checkout_opts.checkout_strategy = GIT_CHECKOUT_SAFE;
         checkout_opts.progress_cb = Rice::checkout_progress;
-        checkout_opts.progress_payload = &pd;
         clone_opts.checkout_opts = checkout_opts;
         clone_opts.fetch_opts.callbacks.transfer_progress = Rice::fetch_progress;
         clone_opts.fetch_opts.callbacks.credentials = (git_credential_acquire_cb)Rice::cred_acquire;
-        clone_opts.fetch_opts.callbacks.payload = &pd;
 
         handle_libgit_error(git_clone(&repo, git_repo_uri.c_str(), git_path.c_str(), &clone_opts));
     }

@@ -1,4 +1,12 @@
 #include "database.hpp"
+#include "progressbar.hpp"
+#include "utils.hpp"
+#include "constants.hpp"
+
+#include <fmt/format.h>
+
+#include <iostream>
+#include <fstream>
 
 Database::Database(std::string name, std::string remoteuri)
 : db_name{name}, local_path{fmt::format("{}/{}.db", LOCAL_DB_DIR, name)}, remote_uri{remoteuri}, remote_hash_uri{fmt::format("{}/rices.db.sha256sum", remoteuri)}, local_tmp_path{fmt::format("{}.tmp", local_path)}, remote_db{fmt::format("{}/rices.db", remoteuri)}
