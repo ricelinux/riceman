@@ -18,9 +18,14 @@ void Rice::checkout_progress(const char *path, size_t cur, size_t tot, void *pay
         progress_bar->done();
         delete progress_bar;
 
-        progress_bar = new ProgressBar{"checking out commit", 0.4};
+        progress_bar = new ProgressBar{"checking out head", 0.4};
     }
     progress_bar->update("", cur / (tot + 1));
+
+    if (cur == tot) {
+        progress_bar->done();
+        delete progress_bar;
+    }
 }
 
 void Rice::handle_libgit_error(int error)
@@ -67,6 +72,9 @@ void Rice::cred_acquire(git_credential **out, const char *url, const char *usern
 
 void Rice::install()
 {
+    Utils::show_cursor(false);
+    Utils::handle_signals(true);
+
     /* Download rice's toml */
     using namespace std::placeholders;
     progress_bar = new ProgressBar{"downloading rice config", 0.4};
@@ -105,27 +113,58 @@ void Rice::install()
         clone_opts.fetch_opts.callbacks.payload = &pd;
 
         handle_libgit_error(git_clone(&repo, git_repo_uri.c_str(), git_path.c_str(), &clone_opts));
-
-        /* Checkout repo with hash */
-        git_commit *commit;
-        git_oid commit_oid;
-        git_checkout_options final_checkout_opts = GIT_CHECKOUT_OPTIONS_INIT;
-        final_checkout_opts.checkout_strategy = GIT_CHECKOUT_SAFE;
-        
-
-        handle_libgit_error(git_oid_fromstr(&commit_oid, git_commit_hash.c_str()));
-        handle_libgit_error(git_commit_lookup(&commit, repo, &commit_oid));
-        handle_libgit_error(git_checkout_tree(repo, (const git_object *)commit, &final_checkout_opts));
-
-        /* Update HEAD */
-        handle_libgit_error(git_repository_set_head_detached(repo, &commit_oid));
-
-        git_commit_free(commit);
-
     }
 
+    /* Checkout repo with hash */
+    progress_bar = new ProgressBar{"checking out commit", 0.4};
+
+    git_commit *commit;
+    git_oid commit_oid;
+    git_checkout_options final_checkout_opts = GIT_CHECKOUT_OPTIONS_INIT;
+    final_checkout_opts.checkout_strategy = GIT_CHECKOUT_SAFE;
+    
+    handle_libgit_error(git_oid_fromstr(&commit_oid, git_commit_hash.c_str()));
+    handle_libgit_error(git_commit_lookup(&commit, repo, &commit_oid));
+    handle_libgit_error(git_checkout_tree(repo, (const git_object *)commit, &final_checkout_opts));
+
+    /* Update HEAD */
+    handle_libgit_error(git_repository_set_head_detached(repo, &commit_oid));
+    git_commit_free(commit);
+
+    /* Stop progress bar */
     progress_bar->done();
     delete progress_bar;
     
+    /** Create .desktop file in either /usr/share/xsessions or /usr/share/wayland-sessions **/
+    progress_bar = new ProgressBar{"writing desktop file", 0.4};
 
+    /* Get remaining important config file data */
+    std::string display_server = rice_config->get_qualified_as<std::string>("window-manager.display-server").value_or("");
+    std::string wm_path = rice_config->get_qualified_as<std::string>("window-manager.executable").value_or("");
+    std::string wm_params = rice_config->get_qualified_as<std::string>("window-manager.params").value_or("");
+
+    if (display_server.length() == 0) throw std::runtime_error{fmt::format("display server not specified in '{}' config", name)};
+    if (wm_path.length() == 0) throw std::runtime_error{fmt::format("window manager path not specified in '{}' config", name)};
+    if (wm_params.length() == 0) throw std::runtime_error{fmt::format("window manager params not specified in '{}' config", name)};
+
+    wm_params = fmt::format(wm_params, git_path);
+
+    /* Get correct session directory */
+    std::string session_path;
+    if (display_server == "xorg") {
+        session_path = XSESSIONS_PATH;
+    } else if (display_server == "wayland") {
+        session_path = WSESSIONS_PATH;
+    } else throw std::runtime_error{fmt::format("invalid display server specified in '{}' config", name)};
+    
+    /* Write desktop file */
+    std::string file_content = fmt::format(
+        "[Desktop Entry]\nName={0}\nComment={1}\nExec=env RICE_DIR={2} {3} {4}\nType=Application\nPath={2}\n",
+        name, description, git_path, wm_path, wm_params);
+
+    Utils::write_file_content(fmt::format("{}/{}.desktop", session_path, id), file_content);
+    progress_bar->done();
+
+    Utils::show_cursor(true);
+    Utils::handle_signals(false);
 }
