@@ -1,6 +1,4 @@
 #include "database_collection.hpp"
-#include "utils.hpp"
-#include "constants.hpp"
 
 DatabaseCollection::DatabaseCollection() {
     Utils::create_directory(LOCAL_BASE_DIR);

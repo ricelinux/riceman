@@ -11,6 +11,9 @@
 #define VERSION "v1.0.0"
 #endif
 
+/* AUR Helper */
+#define AUR_HELPER "yay"
+
 /* Repository Info */
 #define DB_NAME "rices.db"
 

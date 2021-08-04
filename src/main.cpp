@@ -1,7 +1,5 @@
 #include "constants.hpp"
-
 #include "utils.hpp"
-
 #include "database_collection.hpp"
 #include "sync.hpp"
 

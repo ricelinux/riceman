@@ -2,6 +2,9 @@
 
 #include "option.hpp"
 #include "operation.hpp"
+#include "constants.hpp"
+
+#include <fmt/format.h>
 
 class SyncHandler: public OperationHandler
 {

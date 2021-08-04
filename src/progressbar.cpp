@@ -1,13 +1,5 @@
 #include "progressbar.hpp"
 
-#include <iostream>
-#include <cmath>
-
-#include <fmt/format.h>
-
-#include <sys/ioctl.h>
-#include <unistd.h>
-
 ProgressBar::ProgressBar(const std::string &title, double percent_length): title{title}
 {
     struct winsize window;

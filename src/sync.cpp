@@ -1,7 +1,4 @@
 #include "sync.hpp"
-#include "constants.hpp"
-
-#include <fmt/format.h>
 
 /* Init statics */
 const struct option<int> SyncHandler::op_modifiers[SyncHandler::s_op_modifiers] = { 
@@ -104,6 +101,8 @@ bool SyncHandler::install_rices()
     }
 
     /* Install all available rices */
+    utils.colon_log("Installing rices...");
+    utils.rice_log(rices);
 
     /* If there are invalid rice names specified */
     if (incorrect_rice_names.size() == 0) return true;

@@ -3,12 +3,22 @@
 // Needs to be defined here because of static functions
 ProgressBar *progress_bar;
 
-Rice::Rice(std::string name, std::string id, std::string description, std::string version, std::string window_manager, std::vector<Dependency> dependencies)
+Rice::Rice(std::string name, std::string id, std::string description, std::string new_version, std::string window_manager, std::vector<Dependency> dependencies)
 : name{name}, id{id}, description{description}, version{version}, window_manager{window_manager}, dependencies{dependencies}, toml_path{fmt::format("{}/{}.toml", LOCAL_CONFIG_DIR, id)}, git_path{fmt::format("{}/{}", LOCAL_RICES_DIR, id)}, install_state{NOT_INSTALLED}
 {
     /* If .toml and git are installed */
     if (fs::exists(toml_path) && fs::is_regular_file(toml_path)) install_state = install_state | TOML_INSTALLED;
     if (fs::exists(git_path) && fs::is_directory(git_path)) install_state = install_state | GIT_INSTALLED;
+
+    /* If rice is up-to-date */
+    if (install_state != BOTH_INSTALLED) return;
+
+    auto rice_config = cpptoml::parse_file(toml_path);
+    
+    std::string old_version = rice_config->get_qualified_as<std::string>("theme.version").value_or("");
+    if (new_version.length() == 0) throw std::runtime_error{fmt::format("theme version not specified in '{}' config", name)};
+
+    if (new_version == old_version) install_state = install_state | UP_TO_DATE;
 }
 
 int Rice::fetch_progress(const git_indexer_progress *stats, void *payload)
@@ -89,7 +99,7 @@ void Rice::install()
 
     if (!Utils::write_file_content(toml_path, r.text)) throw std::runtime_error{fmt::format("unable to write to '{}'", toml_path)};
 
-    /* Parse TOML */
+    /* Parse TOML (called cpptoml::parse_file in constructor and here because file is re-downloaded here) */
     auto rice_config = cpptoml::parse_file(toml_path);
     
     git_repo_uri = rice_config->get_qualified_as<std::string>("git.repo").value_or("");

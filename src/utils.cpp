@@ -1,7 +1,4 @@
 #include "utils.hpp"
-#include "constants.hpp"
-
-#include <sstream>
 
 Utils::Utils(RicemanConfig &conf)
     : config{conf} {};
@@ -73,6 +70,17 @@ const bool Utils::log(const int level, const int &message, const bool line_break
 void Utils::colon_log(const std::string &message)
 {
 	std::cout << config.colors.colon << message << config.colors.nocolor << std::endl;
+}
+
+void Utils::rice_log(const std::vector<Rice> &rices)
+{
+	std::cout << config.colors.title << "Packages (" << rices.size() << ") " << config.colors.nocolor;
+
+	for(int i = 0; i < rices.size(); ++i) {
+		std::cout << rices[i].name << config.colors.faint << "-" << rices[i].version << config.colors.nocolor << "  ";
+	}
+
+	std::cout << std::endl;
 }
 
 void Utils::show_cursor(const bool status)

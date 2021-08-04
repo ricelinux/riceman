@@ -1,6 +1,8 @@
 #pragma once
 
 #include "database.hpp"
+#include "utils.hpp"
+#include "constants.hpp"
 
 #include <vector>
 

@@ -2,7 +2,6 @@
 
 #include "progressbar.hpp"
 #include "constants.hpp"
-#include "utils.hpp"
 
 #include <fmt/format.h>
 #include <cpr/cpr.h>
@@ -34,7 +33,7 @@ class Rice
     Rice(std::string name, 
         std::string id, 
         std::string description, 
-        std::string version, 
+        std::string new_version, 
         std::string window_manager,
         std::vector<Dependency> dependencies);
 
@@ -70,9 +69,10 @@ class Rice
     std::chrono::high_resolution_clock::time_point start_time;
 
     enum {
-        NOT_INSTALLED  = 0b00,
-        TOML_INSTALLED = 0b01,
-        GIT_INSTALLED  = 0b10,
-        BOTH_INSTALLED = 0b11,
+        NOT_INSTALLED  = 0b000,
+        TOML_INSTALLED = 0b001,
+        GIT_INSTALLED  = 0b010,
+        BOTH_INSTALLED = 0b011,
+        UP_TO_DATE     = 0b100,
     };
 };
