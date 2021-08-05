@@ -1,6 +1,5 @@
 #include "rice.hpp"
 #include "utils.hpp"
-#include "progressbar.hpp"
 #include "constants.hpp"
 
 #include <fmt/format.h>
@@ -10,9 +9,6 @@
 #include <iostream>
 
 namespace fs = std::filesystem;
-
-// Needs to be defined here because of static functions
-ProgressBar *progress_bar;
 
 Rice::Rice(std::string name, std::string id, std::string description, std::string new_version, std::string window_manager, std::string hash, std::vector<Dependency> dependencies)
 : name{name}, id{id}, description{description}, version{new_version}, window_manager{window_manager},
@@ -33,27 +29,6 @@ Rice::Rice(std::string name, std::string id, std::string description, std::strin
     if (new_version.length() == 0) throw std::runtime_error{fmt::format("theme version not specified in '{}' config", name)};
 
     if (new_version == old_version) install_state = install_state | UP_TO_DATE;
-}
-
-int Rice::fetch_progress(const git_indexer_progress *stats, void *payload)
-{   
-    progress_bar->update("", ((double)stats->indexed_deltas+(double)stats->received_objects) / ((double)stats->total_deltas+(double)stats->total_objects));
-    return 0;
-}
-void Rice::checkout_progress(const char *path, size_t cur, size_t tot, void *payload)
-{
-    if (cur == 0) {
-        progress_bar->done();
-        delete progress_bar;
-
-        progress_bar = new ProgressBar{"checking out head", 0.4};
-    }
-    progress_bar->update("", cur / (tot + 1));
-
-    if (cur == tot) {
-        progress_bar->done();
-        delete progress_bar;
-    }
 }
 
 void Rice::handle_libgit_error(int error)
@@ -131,8 +106,6 @@ void Rice::install_toml(const std::string &progress_bar_name)
 void Rice::install_git()
 {
     /* Check if git repo exists, verify commit hash */
-    progress_bar = new ProgressBar{"cloning repository", 0.4};
-
     git_repository *repo = NULL;
     if (!repo_exists(git_path, &repo)) {
         /* Clone git repo */
@@ -140,17 +113,13 @@ void Rice::install_git()
         git_checkout_options checkout_opts = GIT_CHECKOUT_OPTIONS_INIT;
 
         checkout_opts.checkout_strategy = GIT_CHECKOUT_SAFE;
-        checkout_opts.progress_cb = Rice::checkout_progress;
         clone_opts.checkout_opts = checkout_opts;
-        clone_opts.fetch_opts.callbacks.transfer_progress = Rice::fetch_progress;
         clone_opts.fetch_opts.callbacks.credentials = (git_credential_acquire_cb)Rice::cred_acquire;
 
         handle_libgit_error(git_clone(&repo, git_repo_uri.c_str(), git_path.c_str(), &clone_opts));
     }
 
     /* Checkout repo with hash */
-    progress_bar = new ProgressBar{"checking out commit", 0.4};
-
     git_commit *commit;
     git_oid commit_oid;
     git_checkout_options final_checkout_opts = GIT_CHECKOUT_OPTIONS_INIT;
@@ -163,17 +132,10 @@ void Rice::install_git()
     /* Update HEAD */
     handle_libgit_error(git_repository_set_head_detached(repo, &commit_oid));
     git_commit_free(commit);
-
-    /* Stop progress bar */
-    progress_bar->done();
-    delete progress_bar;
 }
 
 void Rice::install_desktop()
 {
-    /** Create .desktop file in either /usr/share/xsessions or /usr/share/wayland-sessions **/
-    progress_bar = new ProgressBar{"writing desktop file", 0.4};
-
     /* Get correct session directory */
     std::string session_path;
     if (display_server == "xorg") {
@@ -188,6 +150,4 @@ void Rice::install_desktop()
         name, description, git_path, wm_path, wm_params);
 
     Utils::write_file_content(fmt::format("{}/{}.desktop", session_path, id), file_content);
-    progress_bar->done();
-    delete progress_bar;
 }

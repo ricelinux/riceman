@@ -1,5 +1,7 @@
 #pragma once
 
+#include "progressbar.hpp"
+
 #include <string>
 #include <vector>
 #include <chrono>
@@ -64,6 +66,7 @@ class Rice
 		unsigned int allowed_types,
 		void *payload);
 
+    ProgressBar *progress_bar;
     std::chrono::high_resolution_clock::time_point start_time;
     std::string display_server;
     std::string wm_path;
