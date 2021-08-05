@@ -106,7 +106,7 @@ bool SyncHandler::install_rices()
     utils.colon_log("Proceed with installation? [Y/n] ", false);
     
     const char confirm = std::getchar();
-    if (confirm != '\n' && confirm != 'y' && confirm != 'Y') utils.log(LOG_FATAL, "install aborted");
+    if (confirm != '\n' && confirm != 'y' && confirm != 'Y' && confirm != ' ') utils.log(LOG_FATAL, "install aborted");
 
     Utils::show_cursor(false);
     Utils::handle_signals(true);
