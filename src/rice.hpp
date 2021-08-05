@@ -40,6 +40,14 @@ class Rice
     std::string git_repo_uri;
     std::string git_commit_hash;
 
+    enum {
+        NOT_INSTALLED  = 0b000,
+        TOML_INSTALLED = 0b001,
+        GIT_INSTALLED  = 0b010,
+        BOTH_INSTALLED = 0b011,
+        UP_TO_DATE     = 0b100,
+    };
+
     private:
     
     const bool repo_exists(const std::string &path, git_repository **repo);
@@ -58,13 +66,4 @@ class Rice
     std::string display_server;
     std::string wm_path;
     std::string wm_params;
-
-
-    enum {
-        NOT_INSTALLED  = 0b000,
-        TOML_INSTALLED = 0b001,
-        GIT_INSTALLED  = 0b010,
-        BOTH_INSTALLED = 0b011,
-        UP_TO_DATE     = 0b100,
-    };
 };
