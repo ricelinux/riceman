@@ -13,7 +13,7 @@ ProgressBar::ProgressBar(const std::string &title, double percent_length): title
     struct winsize window;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
 
-    std::cout << "\r " << title;
+    std::cout << "\r" << title;
 
     /* NOTE: the 7 is the length of the '[]', percent symbol, space after progress, and percent */
     progress_length = std::trunc(window.ws_col * percent_length) - 7;
@@ -55,6 +55,12 @@ void ProgressBar::update(std::string prefix, double percentage)
         /* print percentage */
         std::cout << fmt::format("{:>3.0f}%", percentage);
     }
+}
+
+void ProgressBar::update_title(std::string t)
+{
+    title = t;
+    std::cout << "\r" << t;
 }
 
 void ProgressBar::done()
