@@ -31,6 +31,11 @@ Rice::Rice(std::string name, std::string id, std::string description, std::strin
     if (new_version == old_version) install_state = install_state | UP_TO_DATE;
 }
 
+Rice::~Rice()
+{
+    delete progress_bar;
+}
+
 void Rice::handle_libgit_error(int error)
 {
     if (error >= 0) return;
