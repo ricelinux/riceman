@@ -58,7 +58,7 @@ bool SyncHandler::refresh_rices()
         if (local_hash.compare(remote_hash) != 0 || refresh == 2) {
             switch(db.refresh(remote_hash)) {
                 case -3:
-                    utils.log(LOG_FATAL, fmt::format("download of '{}' database corrupted.\n       temporary database still present in {} for debugging.", db.db_name, LOCAL_DB_DIR));
+                    utils.log(LOG_FATAL, fmt::format("download of '{}' database corrupted", db.db_name));
                     break;
                 case -2:
                     utils.log(LOG_FATAL, "failed to write database to file");
@@ -120,31 +120,63 @@ bool SyncHandler::install_rices()
 
     for (int i = 0; i < rices.size(); ++i) {
         try {
-            rices[i].install_toml(fmt::format("{}{}-{}{}", rices[i].name, config.colors.faint, rices[i].version, config.colors.nocolor));
+            rices[i].download_toml(fmt::format("{}{}-{}{}", rices[i].name, config.colors.faint, rices[i].version, config.colors.nocolor));
         } catch (std::runtime_error err) {
             utils.log(LOG_FATAL, err.what());
         }
     }
+    
+    /* Check integrity */
+    ProgressBar pb{fmt::format("(0/{}) checking integrity", rices.size()), 0.4};
+    for (int i = 0; i < rices.size(); ++i) {
+        pb.update_title(fmt::format("({}/{}) checking integrity", i+1, rices.size()));
+        pb.update("", (double)i / (double)rices.size());
+        if (!rices[i].verify_toml()) utils.log(LOG_FATAL, fmt::format("download of rice '{}' corrupted", rices[i].name));
+    }
+    pb.done();
 
-    utils.colon_log("Downloading config files...");
+    /* Parse toml */
+    pb = ProgressBar{fmt::format("(0/{}) parsing configuration files", rices.size()), 0.4};
+    for (int i = 0; i < rices.size(); ++i) {
+        pb.update_title(fmt::format("({}/{}) parsing configuration files", i+1, rices.size()));
+        pb.update("", (double)i / (double)rices.size());
 
+        try {
+            rices[i].parse_toml();
+        } catch (std::runtime_error err) {
+            utils.log(LOG_FATAL, err.what());
+        }
+    }
+    pb.done();
+
+    utils.colon_log("Processing changes...");
+
+    pb = ProgressBar{fmt::format("(0/{}) installing rices", rices.size()), 0.4};
     for(int i = 0; i < rices.size(); ++i) {
+        pb.update_title(fmt::format("({}/{}) installing rices", i+1, rices.size()));
+        pb.update("", (double)i / (double)rices.size());
+
         try {
             rices[i].install_git();
         } catch (std::runtime_error err) {
             utils.log(LOG_FATAL, err.what());
         }
     }
+    pb.done();
 
-    utils.colon_log("Installing .desktop files...");
-
+    pb = ProgressBar{fmt::format("(0/{}) writing desktop entries", rices.size()), 0.4}; 
     for (int i = 0; i < rices.size(); ++i) {
+        pb.update_title(fmt::format("({}/{}) writing desktop entries", i+1, rices.size()));
+        pb.update("", (double)i / (double)rices.size());
+
         try {
             rices[i].install_desktop();
         } catch (std::runtime_error err) {
             utils.log(LOG_FATAL, err.what());
         }
     }
+
+    pb.done();
 
     Utils::show_cursor(true);
     Utils::handle_signals(false);
