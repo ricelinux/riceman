@@ -25,8 +25,7 @@ class Rice
         std::string window_manager,
         std::string hash,
         std::vector<Dependency> dependencies);
-    ~Rice();
-
+        
     void download_toml(const std::string &progress_bar_name);
     bool verify_toml();
     void parse_toml();
