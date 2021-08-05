@@ -22,8 +22,8 @@ class Rice
         std::string new_version, 
         std::string window_manager,
         std::vector<Dependency> dependencies);
-        
-    void install_toml();
+
+    void install_toml(const std::string &progress_bar_name);
     void install_git();
     void install_desktop();
 
@@ -55,7 +55,11 @@ class Rice
 		void *payload);
 
     std::chrono::high_resolution_clock::time_point start_time;
-    std::shared_ptr<cpptoml::table> rice_config;
+    std::string display_server;
+    std::string wm_path;
+    std::string wm_params;
+
+
     enum {
         NOT_INSTALLED  = 0b000,
         TOML_INSTALLED = 0b001,

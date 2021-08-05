@@ -7,6 +7,7 @@
 #include <cpr/cpr.h>
 
 #include <filesystem>
+#include <iostream>
 
 namespace fs = std::filesystem;
 
@@ -25,7 +26,7 @@ Rice::Rice(std::string name, std::string id, std::string description, std::strin
     /* If rice is up-to-date */
     if (install_state != BOTH_INSTALLED) return;
 
-    rice_config = cpptoml::parse_file(toml_path);
+    auto rice_config = cpptoml::parse_file(toml_path);
     
     std::string old_version = rice_config->get_qualified_as<std::string>("theme.version").value_or("");
     if (new_version.length() == 0) throw std::runtime_error{fmt::format("theme version not specified in '{}' config", name)};
@@ -96,23 +97,29 @@ void Rice::cred_acquire(git_credential **out, const char *url, const char *usern
     return throw std::runtime_error{fmt::format("'{}' requires additional authentication", url)};
 }
 
-void Rice::install_toml()
+void Rice::install_toml(const std::string &progress_bar_name)
 {
     using namespace std::placeholders;
-    progress_bar = new ProgressBar{"downloading rice config", 0.4};
+    progress_bar = new ProgressBar{progress_bar_name, 0.4};
     cpr::Response r = cpr::Get(cpr::Url{fmt::format("{}/{}.toml", REMOTE_RICES_URI, id)}, cpr::ProgressCallback{std::bind(&ProgressBar::progress_callback_download, progress_bar, _1, _2, _3, _4)});
+    
     progress_bar->done();
-
     delete progress_bar;
 
     if (!Utils::write_file_content(toml_path, r.text)) throw std::runtime_error{fmt::format("unable to write to '{}'", toml_path)};
 
     /* Parse TOML (called cpptoml::parse_file in constructor and here because file is re-downloaded here) */
-    rice_config = cpptoml::parse_file(toml_path);
+    auto rice_config = cpptoml::parse_file(toml_path);
     
     git_repo_uri = rice_config->get_qualified_as<std::string>("git.repo").value_or("");
     git_commit_hash = rice_config->get_qualified_as<std::string>("git.commit").value_or("");
+    display_server = rice_config->get_qualified_as<std::string>("window-manager.display-server").value_or("");
+    wm_path = rice_config->get_qualified_as<std::string>("window-manager.executable").value_or("");
+    wm_params = fmt::format(rice_config->get_qualified_as<std::string>("window-manager.params").value_or(""), git_path);
 
+    if (display_server.length() == 0) throw std::runtime_error{fmt::format("display server not specified in '{}' config", name)};
+    if (wm_path.length() == 0) throw std::runtime_error{fmt::format("window manager path not specified in '{}' config", name)};
+    if (wm_params.length() == 0) throw std::runtime_error{fmt::format("window manager params not specified in '{}' config", name)};
     if (git_repo_uri.length() == 0) throw std::runtime_error{fmt::format("git repository uri not specified in '{}' config", name)};
     if (git_commit_hash.length() == 0) throw std::runtime_error{fmt::format("git commit hash not specified in '{}' config", name)};
 }
@@ -163,17 +170,6 @@ void Rice::install_desktop()
     /** Create .desktop file in either /usr/share/xsessions or /usr/share/wayland-sessions **/
     progress_bar = new ProgressBar{"writing desktop file", 0.4};
 
-    /* Get remaining important config file data */
-    std::string display_server = rice_config->get_qualified_as<std::string>("window-manager.display-server").value_or("");
-    std::string wm_path = rice_config->get_qualified_as<std::string>("window-manager.executable").value_or("");
-    std::string wm_params = rice_config->get_qualified_as<std::string>("window-manager.params").value_or("");
-
-    if (display_server.length() == 0) throw std::runtime_error{fmt::format("display server not specified in '{}' config", name)};
-    if (wm_path.length() == 0) throw std::runtime_error{fmt::format("window manager path not specified in '{}' config", name)};
-    if (wm_params.length() == 0) throw std::runtime_error{fmt::format("window manager params not specified in '{}' config", name)};
-
-    wm_params = fmt::format(wm_params, git_path);
-
     /* Get correct session directory */
     std::string session_path;
     if (display_server == "xorg") {
@@ -189,4 +185,5 @@ void Rice::install_desktop()
 
     Utils::write_file_content(fmt::format("{}/{}.desktop", session_path, id), file_content);
     progress_bar->done();
+    delete progress_bar;
 }
