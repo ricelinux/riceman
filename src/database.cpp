@@ -20,7 +20,7 @@ Database::Database(std::string name, std::string remoteuri)
     if (file.is_open()) {
         for(std::string line; std::getline(file, line); ) {
             std::stringstream line_stream{line};
-            std::string rice_data[6];
+            std::string rice_data[7];
             std::vector<Dependency> deps;
             int valuei = 0;
             
@@ -44,7 +44,7 @@ Database::Database(std::string name, std::string remoteuri)
                 });
             }
 
-            rices.push_back(Rice(rice_data[0], rice_data[1], rice_data[2], rice_data[3], rice_data[4], deps));
+            rices.push_back(Rice(rice_data[0], rice_data[1], rice_data[2], rice_data[3], rice_data[4], rice_data[6], deps));
         }
     } 
     /* If not open, don't throw error because it could be newly added or recently removed */

@@ -101,6 +101,13 @@ bool SyncHandler::install_rices()
     }
 
     /** Install all available rices **/
+    for(int i = 0; i < rices.size(); ++i) {
+        /* If rice is not up-to-date */
+        if ((rices[i].install_state & Rice::UP_TO_DATE) != 0) {
+            utils.log(LOG_WARNING, fmt::format("{}-{} is up to date -- reinstalling", rices[i].name, rices[i].version));
+        }
+    }
+
     utils.colon_log("Installing rices...");
     utils.rice_log(rices);
     utils.colon_log("Proceed with installation? [Y/n] ", false);
@@ -119,6 +126,8 @@ bool SyncHandler::install_rices()
         }
     }
 
+    utils.colon_log("Downloading config files...");
+
     for(int i = 0; i < rices.size(); ++i) {
         try {
             rices[i].install_git();
@@ -126,6 +135,8 @@ bool SyncHandler::install_rices()
             utils.log(LOG_FATAL, err.what());
         }
     }
+
+    utils.colon_log("Installing .desktop files...");
 
     for (int i = 0; i < rices.size(); ++i) {
         try {

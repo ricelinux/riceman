@@ -106,7 +106,9 @@ void Rice::install_toml(const std::string &progress_bar_name)
     progress_bar->done();
     delete progress_bar;
 
+    /* Handle potential errors */
     if (r.error) throw std::runtime_error{fmt::format("{} (error code {})", r.error.message, r.error.code)};
+    if (Utils::hash_sha256(r.text) != hash) throw std::runtime_error{fmt::format("integrity check failed for '{}'", name)};
 
     if (!Utils::write_file_content(toml_path, r.text)) throw std::runtime_error{fmt::format("unable to write to '{}'", toml_path)};
 
