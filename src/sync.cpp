@@ -135,11 +135,6 @@ bool SyncHandler::install_rices()
     }
     pb.done();
 
-    /* Install deps */
-    for (int i = 0; i < rices.size(); ++i) {
-        rices[i].install_deps();
-    }
-
     /* Parse toml */
     pb = ProgressBar{fmt::format("(0/{}) parsing configuration files", rices.size()), 0.4};
     for (int i = 0; i < rices.size(); ++i) {
@@ -153,6 +148,17 @@ bool SyncHandler::install_rices()
         }
     }
     pb.done();
+
+    utils.colon_log("Installing dependencies...");
+
+    /* Install deps */
+    for (int i = 0; i < rices.size(); ++i) {
+        try {
+            rices[i].install_deps();
+        } catch (std::runtime_error err) {
+            utils.log(LOG_FATAL, err.what());
+        }
+    }
 
     utils.colon_log("Processing changes...");
 
