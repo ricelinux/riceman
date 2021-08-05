@@ -21,6 +21,7 @@ class Rice
         std::string description, 
         std::string new_version, 
         std::string window_manager,
+        std::string hash,
         std::vector<Dependency> dependencies);
 
     void install_toml(const std::string &progress_bar_name);
@@ -33,6 +34,7 @@ class Rice
     const std::string description;
     const std::string version;
     const std::string window_manager;
+    const std::string hash;
     const std::string toml_path;
     const std::string git_path;
     std::vector<Dependency> dependencies; 

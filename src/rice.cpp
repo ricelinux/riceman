@@ -14,10 +14,11 @@ namespace fs = std::filesystem;
 // Needs to be defined here because of static functions
 ProgressBar *progress_bar;
 
-Rice::Rice(std::string name, std::string id, std::string description, std::string new_version, std::string window_manager, std::vector<Dependency> dependencies)
+Rice::Rice(std::string name, std::string id, std::string description, std::string new_version, std::string window_manager, std::string hash, std::vector<Dependency> dependencies)
 : name{name}, id{id}, description{description}, version{new_version}, window_manager{window_manager},
     dependencies{dependencies}, toml_path{fmt::format("{}/{}.toml", LOCAL_CONFIG_DIR, id)}, 
-    git_path{fmt::format("{}/{}", LOCAL_RICES_DIR, id)}, install_state{NOT_INSTALLED}
+    git_path{fmt::format("{}/{}", LOCAL_RICES_DIR, id)}, install_state{NOT_INSTALLED},
+    hash{hash}
 {
     /* If .toml and git are installed */
     if (fs::exists(toml_path) && fs::is_regular_file(toml_path)) install_state = install_state | TOML_INSTALLED;
@@ -102,9 +103,10 @@ void Rice::install_toml(const std::string &progress_bar_name)
     using namespace std::placeholders;
     progress_bar = new ProgressBar{progress_bar_name, 0.4};
     cpr::Response r = cpr::Get(cpr::Url{fmt::format("{}/{}.toml", REMOTE_RICES_URI, id)}, cpr::ProgressCallback{std::bind(&ProgressBar::progress_callback_download, progress_bar, _1, _2, _3, _4)});
-    
     progress_bar->done();
     delete progress_bar;
+
+    if (r.error) throw std::runtime_error{fmt::format("{} (error code {})", r.error.message, r.error.code)};
 
     if (!Utils::write_file_content(toml_path, r.text)) throw std::runtime_error{fmt::format("unable to write to '{}'", toml_path)};
 
