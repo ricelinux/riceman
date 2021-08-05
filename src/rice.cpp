@@ -5,6 +5,9 @@
 #include <fmt/format.h>
 #include <cpr/cpr.h>
 
+#include <sys/wait.h>
+#include <pwd.h>
+
 #include <filesystem>
 #include <iostream>
 
@@ -109,10 +112,36 @@ void Rice::install_deps()
     pacman_args.push_back(NULL);
     aur_args.push_back(NULL);
 
-    
+    run_command(pacman_args.data(), true);
+    run_command(aur_args.data(), false);
+}
 
-    execvp(pacman_args[0], pacman_args.data());
-    execvp(aur_args[0], aur_args.data());
+void Rice::run_command(char **args, bool root)
+{
+    pid_t pid, wpid, parent_pid;
+    int status;
+
+    parent_pid = getpid();
+    pid = fork();
+
+    errno = 0;
+    auto pnobody = getpwnam("nobody");
+    if (errno) throw std::runtime_error{strerror(errno)};
+
+    if (pid == 0) {
+        if (!root) {
+            if (setgid(pnobody->pw_gid) == -1 || setuid(pnobody->pw_uid) == -1 || 
+                setegid(pnobody->pw_gid) == -1 || seteuid(pnobody->pw_uid) == -1) throw std::runtime_error{"failed to drop root permissions"};
+        }
+
+        if (execvp(args[0], args) == -1) {
+            throw std::runtime_error{"failed to fork child process"};
+        }
+    } else if (pid > 0) {
+        do {
+            wpid = waitpid(pid, &status, WUNTRACED);
+        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+    }
 }
 
 void Rice::parse_toml()
