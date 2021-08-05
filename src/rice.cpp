@@ -96,6 +96,11 @@ bool Rice::verify_toml()
     return false;
 }
 
+void Rice::install_deps()
+{
+    
+}
+
 void Rice::parse_toml()
 {
     /* Parse TOML (called cpptoml::parse_file in constructor and here because file is re-downloaded here) */
