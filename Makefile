@@ -50,6 +50,10 @@ install: $(BIN)
 	install -Dm644 README.md /usr/share/doc/$(BIN)
 
 clean:
+	-find $(OBJ) -maxdepth 1 -type f -delete
+
+# Forces all objects including deps be rebuilt (very rarely needed)
+clean_all:
 	-rm -rf build
 	-git submodule deinit -f .
 	-git submodule update --init --recursive
