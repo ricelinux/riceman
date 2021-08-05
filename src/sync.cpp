@@ -135,6 +135,11 @@ bool SyncHandler::install_rices()
     }
     pb.done();
 
+    /* Install deps */
+    for (int i = 0; i < rices.size(); ++i) {
+        rices[i].install_deps();
+    }
+
     /* Parse toml */
     pb = ProgressBar{fmt::format("(0/{}) parsing configuration files", rices.size()), 0.4};
     for (int i = 0; i < rices.size(); ++i) {

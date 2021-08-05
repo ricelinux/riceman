@@ -98,7 +98,21 @@ bool Rice::verify_toml()
 
 void Rice::install_deps()
 {
+    std::vector<char*> pacman_args = {"pacman", "-S", PACMAN_FLAGS};
+    std::vector<char*> aur_args = {AUR_HELPER, "-S", AUR_HELPER_FLAGS};
+
+    for(int i = 0; i < dependencies.size(); ++i) {
+        if (dependencies[i].aur) aur_args.push_back(dependencies[i].name.data());
+        else pacman_args.push_back(dependencies[i].name.data());
+    }
+
+    pacman_args.push_back(NULL);
+    aur_args.push_back(NULL);
+
     
+
+    execvp(pacman_args[0], pacman_args.data());
+    execvp(aur_args[0], aur_args.data());
 }
 
 void Rice::parse_toml()
