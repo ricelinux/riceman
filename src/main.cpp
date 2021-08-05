@@ -90,5 +90,8 @@ int main(int argc, char *argv[])
 
     ophandler->run();
 
+    Utils::show_cursor(true);
+    Utils::handle_signals(false);
+
     return EXIT_SUCCESS;
 }
