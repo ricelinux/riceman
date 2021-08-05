@@ -151,6 +151,7 @@ bool SyncHandler::install_rices()
 
     utils.colon_log("Processing changes...");
 
+    /* Clone git repo */
     pb = ProgressBar{fmt::format("(0/{}) installing rices", rices.size()), 0.4};
     for(int i = 0; i < rices.size(); ++i) {
         pb.update_title(fmt::format("({}/{}) installing rices", i+1, rices.size()));
@@ -164,6 +165,7 @@ bool SyncHandler::install_rices()
     }
     pb.done();
 
+    /* Write .desktop files to session dir */
     pb = ProgressBar{fmt::format("(0/{}) writing desktop entries", rices.size()), 0.4}; 
     for (int i = 0; i < rices.size(); ++i) {
         pb.update_title(fmt::format("({}/{}) writing desktop entries", i+1, rices.size()));
