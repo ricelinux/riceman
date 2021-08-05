@@ -113,11 +113,30 @@ bool SyncHandler::install_rices()
 
     for (int i = 0; i < rices.size(); ++i) {
         try {
-            rices[i].install();
+            rices[i].install_toml(fmt::format("{}{}-{}{}", rices[i].name, config.colors.faint, rices[i].version, config.colors.nocolor));
         } catch (std::runtime_error err) {
             utils.log(LOG_FATAL, err.what());
         }
     }
+
+    for(int i = 0; i < rices.size(); ++i) {
+        try {
+            rices[i].install_git();
+        } catch (std::runtime_error err) {
+            utils.log(LOG_FATAL, err.what());
+        }
+    }
+
+    for (int i = 0; i < rices.size(); ++i) {
+        try {
+            rices[i].install_desktop();
+        } catch (std::runtime_error err) {
+            utils.log(LOG_FATAL, err.what());
+        }
+    }
+
+    Utils::show_cursor(true);
+    Utils::handle_signals(false);
 
     /* Deal with invalid rice names */
     if (incorrect_rice_names.size() == 0) return true;
@@ -127,9 +146,6 @@ bool SyncHandler::install_rices()
         utils.log(LOG_ALL, " " + incorrect_rice_names[i], false);
     }
     std::cout << std::endl;
-
-    Utils::show_cursor(true);
-    Utils::handle_signals(false);
 
     return true;
 }
