@@ -13,8 +13,8 @@ namespace fs = std::filesystem;
 Rice::Rice(std::string name, std::string id, std::string description, std::string new_version, std::string window_manager, std::string hash, std::vector<Dependency> dependencies)
 : name{name}, id{id}, description{description}, version{new_version}, window_manager{window_manager},
     dependencies{dependencies}, toml_path{fmt::format("{}/{}.toml", LOCAL_CONFIG_DIR, id)}, 
-    git_path{fmt::format("{}/{}", LOCAL_RICES_DIR, id)}, install_state{NOT_INSTALLED},
-    hash{hash}
+    toml_tmp_path{fmt::format("{}.tmp", toml_path)}, git_path{fmt::format("{}/{}", LOCAL_RICES_DIR, id)}, 
+    install_state{NOT_INSTALLED}, hash{hash}
 {
     /* If .toml and git are installed */
     if (fs::exists(toml_path) && fs::is_regular_file(toml_path)) install_state = install_state | TOML_INSTALLED;
@@ -73,20 +73,31 @@ void Rice::cred_acquire(git_credential **out, const char *url, const char *usern
     return throw std::runtime_error{fmt::format("'{}' requires additional authentication", url)};
 }
 
-void Rice::install_toml(const std::string &progress_bar_name)
+void Rice::download_toml(const std::string &progress_bar_name)
 {
     using namespace std::placeholders;
-    progress_bar = new ProgressBar{progress_bar_name, 0.4};
+    progress_bar = new ProgressBar{" " + progress_bar_name, 0.4};
     cpr::Response r = cpr::Get(cpr::Url{fmt::format("{}/{}.toml", REMOTE_RICES_URI, id)}, cpr::ProgressCallback{std::bind(&ProgressBar::progress_callback_download, progress_bar, _1, _2, _3, _4)});
     progress_bar->done();
     delete progress_bar;
 
     /* Handle potential errors */
     if (r.error) throw std::runtime_error{fmt::format("{} (error code {})", r.error.message, r.error.code)};
-    if (Utils::hash_sha256(r.text) != hash) throw std::runtime_error{fmt::format("integrity check failed for '{}'", name)};
 
-    if (!Utils::write_file_content(toml_path, r.text)) throw std::runtime_error{fmt::format("unable to write to '{}'", toml_path)};
+    if (!Utils::write_file_content(toml_tmp_path, r.text)) throw std::runtime_error{fmt::format("unable to write to '{}'", toml_path)};
+}
 
+bool Rice::verify_toml()
+{
+    if(Utils::hash_file(toml_tmp_path) == hash) {
+        fs::rename(toml_tmp_path, toml_path);
+        return true;
+    }
+    return false;
+}
+
+void Rice::parse_toml()
+{
     /* Parse TOML (called cpptoml::parse_file in constructor and here because file is re-downloaded here) */
     auto rice_config = cpptoml::parse_file(toml_path);
     

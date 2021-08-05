@@ -26,7 +26,9 @@ class Rice
         std::string hash,
         std::vector<Dependency> dependencies);
 
-    void install_toml(const std::string &progress_bar_name);
+    void download_toml(const std::string &progress_bar_name);
+    bool verify_toml();
+    void parse_toml();
     void install_git();
     void install_desktop();
 
@@ -38,6 +40,7 @@ class Rice
     const std::string window_manager;
     const std::string hash;
     const std::string toml_path;
+    const std::string toml_tmp_path;
     const std::string git_path;
     std::vector<Dependency> dependencies; 
 
