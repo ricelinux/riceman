@@ -10,9 +10,9 @@
 
 namespace fs = std::filesystem;
 
-Rice::Rice(std::string name, std::string id, std::string description, std::string new_version, std::string window_manager, std::string hash, std::vector<Dependency> dependencies)
+Rice::Rice(std::string name, std::string id, std::string description, std::string new_version, std::string window_manager, std::string hash, DependencyVec new_dependencies)
 : name{name}, id{id}, description{description}, version{new_version}, window_manager{window_manager},
-    dependencies{dependencies}, toml_path{fmt::format("{}/{}.toml", LOCAL_CONFIG_DIR, id)}, 
+    new_dependencies{new_dependencies}, toml_path{fmt::format("{}/{}.toml", LOCAL_CONFIG_DIR, id)}, 
     toml_tmp_path{fmt::format("{}.tmp", toml_path)}, git_path{fmt::format("{}/{}", LOCAL_RICES_DIR, id)}, 
     install_state{NOT_INSTALLED}, hash{hash}
 {
@@ -25,10 +25,31 @@ Rice::Rice(std::string name, std::string id, std::string description, std::strin
 
     auto rice_config = cpptoml::parse_file(toml_path);
     
-    std::string old_version = rice_config->get_qualified_as<std::string>("theme.version").value_or("");
+    std::string old_version = rice_config->get_qualified_as<std::string>("theme.version")
+        .value_or("");
+    std::vector<std::string> pacman_deps = rice_config->get_qualified_array_of<std::string>("packages.pacman")
+        .value_or<std::vector<std::string>>({});
+    std::vector<std::string> aur_deps = rice_config->get_qualified_array_of<std::string>("packages.aur")
+        .value_or<std::vector<std::string>>({});
+
     if (new_version.length() == 0) throw std::runtime_error{fmt::format("theme version not specified in '{}' config", name)};
+    // NOTE: No need to check deps because there might be a case of a rice without dependencies
 
     if (new_version == old_version) install_state = install_state | UP_TO_DATE;
+
+    for (std::string &dep_name : pacman_deps) {
+        old_dependencies.push_back({
+            false,
+            dep_name
+        });
+    }
+
+    for (std::string &dep_name : aur_deps) {
+        old_dependencies.push_back({
+            true,
+            dep_name
+        });
+    }
 }
 
 void Rice::handle_libgit_error(int error)
@@ -94,18 +115,6 @@ bool Rice::verify_toml()
         return true;
     }
     return false;
-}
-
-void Rice::install_deps()
-{
-    DependencyVec tmpdeps = {
-        {
-            false,
-            "bspwm"
-        }
-    };
-
-    PackageManager::install_diff(dependencies, tmpdeps);
 }
 
 void Rice::parse_toml()

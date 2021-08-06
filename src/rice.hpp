@@ -20,11 +20,10 @@ class Rice
         std::string new_version, 
         std::string window_manager,
         std::string hash,
-        DependencyVec dependencies);
+        DependencyVec new_dependencies);
 
     void download_toml(const std::string &progress_bar_name);
     bool verify_toml();
-    void install_deps();
     void parse_toml();
     void install_git();
     void install_desktop();
@@ -39,7 +38,8 @@ class Rice
     const std::string toml_path;
     const std::string toml_tmp_path;
     const std::string git_path;
-    DependencyVec dependencies; 
+    DependencyVec old_dependencies;
+    DependencyVec new_dependencies; 
 
     std::string git_repo_uri;
     std::string git_commit_hash;
