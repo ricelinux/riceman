@@ -1,6 +1,7 @@
 #pragma once
 
 #include "progressbar.hpp"
+#include "package_manager.hpp"
 
 #include <string>
 #include <vector>
@@ -8,11 +9,6 @@
 
 #include <git2.h>
 #include <cpptoml.h>
-
-typedef struct Dependency {
-    bool aur;
-    std::string name;
-} Dependency;
 
 class Rice
 {
@@ -24,7 +20,7 @@ class Rice
         std::string new_version, 
         std::string window_manager,
         std::string hash,
-        std::vector<Dependency> dependencies);
+        DependencyVec dependencies);
 
     void download_toml(const std::string &progress_bar_name);
     bool verify_toml();
@@ -43,7 +39,7 @@ class Rice
     const std::string toml_path;
     const std::string toml_tmp_path;
     const std::string git_path;
-    std::vector<Dependency> dependencies; 
+    DependencyVec dependencies; 
 
     std::string git_repo_uri;
     std::string git_commit_hash;
