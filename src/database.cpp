@@ -21,7 +21,7 @@ Database::Database(std::string name, std::string remoteuri)
         for(std::string line; std::getline(file, line); ) {
             std::stringstream line_stream{line};
             std::string rice_data[7];
-            std::vector<Dependency> deps;
+            DependencyVec deps;
             int valuei = 0;
             
             for(std::string value; std::getline(line_stream, value, ','); ) {
@@ -38,7 +38,7 @@ Database::Database(std::string name, std::string remoteuri)
                 else if (type.compare("aur") == 0) aur = true;
                 else throw std::runtime_error{fmt::format("unexpected dependecy type found in theme '{}'", rice_data[0])};
 
-                deps.push_back({
+                deps.push_back((DependencyVec){
                     aur,
                     dependency.substr(slash_loc + 1, dependency.length())
                 });
