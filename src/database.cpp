@@ -38,7 +38,7 @@ Database::Database(std::string name, std::string remoteuri)
                 else if (type.compare("aur") == 0) aur = true;
                 else throw std::runtime_error{fmt::format("unexpected dependecy type found in theme '{}'", rice_data[0])};
 
-                deps.push_back((DependencyVec){
+                deps.push_back({
                     aur,
                     dependency.substr(slash_loc + 1, dependency.length())
                 });
