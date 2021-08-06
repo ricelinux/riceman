@@ -28,8 +28,11 @@ class PackageManager
 
     PackageManager();
 
+    static void install(Dependency &dep);
     static void install_pacman(Dependency &dep);
     static void install_aur(Dependency &dep);
+
+    static void remove(Dependency &dep);
     
     static void exec_pacman(char **args);
 };
