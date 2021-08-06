@@ -28,11 +28,11 @@ class PackageManager
 
     PackageManager();
 
-    static void install(Dependency &dep);
-    static void install_pacman(Dependency &dep);
-    static void install_aur(Dependency &dep);
+    static void install(DependencyVec &deps);
+    static void install_pacman(std::vector<std::string> &deps);
+    static void install_aur(std::vector<std::string> &deps);
 
-    static void remove(Dependency &dep);
+    static void remove(DependencyVec &deps);
     
     static void exec(char **args);
 };

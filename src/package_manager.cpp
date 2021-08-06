@@ -32,27 +32,26 @@ void PackageManager::install_diff(DependencyVec &old_deps, DependencyVec &new_de
         diff_func
     );
     
-    for (Dependency &dep : remove_deps) remove(dep);
-    for (Dependency &dep : add_deps) install(dep);
+    remove(remove_deps);
+    install(add_deps);
 }
 
-void PackageManager::install(Dependency &dep)
+void PackageManager::install(DependencyVec &deps)
 {
-    if (dep.aur) install_aur(dep);
-    else install_pacman(dep);
+    
 }
 
-void PackageManager::install_pacman(Dependency &dep)
-{
-
-}
-
-void PackageManager::install_aur(Dependency &dep)
+void PackageManager::install_pacman(std::vector<std::string> &dep)
 {
 
 }
 
-void PackageManager::remove(Dependency &dep)
+void PackageManager::install_aur(std::vector<std::string> &dep)
+{
+
+}
+
+void PackageManager::remove(DependencyVec &deps)
 {
 
 }
