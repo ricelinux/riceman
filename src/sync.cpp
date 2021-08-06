@@ -88,11 +88,14 @@ bool SyncHandler::install_rices()
     }
 
     std::vector<Rice> rices;
-    std::vector<std::string> incorrect_rice_names; 
+    std::vector<std::string> incorrect_rice_names;
+
+    std::string adding_dep_str;
+    std::string removing_dep_str;
+    std::vector<DependencyDiff> dep_changes;
 
     /* Verify to-be-installed rices */
-    for (int i = 0; i < targets.size(); ++i) {
-        std::string &target = targets[i];
+    for(std::string &target : targets) {
         try {
             rices.push_back(databases.get_rice(target));
         } catch (std::runtime_error err) {
@@ -100,16 +103,38 @@ bool SyncHandler::install_rices()
         }
     }
 
+        /* Resolve new and outdated dependencies */
+    for (Rice &rice : rices) {
+        DependencyDiff diff = PackageManager::get_diff(rice.old_dependencies, rice.new_dependencies);
+        
+        for (Dependency &rm_dep : diff.remove) {
+            std::cout << rm_dep.name << std::endl;
+            removing_dep_str.append(" " + rm_dep.name);
+        }
+
+        for (Dependency &add_dep : diff.add) {
+            std::cout << add_dep.name << std::endl;
+            adding_dep_str.append(" " + add_dep.name);
+        }
+    }
+
     /** Install all available rices **/
-    for(int i = 0; i < rices.size(); ++i) {
+    for(Rice &rice : rices) {
         /* If rice is not up-to-date */
-        if ((rices[i].install_state & Rice::UP_TO_DATE) != 0) {
-            utils.log(LOG_WARNING, fmt::format("{}-{} is up to date -- reinstalling", rices[i].name, rices[i].version));
+        if ((rice.install_state & Rice::UP_TO_DATE) != 0) {
+            utils.log(LOG_WARNING, fmt::format("{}-{} is up to date -- reinstalling", rice.name, rice.version));
         }
     }
 
     utils.colon_log("Installing rices...");
     utils.rice_log(rices);
+    
+    std::cout << config.colors.title << "New Dependencies:\t"
+             << config.colors.nocolor << (adding_dep_str.length() ? adding_dep_str : "None") << std::endl
+             << config.colors.title << "Outdated Dependencies:\t" 
+             << config.colors.nocolor << (removing_dep_str.length() ? removing_dep_str : "None") << std::endl 
+             << std::endl;
+
     utils.colon_log("Proceed with installation? [Y/n] ", false);
     
     const char confirm = std::getchar();
@@ -118,9 +143,9 @@ bool SyncHandler::install_rices()
     Utils::show_cursor(false);
     Utils::handle_signals(true);
 
-    for (int i = 0; i < rices.size(); ++i) {
+    for (Rice &rice : rices) {
         try {
-            rices[i].download_toml(fmt::format("{}{}-{}{}", rices[i].name, config.colors.faint, rices[i].version, config.colors.nocolor));
+            rice.download_toml(fmt::format("{}{}-{}{}", rice.name, config.colors.faint, rice.version, config.colors.nocolor));
         } catch (std::runtime_error err) {
             utils.log(LOG_FATAL, err.what());
         }
@@ -151,14 +176,7 @@ bool SyncHandler::install_rices()
 
     utils.colon_log("Installing dependencies...");
 
-    /* Install deps */
-    for (int i = 0; i < rices.size(); ++i) {
-        try {
-            rices[i].install_deps();
-        } catch (std::runtime_error err) {
-            utils.log(LOG_FATAL, err.what());
-        }
-    }
+    return true;
 
     utils.colon_log("Processing changes...");
 
