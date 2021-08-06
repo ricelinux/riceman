@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-void PackageManager::install_diff(DependencyVec &old_deps, DependencyVec &new_deps)
+DependencyDiff PackageManager::get_diff(DependencyVec &old_deps, DependencyVec &new_deps)
 {
     DependencyVec remove_deps;
     DependencyVec add_deps;
@@ -32,31 +32,40 @@ void PackageManager::install_diff(DependencyVec &old_deps, DependencyVec &new_de
         diff_func
     );
     
-    remove(remove_deps);
-    install(add_deps);
+    return {
+        add_deps,
+        remove_deps,
+    };
 }
 
 void PackageManager::install(DependencyVec &deps)
 {
-    
+    std::vector<char *> pacman = {"pacman", "-S"};
+    std::vector<std::string> aur;
+
+    for (Dependency &dep : deps) {
+        if (dep.aur) aur.push_back(dep.name);
+        else pacman.push_back(dep.name.data());
+    }
+
+    exec(pacman.data());
+    install_aur(aur);
 }
 
-void PackageManager::install_pacman(std::vector<std::string> &dep)
+void PackageManager::install_aur(std::vector<std::string> &deps)
 {
-
-}
-
-void PackageManager::install_aur(std::vector<std::string> &dep)
-{
-
+    std::cout << "Installing all AUR packages:" << std::endl;
+    for (std::string &dep : deps) {
+        std::cout << dep << " ";
+    }
 }
 
 void PackageManager::remove(DependencyVec &deps)
 {
-
+    
 }
 
-void PackageManager::exec(char **args)
+void PackageManager::exec(char * const *args)
 {
     pid_t pid, wpid;
     int status;
@@ -65,7 +74,7 @@ void PackageManager::exec(char **args)
 
     if (pid == 0) {
         if (execvp(args[0], args) == -1) {
-            throw std::runtime_error{"failed to fork child process"};
+            throw std::runtime_error{"failed to run pacman in child process"};
         }
     } else if (pid > 0) {
         do {
@@ -74,6 +83,4 @@ void PackageManager::exec(char **args)
     } else {
         throw std::runtime_error{"failed to fork child process"};
     }
-
-
 }

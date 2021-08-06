@@ -18,21 +18,25 @@ typedef struct Dependency {
 
 typedef std::vector<Dependency> DependencyVec;
 
+typedef struct DependencyDiff {
+    DependencyVec add;
+    DependencyVec remove;
+} DependencyDiff;
+
 class PackageManager
 {
     public:
 
-    static void install_diff(DependencyVec &old_deps, DependencyVec &new_deps);
+    static DependencyDiff get_diff(DependencyVec &old_deps, DependencyVec &new_deps);
 
     private:
 
     PackageManager();
 
     static void install(DependencyVec &deps);
-    static void install_pacman(std::vector<std::string> &deps);
-    static void install_aur(std::vector<std::string> &deps);
-
     static void remove(DependencyVec &deps);
+
+    static void install_aur(std::vector<std::string> &deps);
     
-    static void exec(char **args);
+    static void exec(char * const *args);
 };
