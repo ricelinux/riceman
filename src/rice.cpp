@@ -5,9 +5,6 @@
 #include <fmt/format.h>
 #include <cpr/cpr.h>
 
-#include <sys/wait.h>
-#include <pwd.h>
-
 #include <filesystem>
 #include <iostream>
 
@@ -101,47 +98,14 @@ bool Rice::verify_toml()
 
 void Rice::install_deps()
 {
-    std::vector<char*> pacman_args = {"pacman", "-S", PACMAN_FLAGS};
-    std::vector<char*> aur_args = {AUR_HELPER, "-S", AUR_HELPER_FLAGS};
-
-    for(int i = 0; i < dependencies.size(); ++i) {
-        if (dependencies[i].aur) aur_args.push_back(dependencies[i].name.data());
-        else pacman_args.push_back(dependencies[i].name.data());
-    }
-
-    pacman_args.push_back(NULL);
-    aur_args.push_back(NULL);
-
-    run_command(pacman_args.data(), true);
-    run_command(aur_args.data(), false);
-}
-
-void Rice::run_command(char **args, bool root)
-{
-    pid_t pid, wpid, parent_pid;
-    int status;
-
-    parent_pid = getpid();
-    pid = fork();
-
-    errno = 0;
-    auto pnobody = getpwnam("nobody");
-    if (errno) throw std::runtime_error{strerror(errno)};
-
-    if (pid == 0) {
-        if (!root) {
-            if (setgid(pnobody->pw_gid) == -1 || setuid(pnobody->pw_uid) == -1 || 
-                setegid(pnobody->pw_gid) == -1 || seteuid(pnobody->pw_uid) == -1) throw std::runtime_error{"failed to drop root permissions"};
+    DependencyVec tmpdeps = {
+        {
+            false,
+            "bspwm"
         }
+    };
 
-        if (execvp(args[0], args) == -1) {
-            throw std::runtime_error{"failed to fork child process"};
-        }
-    } else if (pid > 0) {
-        do {
-            wpid = waitpid(pid, &status, WUNTRACED);
-        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
-    }
+    PackageManager::install_diff(dependencies, tmpdeps);
 }
 
 void Rice::parse_toml()

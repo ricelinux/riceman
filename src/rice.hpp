@@ -53,8 +53,6 @@ class Rice
     };
 
     private:
-    
-    void run_command(char **args, bool root);
 
     const bool repo_exists(const std::string &path, git_repository **repo);
     const std::string get_head_hash(git_repository *repo);
