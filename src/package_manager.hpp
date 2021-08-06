@@ -34,5 +34,5 @@ class PackageManager
 
     static void remove(Dependency &dep);
     
-    static void exec_pacman(char **args);
+    static void exec(char **args);
 };

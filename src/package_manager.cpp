@@ -57,7 +57,7 @@ void PackageManager::remove(Dependency &dep)
 
 }
 
-void PackageManager::exec_pacman(char **args)
+void PackageManager::exec(char **args)
 {
     pid_t pid, wpid;
     int status;
