@@ -116,6 +116,8 @@ bool SyncHandler::install_rices()
             std::cout << add_dep.name << std::endl;
             adding_dep_str.append(" " + add_dep.name);
         }
+        
+        dep_changes.push_back(diff);
     }
 
     /** Install all available rices **/
@@ -175,6 +177,17 @@ bool SyncHandler::install_rices()
     pb.done();
 
     utils.colon_log("Installing dependencies...");
+
+    for (int i = 0; i < rices.size(); ++i) {
+        DependencyDiff &diff = dep_changes[i];
+        try { 
+            PackageManager::remove(diff.remove);
+            PackageManager::install(diff.add);
+        } catch (std::runtime_error err) {
+            utils.log(LOG_FATAL, err.what());
+        }
+    }
+
 
     return true;
 
