@@ -62,7 +62,7 @@ void PackageManager::install_aur(std::vector<std::string> &deps)
     }
 }
 
-void PackageManager::remove(DependencyVec &deps)
+void PackageManager::remove(DependencyVec &deps, std::string &ignore)
 {
     
 }
