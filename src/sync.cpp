@@ -109,13 +109,11 @@ bool SyncHandler::install_rices()
             DependencyDiff diff = PackageManager::get_diff(rice.old_dependencies, rice.new_dependencies);
             
             for (Dependency &rm_dep : diff.remove) {
-                std::cout << rm_dep.name << std::endl;
-                removing_dep_str.append(" " + rm_dep.name);
+                removing_dep_str.append(rm_dep.name + " ");
             }
 
             for (Dependency &add_dep : diff.add) {
-                std::cout << add_dep.name << std::endl;
-                adding_dep_str.append(" " + add_dep.name);
+                adding_dep_str.append(add_dep.name + " ");
             }
             
             dep_changes.push_back(diff);
@@ -179,6 +177,7 @@ bool SyncHandler::install_rices()
 
         utils.colon_log("Installing dependencies...");
 
+
         for (int i = 0; i < rices.size(); ++i) {
             DependencyDiff &diff = dep_changes[i];
             try { 
@@ -189,8 +188,7 @@ bool SyncHandler::install_rices()
             }
         }
 
-
-        return true;
+        ProgressBar{"(1/1) installing dependencies", 0.4}.done();
 
         utils.colon_log("Processing changes...");
 
