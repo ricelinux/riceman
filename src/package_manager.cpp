@@ -40,7 +40,7 @@ DependencyDiff PackageManager::get_diff(DependencyVec &old_deps, DependencyVec &
 
 void PackageManager::install(DependencyVec &deps)
 {
-    std::vector<char *> pacman = {"pacman", "-S"};
+    std::vector<char *> pacman = {"pacman", "-S", "--noconfirm", "--needed"};
     std::vector<std::string> aur;
 
     for (Dependency &dep : deps) {
@@ -48,8 +48,10 @@ void PackageManager::install(DependencyVec &deps)
         else pacman.push_back(dep.name.data());
     }
 
-    exec(pacman.data());
-    install_aur(aur);
+    pacman.push_back(NULL);
+
+    if (pacman.size() > 5) exec(pacman.data());
+    if (aur.size() > 0) install_aur(aur);
 }
 
 void PackageManager::install_aur(std::vector<std::string> &deps)
