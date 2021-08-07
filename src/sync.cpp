@@ -177,11 +177,9 @@ bool SyncHandler::install_rices()
 
         utils.colon_log("Installing dependencies...");
 
-
         for (int i = 0; i < rices.size(); ++i) {
             DependencyDiff &diff = dep_changes[i];
             try { 
-                PackageManager::remove(diff.remove);
                 PackageManager::install(diff.add);
             } catch (std::runtime_error err) {
                 utils.log(LOG_FATAL, err.what());
@@ -189,6 +187,34 @@ bool SyncHandler::install_rices()
         }
 
         ProgressBar{"(1/1) installing dependencies", 0.4}.done();
+
+        utils.colon_log("Removing outdated...\n");
+
+        for (int i = 0; i < rices.size(); ++i) {
+            DependencyDiff &diff = dep_changes[i];
+            try { 
+                if (diff.remove.size() > 0) {
+                    for (int i = 0; i < diff.remove.size(); ++i) {
+                        std::cout << config.colors.groups << i+1 << config.colors.nocolor << " " << config.colors.title << diff.remove[i].name << config.colors.nocolor << std::endl;
+                    }
+                    utils.colon_log("These packages are no longer in use and will be removed. Ignore any? [N]", true, false);
+                    utils.colon_log("[N]one [A]ll or (1 2 3)", true, false);
+                    std::cout << config.colors.version << ">> " << config.colors.nocolor;
+
+                    std::string ignore;
+                    std::getline(std::cin, ignore);
+
+                    PackageManager::remove(diff.remove, ignore);
+
+                }
+            } catch (std::runtime_error err) {
+                utils.log(LOG_FATAL, err.what());
+            }
+        }
+
+        for (Rice &rice : rices) {
+
+        }
 
         utils.colon_log("Processing changes...");
 
