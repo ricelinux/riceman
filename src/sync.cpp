@@ -212,10 +212,6 @@ bool SyncHandler::install_rices()
             }
         }
 
-        for (Rice &rice : rices) {
-
-        }
-
         utils.colon_log("Processing changes...");
 
         /* Clone git repo */
