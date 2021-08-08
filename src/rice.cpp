@@ -36,7 +36,7 @@ Rice::Rice(std::string name, std::string id, std::string description, std::strin
     if (new_version.length() == 0) throw std::runtime_error{fmt::format("theme version not specified in '{}' config", name)};
     // NOTE: No need to check deps because there might be a case of a rice without dependencies
 
-    if (new_version == old_version) install_state = install_state | UP_TO_DATE;
+    if (new_version == old_version) install_state |= UP_TO_DATE;
 
     for (std::string &dep_name : pacman_deps) {
         old_dependencies.push_back({
