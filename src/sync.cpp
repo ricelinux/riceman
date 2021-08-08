@@ -49,7 +49,6 @@ bool SyncHandler::refresh_rices()
             local_hash = Utils::hash_file(db.local_path);
             remote_hash = Utils::get_uri_content(db.remote_hash_uri);
         } catch (std::runtime_error err) {
-            std::cout << "\n";
             utils.log(LOG_FATAL, err.what());
         }
         
