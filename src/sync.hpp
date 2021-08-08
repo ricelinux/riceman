@@ -26,5 +26,4 @@ class SyncHandler: public OperationHandler
     /* Operation Modifiers */
     unsigned short refresh;
     bool upgrade;
-    bool install;
 };
