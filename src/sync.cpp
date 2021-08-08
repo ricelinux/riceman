@@ -196,29 +196,30 @@ bool SyncHandler::install_rices()
 
         for (int i = 0; i < rices.size(); ++i) {
             DependencyDiff &diff = dep_changes[i];
-            try { 
-                if (diff.remove.size() > 0) {
-                    std::string ignore;
-                    std::vector<int> ignore_indexes;
-                    for (int i = 0; i < diff.remove.size(); ++i) {
-                        std::cout << config.colors.groups << i+1 << config.colors.nocolor << " " << config.colors.title << diff.remove[i].name << config.colors.nocolor << std::endl;
-                    }
-                    utils.colon_log("These packages are no longer in use and will be removed. Ignore any? [N]", true, false);
-                    utils.colon_log("[N]one [A]ll or (1 2 3)", true, false);
-                    std::cout << config.colors.version << ">> " << config.colors.nocolor;
+            
+            if (diff.remove.size() > 0) {
+                std::string ignore;
+                std::vector<int> ignore_indexes;
+                for (int i = 0; i < diff.remove.size(); ++i) {
+                    std::cout << config.colors.groups << i+1 << config.colors.nocolor << " " << config.colors.title << diff.remove[i].name << config.colors.nocolor << std::endl;
+                }
+                utils.colon_log("These packages are no longer in use and will be removed. Ignore any? [N]", true, false);
+                utils.colon_log("[N]one [A]ll or (1 2 3)", true, false);
+                std::cout << config.colors.version << ">> " << config.colors.nocolor;
 
-                    std::getline(std::cin, ignore);
-                    if (PackageManager::parse_ignore(ignore, &ignore_indexes) != 0) continue;
+                std::getline(std::cin, ignore);
+                if (PackageManager::parse_ignore(ignore, &ignore_indexes) != 0) continue;
 
-                    for (int index: ignore_indexes) {
-                        if (index <= diff.remove.size()) std::cout << "(1/1) skipping " << diff.remove[index - 1].name << std::endl;
-                    }
-
+                for (int index: ignore_indexes) {
+                    if (index <= diff.remove.size()) std::cout << "(1/1) skipping " << diff.remove[index - 1].name << std::endl;
+                }
+                
+                try { 
                     PackageManager::remove(diff.remove, ignore_indexes);
-                } else utils.log(LOG_ALL, fmt::format(" nothing to remove for {}", rices[i].name));
-            } catch (std::runtime_error err) {
-                utils.log(LOG_FATAL, err.what());
-            }
+                } catch (std::runtime_error err) {
+                    utils.log(LOG_FATAL, err.what());
+                }
+            } else utils.log(LOG_ALL, fmt::format(" nothing to remove for {}", rices[i].name));
         }
 
         utils.colon_log("Processing changes...");
