@@ -198,6 +198,8 @@ bool SyncHandler::install_rices()
             DependencyDiff &diff = dep_changes[i];
             try { 
                 if (diff.remove.size() > 0) {
+                    std::string ignore;
+                    std::vector<int> ignore_indexes;
                     for (int i = 0; i < diff.remove.size(); ++i) {
                         std::cout << config.colors.groups << i+1 << config.colors.nocolor << " " << config.colors.title << diff.remove[i].name << config.colors.nocolor << std::endl;
                     }
@@ -205,10 +207,10 @@ bool SyncHandler::install_rices()
                     utils.colon_log("[N]one [A]ll or (1 2 3)", true, false);
                     std::cout << config.colors.version << ">> " << config.colors.nocolor;
 
-                    std::string ignore;
                     std::getline(std::cin, ignore);
+                    if (PackageManager::parse_ignore(ignore, &ignore_indexes) != 0) continue;
 
-                    PackageManager::remove(diff.remove, ignore);
+                    PackageManager::remove(diff.remove, ignore_indexes);
                 } else utils.log(LOG_ALL, fmt::format(" nothing to remove for {}", rices[i].name));
             } catch (std::runtime_error err) {
                 utils.log(LOG_FATAL, err.what());
