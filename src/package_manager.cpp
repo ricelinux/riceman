@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 
 #include <unistd.h>
 #include <sys/wait.h>
@@ -40,7 +41,7 @@ DependencyDiff PackageManager::get_diff(DependencyVec &old_deps, DependencyVec &
 
 void PackageManager::install(DependencyVec &deps)
 {
-    std::vector<char *> pacman = {"pacman", "-S", "--noconfirm", "--needed"};
+    std::vector<char *> pacman = { DEFAULT_PACMAN_SYNC_ARGS };
     std::vector<std::string> aur;
 
     for (Dependency &dep : deps) {
@@ -64,14 +65,42 @@ void PackageManager::install_aur(std::vector<std::string> &deps)
 
 void PackageManager::remove(DependencyVec &deps, std::string &ignore)
 {
-    std::cout << parse_ignore(ignore)[0] << std::endl;
+    std::vector<int> ignore_indexes = parse_ignore(ignore);
+    std::vector<char *> remove_args = { DEFAULT_PACMAN_REMOVE_ARGS };
+
+    if (ignore_indexes.size() == deps.size() || (ignore_indexes.size() > 0 && ignore_indexes[0] == -2)) return;
+
+    for (int index : ignore_indexes) {
+        if (index <= deps.size() - 1) deps[index].name = '\0';
+    }
+
+    for (Dependency &dep : deps) {
+        if (dep.name != "\0") remove_args.push_back(dep.name.data());
+    }
+
+    remove_args.push_back(NULL);
+
+    std::cout << remove_args.size() << std::endl;
+
+    if (remove_args.size() > DEFAULT_PACMAN_REMOVE_ARG_LEN + 1) {
+        exec(remove_args.data());
+    }
 }
 
 std::vector<int> PackageManager::parse_ignore(std::string &ignore)
 {
-    if (ignore.length() == 0 || ignore[0] == 'n' || ignore[0] == 'N') return { 1 };
-    else if (ignore[0] == 'a' || ignore[0] == 'A') return { 2 };
-    return { 0 };
+    if (ignore.length() == 0 || ignore[0] == 'n' || ignore[0] == 'N') return { };
+    else if (ignore[0] == 'a' || ignore[0] == 'A') return { -2 };
+
+    std::vector<int> ret;
+    std::stringstream ignore_stream{ignore};
+
+    for (std::string value; std::getline(ignore_stream, value, ' ');) {
+        try {
+            ret.push_back(std::stoi(value));
+        } catch (std::invalid_argument err) {}; /* do nothing if invalid */
+    }
+    return ret;
 }
 
 void PackageManager::exec(char * const *args)
