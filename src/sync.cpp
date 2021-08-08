@@ -1,5 +1,7 @@
 #include "sync.hpp"
 
+#include <filesystem>
+
 /* Init statics */
 const struct option<int> SyncHandler::op_modifiers[SyncHandler::s_op_modifiers] = { 
     OPT('y', "refresh", 0, 1, "refreshes downloaded databases"),
@@ -142,14 +144,14 @@ bool SyncHandler::install_rices()
 
         /* Download toml */
         for (Rice &rice : rices) {
+            ProgressBar pb{fmt::format(" {}{}-{}{}", rice.name, config.colors.faint, rice.version, config.colors.nocolor), 0.4};
             try {
-                ProgressBar pb{fmt::format(" {}{}-{}{}", rice.name, config.colors.faint, rice.version, config.colors.nocolor), 0.4};
                 rice.download_toml(&pb);
-                pb.done();
-                rice.install_state |= Rice::TOML_INSTALLED;
             } catch (std::runtime_error err) {
                 utils.log(LOG_FATAL, err.what());
             }
+            pb.done();
+            rice.install_state |= Rice::TOML_INSTALLED;
         }
         
         /* Check integrity */
@@ -174,6 +176,15 @@ bool SyncHandler::install_rices()
             }
         }
         pb.done();
+        
+        /* Move .toml.tmp to .toml */
+        for (Rice &rice : rices) {
+            try {
+                std::filesystem::rename(rice.toml_tmp_path, rice.toml_path);
+            } catch (std::filesystem::filesystem_error err) {
+                utils.log(LOG_FATAL, fmt::format("unable to write to '{}'", rice.toml_path));
+            }
+        }
 
         utils.colon_log("Installing dependencies...");
 

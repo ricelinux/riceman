@@ -103,22 +103,18 @@ void Rice::download_toml(ProgressBar *pb)
     /* Handle potential errors */
     if (r.error) throw std::runtime_error{fmt::format("{} (error code {})", r.error.message, r.error.code)};
 
-    if (!Utils::write_file_content(toml_tmp_path, r.text)) throw std::runtime_error{fmt::format("unable to write to '{}'", toml_path)};
+    if (!Utils::write_file_content(toml_tmp_path, r.text)) throw std::runtime_error{fmt::format("unable to write to '{}'", toml_tmp_path)};
 }
 
 bool Rice::verify_toml()
 {
-    if(Utils::hash_file(toml_tmp_path) == hash) {
-        fs::rename(toml_tmp_path, toml_path);
-        return true;
-    }
-    return false;
+    return Utils::hash_file(toml_tmp_path) == hash;
 }
 
 void Rice::parse_toml()
 {
     /* Parse TOML (called cpptoml::parse_file in constructor and here because file is re-downloaded here) */
-    auto rice_config = cpptoml::parse_file(toml_path);
+    auto rice_config = cpptoml::parse_file(toml_tmp_path);
     
     git_repo_uri = rice_config->get_qualified_as<std::string>("git.repo").value_or("");
     git_commit_hash = rice_config->get_qualified_as<std::string>("git.commit").value_or("");
