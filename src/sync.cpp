@@ -151,7 +151,6 @@ bool SyncHandler::install_rices()
                 utils.log(LOG_FATAL, err.what());
             }
             pb.done();
-            rice.install_state |= Rice::TOML_INSTALLED;
         }
         
         /* Check integrity */
@@ -184,6 +183,7 @@ bool SyncHandler::install_rices()
             } catch (std::filesystem::filesystem_error err) {
                 utils.log(LOG_FATAL, fmt::format("unable to write to '{}'", rice.toml_path));
             }
+            rice.install_state |= Rice::TOML_INSTALLED;
         }
 
         utils.colon_log("Installing dependencies...");
