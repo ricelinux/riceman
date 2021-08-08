@@ -118,7 +118,7 @@ bool SyncHandler::install_rices()
         /** Install all available rices **/
         for(Rice &rice : rices) {
             /* If rice is not up-to-date */
-            if ((rice.install_state & Rice::UP_TO_DATE) == 1) {
+            if ((rice.install_state & Rice::UP_TO_DATE) == Rice::UP_TO_DATE) {
                 utils.log(LOG_WARNING, fmt::format("{}-{} is up to date -- reinstalling", rice.name, rice.version));
             }
         }
