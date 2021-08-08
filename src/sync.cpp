@@ -100,17 +100,10 @@ bool SyncHandler::install_rices()
         }
     }
 
-    DependencyVec test = {
-        {
-            false,
-            "neofetch"
-        }
-    };
-
     if (rices.size() > 0) {
         /* Resolve new and outdated dependencies */
         for (Rice &rice : rices) {
-            DependencyDiff diff = PackageManager::get_diff(test, rice.new_dependencies);
+            DependencyDiff diff = PackageManager::get_diff(rice.old_dependencies, rice.new_dependencies);
             
             for (Dependency &rm_dep : diff.remove) {
                 removing_dep_str.append(rm_dep.name + " ");
