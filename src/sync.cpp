@@ -7,17 +7,15 @@ const struct option<int> SyncHandler::op_modifiers[SyncHandler::s_op_modifiers] 
 };
 
 SyncHandler::SyncHandler(argparse::ArgumentParser &parser, RicemanConfig &conf, Utils &util, DatabaseCollection &database_col) 
-: OperationHandler(parser, conf, util, database_col), install{true}
+: OperationHandler(parser, conf, util, database_col)
 {
     git_libgit2_init();
     
     if (argparser.is_used("--refresh")) {
         refresh = argparser.get_length("--refresh");
-        install = false;
     }
     if (argparser.is_used("--upgrade")) {
         upgrade = argparser.get<int>("--upgrade");
-        install = false;
     }
     if (argparser.is_used("targets")) {
         targets = argparser.get<std::vector<std::string>>("targets");
@@ -28,7 +26,7 @@ bool SyncHandler::run()
 {
     if (refresh) refresh_rices();
     if (upgrade) utils.log(LOG_ALL, "Upgrading all rices.");
-    if (install) install_rices();
+    if (!targets.empty()) install_rices();
 
     return true;
 }
@@ -103,10 +101,17 @@ bool SyncHandler::install_rices()
         }
     }
 
+    DependencyVec test = {
+        {
+            false,
+            "neofetch"
+        }
+    };
+
     if (rices.size() > 0) {
         /* Resolve new and outdated dependencies */
         for (Rice &rice : rices) {
-            DependencyDiff diff = PackageManager::get_diff(rice.old_dependencies, rice.new_dependencies);
+            DependencyDiff diff = PackageManager::get_diff(test, rice.new_dependencies);
             
             for (Dependency &rm_dep : diff.remove) {
                 removing_dep_str.append(rm_dep.name + " ");
@@ -188,7 +193,7 @@ bool SyncHandler::install_rices()
 
         ProgressBar{"(1/1) installing dependencies", 0.4}.done();
 
-        utils.colon_log("Removing outdated...\n");
+        utils.colon_log("Removing outdated...");
 
         for (int i = 0; i < rices.size(); ++i) {
             DependencyDiff &diff = dep_changes[i];
@@ -205,8 +210,7 @@ bool SyncHandler::install_rices()
                     std::getline(std::cin, ignore);
 
                     PackageManager::remove(diff.remove, ignore);
-
-                }
+                } else utils.log(LOG_ALL, fmt::format(" nothing to remove for {}", rices[i].name));
             } catch (std::runtime_error err) {
                 utils.log(LOG_FATAL, err.what());
             }
