@@ -11,12 +11,6 @@
 #define VERSION "v1.0.0"
 #endif
 
-/* Dependency Management */
-#define AUR_HELPER "yay"
-#define PACMAN_FLAGS "--noconfirm"
-#define AUR_HELPER_FLAGS "--nouseask", "--nopgpfetch", "--noupgrademenu", "--nodiffmenu", "--noeditmenu", "--nocleanmenu", PACMAN_FLAGS
-
-
 /* Repository Info */
 #define DB_NAME "rices.db"
 
