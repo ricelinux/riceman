@@ -48,8 +48,8 @@ class Rice
         NOT_INSTALLED  = 0b000,
         TOML_INSTALLED = 0b001,
         GIT_INSTALLED  = 0b010,
-        BOTH_INSTALLED = 0b011,
         UP_TO_DATE     = 0b100,
+        BOTH_INSTALLED = TOML_INSTALLED | GIT_INSTALLED,
     };
 
     private:
