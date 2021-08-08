@@ -200,6 +200,9 @@ bool SyncHandler::install_rices()
             if (diff.remove.size() > 0) {
                 std::string ignore;
                 std::vector<int> ignore_indexes;
+
+                std::cout << std::endl;
+
                 for (int i = 0; i < diff.remove.size(); ++i) {
                     std::cout << config.colors.groups << i+1 << config.colors.nocolor << " " << config.colors.title << diff.remove[i].name << config.colors.nocolor << std::endl;
                 }
@@ -213,7 +216,7 @@ bool SyncHandler::install_rices()
                 for (int index: ignore_indexes) {
                     if (index <= diff.remove.size()) std::cout << "(1/1) skipping " << diff.remove[index - 1].name << std::endl;
                 }
-                
+
                 try { 
                     PackageManager::remove(diff.remove, ignore_indexes);
                 } catch (std::runtime_error err) {
