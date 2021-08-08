@@ -12,6 +12,7 @@ class SyncHandler: public OperationHandler
 
     SyncHandler(argparse::ArgumentParser &parser, RicemanConfig &conf, Utils &util, DatabaseCollection &databases);
     bool run();
+    void cleanup(std::runtime_error &err);
 
     static const int s_op_modifiers = 2;
     static const struct option<int> op_modifiers[s_op_modifiers];
@@ -22,6 +23,7 @@ class SyncHandler: public OperationHandler
     bool install_rices();
 
     std::vector<std::string> targets;
+    std::vector<Rice> rices;
 
     /* Operation Modifiers */
     unsigned short refresh;

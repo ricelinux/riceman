@@ -84,7 +84,6 @@ bool SyncHandler::install_rices()
         utils.log(LOG_FATAL, "no targets specified");
     }
 
-    std::vector<Rice> rices;
     std::vector<std::string> incorrect_rice_names;
     std::string adding_dep_str;
     std::string removing_dep_str;
@@ -147,6 +146,7 @@ bool SyncHandler::install_rices()
                 ProgressBar pb{fmt::format(" {}{}-{}{}", rice.name, config.colors.faint, rice.version, config.colors.nocolor), 0.4};
                 rice.download_toml(&pb);
                 pb.done();
+                rice.install_state |= Rice::TOML_INSTALLED;
             } catch (std::runtime_error err) {
                 utils.log(LOG_FATAL, err.what());
             }
@@ -206,7 +206,10 @@ bool SyncHandler::install_rices()
                 utils.colon_log("[N]one [A]ll or (1 2 3)", true, false);
                 std::cout << config.colors.version << ">> " << config.colors.nocolor;
 
+                Utils::show_cursor(true);
                 std::getline(std::cin, ignore);
+                Utils::show_cursor(false);
+
                 if (PackageManager::parse_ignore(ignore, &ignore_indexes) != 0) continue;
 
                 for (int index: ignore_indexes) {
@@ -246,6 +249,7 @@ bool SyncHandler::install_rices()
             try {
                 rices[i].install_desktop();
             } catch (std::runtime_error err) {
+                cleanup(err);
                 utils.log(LOG_FATAL, err.what());
             }
         }
@@ -266,4 +270,9 @@ bool SyncHandler::install_rices()
     std::cout << std::endl;
 
     return true;
+}
+
+void SyncHandler::cleanup(std::runtime_error &err)
+{
+
 }
