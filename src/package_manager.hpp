@@ -35,7 +35,7 @@ class PackageManager
 
     PackageManager();
 
-    static int parse_ignore(std::string &ignore);
+    static std::vector<int> parse_ignore(std::string &ignore);
 
     static void install_aur(std::vector<std::string> &deps);
     
