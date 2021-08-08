@@ -71,7 +71,6 @@ void PackageManager::remove(DependencyVec &deps, std::vector<int> &ignore_indexe
 
     for (int index : ignore_indexes) {
         if (index <= deps.size()) {
-            std::cout << "(1/1) skipping " << deps[index - 1].name << std::endl;
             deps[index - 1].name = "\0";
         }
     }

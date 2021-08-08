@@ -210,6 +210,10 @@ bool SyncHandler::install_rices()
                     std::getline(std::cin, ignore);
                     if (PackageManager::parse_ignore(ignore, &ignore_indexes) != 0) continue;
 
+                    for (int index: ignore_indexes) {
+                        if (index <= diff.remove.size()) std::cout << "(1/1) skipping " << diff.remove[index - 1].name << std::endl;
+                    }
+
                     PackageManager::remove(diff.remove, ignore_indexes);
                 } else utils.log(LOG_ALL, fmt::format(" nothing to remove for {}", rices[i].name));
             } catch (std::runtime_error err) {
