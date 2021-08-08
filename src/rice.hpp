@@ -22,7 +22,7 @@ class Rice
         std::string hash,
         DependencyVec new_dependencies);
 
-    void download_toml(const std::string &progress_bar_name);
+    void download_toml(ProgressBar *pb);
     bool verify_toml();
     void parse_toml();
     void install_git();
@@ -66,7 +66,6 @@ class Rice
 		unsigned int allowed_types,
 		void *payload);
 
-    ProgressBar *progress_bar;
     std::chrono::high_resolution_clock::time_point start_time;
     std::string display_server;
     std::string wm_path;

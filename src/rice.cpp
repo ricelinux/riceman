@@ -1,6 +1,7 @@
 #include "rice.hpp"
 #include "utils.hpp"
 #include "constants.hpp"
+#include "progressbar.hpp"
 
 #include <fmt/format.h>
 #include <cpr/cpr.h>
@@ -94,13 +95,10 @@ void Rice::cred_acquire(git_credential **out, const char *url, const char *usern
     return throw std::runtime_error{fmt::format("'{}' requires additional authentication", url)};
 }
 
-void Rice::download_toml(const std::string &progress_bar_name)
+void Rice::download_toml(ProgressBar *pb)
 {
     using namespace std::placeholders;
-    progress_bar = new ProgressBar{" " + progress_bar_name, 0.4};
-    cpr::Response r = cpr::Get(cpr::Url{fmt::format("{}/{}.toml", REMOTE_RICES_URI, id)}, cpr::ProgressCallback{std::bind(&ProgressBar::progress_callback_download, progress_bar, _1, _2, _3, _4)});
-    progress_bar->done();
-    delete progress_bar;
+    cpr::Response r = cpr::Get(cpr::Url{fmt::format("{}/{}.toml", REMOTE_RICES_URI, id)}, cpr::ProgressCallback{std::bind(&ProgressBar::progress_callback_download, pb, _1, _2, _3, _4)});
 
     /* Handle potential errors */
     if (r.error) throw std::runtime_error{fmt::format("{} (error code {})", r.error.message, r.error.code)};

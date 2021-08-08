@@ -86,7 +86,6 @@ bool SyncHandler::install_rices()
 
     std::vector<Rice> rices;
     std::vector<std::string> incorrect_rice_names;
-
     std::string adding_dep_str;
     std::string removing_dep_str;
     std::vector<DependencyDiff> dep_changes;
@@ -119,7 +118,7 @@ bool SyncHandler::install_rices()
         /** Install all available rices **/
         for(Rice &rice : rices) {
             /* If rice is not up-to-date */
-            if ((rice.install_state & Rice::UP_TO_DATE) != 0) {
+            if ((rice.install_state & Rice::UP_TO_DATE) == 1) {
                 utils.log(LOG_WARNING, fmt::format("{}-{} is up to date -- reinstalling", rice.name, rice.version));
             }
         }
@@ -145,7 +144,9 @@ bool SyncHandler::install_rices()
         /* Download toml */
         for (Rice &rice : rices) {
             try {
-                rice.download_toml(fmt::format("{}{}-{}{}", rice.name, config.colors.faint, rice.version, config.colors.nocolor));
+                ProgressBar pb{fmt::format(" {}{}-{}{}", rice.name, config.colors.faint, rice.version, config.colors.nocolor), 0.4};
+                rice.download_toml(&pb);
+                pb.done();
             } catch (std::runtime_error err) {
                 utils.log(LOG_FATAL, err.what());
             }
