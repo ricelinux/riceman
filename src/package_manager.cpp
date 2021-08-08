@@ -64,7 +64,14 @@ void PackageManager::install_aur(std::vector<std::string> &deps)
 
 void PackageManager::remove(DependencyVec &deps, std::string &ignore)
 {
-    
+    std::cout << parse_ignore(ignore) << std::endl;
+}
+
+int PackageManager::parse_ignore(std::string &ignore)
+{
+    if (ignore.length() == 0 || ignore[0] == 'n' || ignore[0] == 'N') return 1;
+    else if (ignore[0] == 'a' || ignore[0] == 'A') return 2;
+    return 0;
 }
 
 void PackageManager::exec(char * const *args)
