@@ -63,9 +63,8 @@ void PackageManager::install_aur(std::vector<std::string> &deps)
     }
 }
 
-void PackageManager::remove(DependencyVec &deps, std::string &ignore)
+void PackageManager::remove(DependencyVec &deps, std::vector<int> &ignore_indexes)
 {
-    std::vector<int> ignore_indexes = parse_ignore(ignore);
     std::vector<char *> remove_args = { DEFAULT_PACMAN_REMOVE_ARGS };
 
     if (ignore_indexes.size() > 0 && ignore_indexes[0] == -2) return;
@@ -86,20 +85,20 @@ void PackageManager::remove(DependencyVec &deps, std::string &ignore)
     if (remove_args.size() > DEFAULT_PACMAN_REMOVE_ARG_LEN + 1) exec(remove_args.data());
 }
 
-std::vector<int> PackageManager::parse_ignore(std::string &ignore)
+int PackageManager::parse_ignore(std::string &ignore, std::vector<int> *vec)
 {
-    if (ignore.length() == 0 || ignore[0] == 'n' || ignore[0] == 'N') return { };
-    else if (ignore[0] == 'a' || ignore[0] == 'A') return { -2 };
+    if (ignore.length() == 0 || ignore[0] == 'n' || ignore[0] == 'N') return 0;
+    else if (ignore[0] == 'a' || ignore[0] == 'A') return -1;
 
-    std::vector<int> ret;
     std::stringstream ignore_stream{ignore};
 
     for (std::string value; std::getline(ignore_stream, value, ' ');) {
         try {
-            ret.push_back(std::stoi(value));
+            vec->push_back(std::stoi(value));
         } catch (std::invalid_argument err) {}; /* do nothing if invalid */
     }
-    return ret;
+
+    return 0;
 }
 
 void PackageManager::exec(char * const *args)

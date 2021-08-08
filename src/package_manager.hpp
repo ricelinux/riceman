@@ -34,13 +34,12 @@ class PackageManager
 
     static DependencyDiff get_diff(DependencyVec &old_deps, DependencyVec &new_deps);
     static void install(DependencyVec &deps);
-    static void remove(DependencyVec &deps, std::string &ignore);
+    static void remove(DependencyVec &deps, std::vector<int> &ignore_indexes);
+    static int parse_ignore(std::string &ignore, std::vector<int> *vec);
 
     private:
 
     PackageManager();
-
-    static std::vector<int> parse_ignore(std::string &ignore);
 
     static void install_aur(std::vector<std::string> &deps);
     
