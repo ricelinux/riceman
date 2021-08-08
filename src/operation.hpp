@@ -13,6 +13,7 @@ class OperationHandler
     OperationHandler(argparse::ArgumentParser &parser, RicemanConfig &conf, Utils &util, DatabaseCollection &databases);
 
     virtual bool run() = 0;
+    virtual void cleanup() = 0;
 
     protected:
 
