@@ -185,7 +185,7 @@ bool SyncHandler::install_rices()
 
         ProgressBar{"(1/1) installing dependencies", 0.4}.done();
 
-        utils.colon_log("Removing outdated...");
+        utils.colon_log("Removing outdated dependencies...");
 
         for (int i = 0; i < rices.size(); ++i) {
             DependencyDiff &diff = dep_changes[i];
