@@ -28,7 +28,7 @@ class Rice
     void install_git();
     void install_desktop();
 
-    int install_state;
+    short install_state;
     const std::string name;
     const std::string id;
     const std::string description;
