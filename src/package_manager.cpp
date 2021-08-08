@@ -68,10 +68,13 @@ void PackageManager::remove(DependencyVec &deps, std::string &ignore)
     std::vector<int> ignore_indexes = parse_ignore(ignore);
     std::vector<char *> remove_args = { DEFAULT_PACMAN_REMOVE_ARGS };
 
-    if (ignore_indexes.size() == deps.size() || (ignore_indexes.size() > 0 && ignore_indexes[0] == -2)) return;
+    if (ignore_indexes.size() > 0 && ignore_indexes[0] == -2) return;
 
     for (int index : ignore_indexes) {
-        if (index <= deps.size() - 1) deps[index].name = '\0';
+        if (index <= deps.size()) {
+            std::cout << "(1/1) skipping " << deps[index - 1].name << std::endl;
+            deps[index - 1].name = "\0";
+        }
     }
 
     for (Dependency &dep : deps) {
@@ -80,11 +83,7 @@ void PackageManager::remove(DependencyVec &deps, std::string &ignore)
 
     remove_args.push_back(NULL);
 
-    std::cout << remove_args.size() << std::endl;
-
-    if (remove_args.size() > DEFAULT_PACMAN_REMOVE_ARG_LEN + 1) {
-        exec(remove_args.data());
-    }
+    if (remove_args.size() > DEFAULT_PACMAN_REMOVE_ARG_LEN + 1) exec(remove_args.data());
 }
 
 std::vector<int> PackageManager::parse_ignore(std::string &ignore)
