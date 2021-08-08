@@ -124,6 +124,7 @@ bool SyncHandler::install_rices()
             }
         }
 
+        /* Print confirmation dialog */
         utils.colon_log("Installing rices...");
         utils.rice_log(rices);
         
@@ -141,6 +142,7 @@ bool SyncHandler::install_rices()
         Utils::show_cursor(false);
         Utils::handle_signals(true);
 
+        /* Download toml */
         for (Rice &rice : rices) {
             try {
                 rice.download_toml(fmt::format("{}{}-{}{}", rice.name, config.colors.faint, rice.version, config.colors.nocolor));
