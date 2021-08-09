@@ -20,8 +20,10 @@ class SyncHandler: public OperationHandler
 
     bool refresh_rices();
     bool install_rices();
+    bool upgrade_rices();
 
     std::vector<std::string> targets;
+    std::vector<std::string> incorrect_rice_names;
     std::vector<Rice> rices;
 
     /* Operation Modifiers */

@@ -27,8 +27,20 @@ SyncHandler::SyncHandler(argparse::ArgumentParser &parser, RicemanConfig &conf, 
 bool SyncHandler::run()
 {
     if (refresh) refresh_rices();
-    if (upgrade) utils.log(LOG_ALL, "Upgrading all rices.");
-    if (!targets.empty()) install_rices();
+    if (upgrade) upgrade_rices();
+    if (!targets.empty()) {
+
+        /* Verify to-be-installed rices */
+        for(std::string &target : targets) {
+            try {
+                rices.push_back(databases.get_rice(target));
+            } catch (std::runtime_error) {
+                incorrect_rice_names.push_back(target);
+            }
+        }
+
+        install_rices();
+    }
 
     return true;
 }
@@ -86,19 +98,9 @@ bool SyncHandler::install_rices()
         utils.log(LOG_FATAL, "no targets specified");
     }
 
-    std::vector<std::string> incorrect_rice_names;
     std::string adding_dep_str;
     std::string removing_dep_str;
     std::vector<DependencyDiff> dep_changes;
-
-    /* Verify to-be-installed rices */
-    for(std::string &target : targets) {
-        try {
-            rices.push_back(databases.get_rice(target));
-        } catch (std::runtime_error err) {
-            incorrect_rice_names.push_back(target);
-        }
-    }
 
     if (rices.size() > 0) {
         /* Resolve new and outdated dependencies */
@@ -278,4 +280,20 @@ bool SyncHandler::install_rices()
     std::cout << std::endl;
 
     return true;
+}
+
+bool SyncHandler::upgrade_rices()
+{
+    for (Database &db : databases.db_list) {
+        for (Rice &rice : db.rices) {
+            try {
+                auto rice_config = cpptoml::parse_file(rice.toml_path);
+            } catch (cpptoml::parse_exception err) {
+                utils.log(LOG_ERROR, err.what());
+            }
+            
+        }
+    }
+
+    return install_rices();
 }
