@@ -116,10 +116,9 @@ bool SyncHandler::install_rices()
             dep_changes.push_back(diff);
         }
 
-        /** Install all available rices **/
+        /* Log reinstall */
         for(Rice &rice : rices) {
-            /* If rice is not up-to-date */
-            if ((rice.install_state & Rice::UP_TO_DATE) == Rice::UP_TO_DATE) {
+            if ((rice.install_state & Rice::UP_TO_DATE) != 0) {
                 utils.log(LOG_WARNING, fmt::format("{}-{} is up to date -- reinstalling", rice.name, rice.version));
             }
         }
@@ -183,7 +182,6 @@ bool SyncHandler::install_rices()
             } catch (std::filesystem::filesystem_error err) {
                 utils.log(LOG_FATAL, fmt::format("unable to write to '{}'", rice.toml_path));
             }
-            rice.install_state |= Rice::TOML_INSTALLED;
         }
 
         utils.colon_log("Installing dependencies...");
@@ -260,7 +258,6 @@ bool SyncHandler::install_rices()
             try {
                 rices[i].install_desktop();
             } catch (std::runtime_error err) {
-                cleanup(err);
                 utils.log(LOG_FATAL, err.what());
             }
         }
@@ -275,15 +272,10 @@ bool SyncHandler::install_rices()
     if (incorrect_rice_names.size() == 0) return true;
     
     utils.log(LOG_ERROR, fmt::format("target not found:"), false);
-    for(int i = 0; i < incorrect_rice_names.size(); ++i) {
+    for (int i = 0; i < incorrect_rice_names.size(); ++i) {
         utils.log(LOG_ALL, " " + incorrect_rice_names[i], false);
     }
     std::cout << std::endl;
 
     return true;
-}
-
-void SyncHandler::cleanup(std::runtime_error &err)
-{
-
 }
