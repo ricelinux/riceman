@@ -120,7 +120,7 @@ void Rice::parse_toml()
     git_commit_hash = rice_config->get_qualified_as<std::string>("git.commit").value_or("");
     display_server = rice_config->get_qualified_as<std::string>("window-manager.display-server").value_or("");
     wm_path = rice_config->get_qualified_as<std::string>("window-manager.executable").value_or("");
-    wm_params = fmt::format(rice_config->get_qualified_as<std::string>("window-manager.params").value_or(""), git_path);
+    wm_params = fmt::format(rice_config->get_qualified_as<std::string>("window-manager.params").value_or(""), fmt::arg("RICE_DIR", git_path));
 
     if (display_server.length() == 0) throw std::runtime_error{fmt::format("display server not specified in '{}' config", name)};
     if (wm_path.length() == 0) throw std::runtime_error{fmt::format("window manager path not specified in '{}' config", name)};
