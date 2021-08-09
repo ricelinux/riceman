@@ -19,8 +19,8 @@ class Database
     const std::string remote_db;
     const std::string remote_hash_uri;
 
+    std::vector<Rice> rices;
+
     private:
     const bool create_local();
-    
-    std::vector<Rice> rices;
 };
