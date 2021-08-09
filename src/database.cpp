@@ -16,6 +16,12 @@ Database::Database(std::string name, std::string remoteuri)
 : db_name{name}, local_path{fmt::format("{}/{}.db", LOCAL_DB_DIR, name)}, remote_uri{remoteuri}, remote_hash_uri{fmt::format("{}/rices.db.sha256sum", remoteuri)}, local_tmp_path{fmt::format("{}.tmp", local_path)}, remote_db{fmt::format("{}/rices.db", remoteuri)}
 {
     create_local();
+    update_rice_cache();
+}
+
+void Database::update_rice_cache()
+{
+    rices.clear();
     std::ifstream file{local_path};
     if (file.is_open()) {
         for(std::string line; std::getline(file, line); ) {
@@ -84,6 +90,8 @@ const short Database::refresh(std::string expected_hash)
     /* Verify newly downloaded DB */
     if (Utils::hash_file(local_tmp_path).compare(expected_hash) == 0) fs::rename(local_tmp_path, local_path);
     else return -3; /* Integrity check failed */
+
+    update_rice_cache();
 
     return 1;
 }

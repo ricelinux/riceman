@@ -23,4 +23,5 @@ class Database
 
     private:
     const bool create_local();
+    void update_rice_cache();
 };
