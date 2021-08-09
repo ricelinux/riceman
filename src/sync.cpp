@@ -197,7 +197,6 @@ bool SyncHandler::install_rices()
             }
         }
 
-        std::cout << std::endl;
         ProgressBar{"(1/1) installing dependencies", 0.4}.done();
 
         utils.colon_log("Removing outdated dependencies...");
