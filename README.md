@@ -32,6 +32,29 @@ SYNC OPTIONS
 
 > Note: This text above is only temporary
 
+## Window Managers
+
+These window managers are split into a few different groups. The main distinction amongst them is whether or not they allow a config file param. I'm really not to sure why
+
+### Supported, tested
+
+- BSPWM
+
+### Supported, untested 
+- DWM (supportable, not yet implemented)
+- Awesome
+- Sway
+- River
+- i3 (and all of it's variants)
+- Fluxbox
+
+### Unsupported
+
+- Xmonad
+- Openbox
+- Qtile
+> Note: As of right now [qtile's docs](http://docs.qtile.org/en/latest/manual/config/index.html) say that a `-c` argument can be given for the configuration file, however, when used, it doesn't work
+
 ### Thank you to...
 
 - the pacman devs
