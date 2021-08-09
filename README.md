@@ -34,7 +34,7 @@ SYNC OPTIONS
 
 ## Window Managers
 
-These window managers are split into a few different groups. The main distinction amongst them is whether or not they allow a config file param. I'm really not to sure why
+These window managers are split into a few different groups. The main distinction amongst them is whether or not they allow a config file param. I'm really not to sure why they wouldn't all allow some kind of config file/dir specification, but there needs to be a different solution for those that don't.
 
 ### Supported, tested
 
