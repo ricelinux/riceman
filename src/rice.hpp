@@ -54,17 +54,8 @@ class Rice
 
     private:
 
-    const bool repo_exists(const std::string &path, git_repository **repo);
-    const std::string get_head_hash(git_repository *repo);
-    void handle_libgit_error(int error);
-
     static void checkout_progress(const char *path, size_t cur, size_t tot, void *payload);
     static int fetch_progress(const git_indexer_progress *stats, void *payload);
-    static void cred_acquire(git_credential **out,
-		const char *url,
-		const char *username_from_url,
-		unsigned int allowed_types,
-		void *payload);
 
     std::chrono::high_resolution_clock::time_point start_time;
     std::string display_server;
