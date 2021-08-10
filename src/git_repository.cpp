@@ -17,6 +17,11 @@ GitRepository::GitRepository(const std::string &path, const std::string &remote_
     }
 }
 
+GitRepository::~GitRepository()
+{
+    git_repository_free(repo);
+}
+
 void GitRepository::clone()
 {
     git_clone_options clone_opts = GIT_CLONE_OPTIONS_INIT;

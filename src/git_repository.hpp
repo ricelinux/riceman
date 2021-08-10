@@ -9,6 +9,7 @@ class GitRepository
     public:
 
     GitRepository(const std::string &path, const std::string &remote);
+    ~GitRepository();
     void clone();
     void checkout_commit(std::string &hash);
     void pull();
