@@ -23,6 +23,10 @@ SyncHandler::SyncHandler(argparse::ArgumentParser &parser, RicemanConfig &conf, 
         targets = argparser.get<std::vector<std::string>>("targets");
     }
 }
+SyncHandler::~SyncHandler()
+{
+    git_libgit2_shutdown();
+}
 
 bool SyncHandler::run()
 {
