@@ -12,14 +12,16 @@ class GitRepository
     ~GitRepository();
     void clone();
     void checkout_commit(std::string &hash);
-    void pull();
+    void checkout_branch(std::string &branch_name);
+    bool pull();
     const std::string get_head_hash();
 
     bool cloned;
 
     private:
 
-    void handle_libgit_error(int error);
+    const char *get_current_branch_name();
+    int handle_libgit_error(int error);
     static void cred_acquire(git_credential **out, const char *url, const char *username_from_url, unsigned int allowed_types, void *payload);
 
     git_repository *repo;

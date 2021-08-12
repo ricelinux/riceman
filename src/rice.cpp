@@ -92,6 +92,9 @@ void Rice::install_git()
     GitRepository git_repo{git_path, git_repo_uri};
 
     if (!git_repo.cloned) git_repo.clone();
+    else {
+        git_repo.pull();
+    }
     git_repo.checkout_commit(git_commit_hash);
 
 }

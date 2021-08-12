@@ -5,6 +5,7 @@
 #include <sstream>
 
 #include <unistd.h>
+#include <git2.h>
 #include <sys/wait.h>
 
 DependencyDiff PackageManager::get_diff(DependencyVec &old_deps, DependencyVec &new_deps)
@@ -57,9 +58,10 @@ void PackageManager::install(DependencyVec &deps)
 
 void PackageManager::install_aur(std::vector<std::string> &deps)
 {
-    std::cout << "Installing all AUR packages:" << std::endl;
     for (std::string &dep : deps) {
-        std::cout << dep << " ";
+        git_repository *repo = NULL;
+
+        
     }
 }
 
