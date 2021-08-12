@@ -20,7 +20,6 @@ class GitRepository
 
     private:
 
-    const char *get_current_branch_name();
     int handle_libgit_error(int error);
     static void cred_acquire(git_credential **out, const char *url, const char *username_from_url, unsigned int allowed_types, void *payload);
 

@@ -122,26 +122,6 @@ bool GitRepository::pull()
     return true;
 }
 
-
-
-const char *GitRepository::get_current_branch_name()
-{
-    git_reference *head;
-
-    git_repository_head(&head, repo);
-
-    /* If head is detached */
-    if (handle_libgit_error(git_repository_head_detached(repo)) == 1) {
-        const git_oid *head_oid;
-
-        head_oid = git_reference_target_peel(head);
-        
-
-    } else {
-        return git_reference_symbolic_target(head);
-    }
-}
-
 int GitRepository::handle_libgit_error(int error)
 {
     if (error >= 0) return error;
