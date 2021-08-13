@@ -12,9 +12,7 @@ class GitRepository
     ~GitRepository();
     void clone();
     void checkout_commit(std::string &hash);
-    void checkout_branch(std::string &branch_name);
     bool pull();
-    const std::string get_head_hash();
 
     bool cloned;
 
