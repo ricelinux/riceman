@@ -15,5 +15,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: clean
       run: make clean
+    - name: install deps
+      run: sudo apt install libgit2-dev libfmt-dev libcrypto++-dev libcurlpp-dev
     - name: make release
       run: make release
