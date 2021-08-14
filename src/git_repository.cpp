@@ -50,19 +50,16 @@ void GitRepository::checkout_commit(std::string &hash)
     git_commit_free(commit);
 }
 
-/**
- * 
- * Reference: https://www.git-scm.com/docs/git-pull
- */
-bool GitRepository::pull()
+void GitRepository::fetch(git_remote **remote)
 {
-    /* Perform `git fetch` */
-    git_remote *remote;
     git_fetch_options fetch_options = GIT_FETCH_OPTIONS_INIT;
-    
-    handle_libgit_error(git_remote_lookup(&remote, repo, "origin"));
-    handle_libgit_error(git_remote_fetch(remote, NULL, &fetch_options, NULL));
 
+    handle_libgit_error(git_remote_lookup(remote, repo, "origin"));
+    handle_libgit_error(git_remote_fetch(*remote, NULL, &fetch_options, NULL));
+}
+
+bool GitRepository::merge_default(git_remote **remote)
+{
     /* Perform `git merge origin/master` */
     git_oid branch_oid;
     git_merge_analysis_t analysis;
@@ -85,23 +82,20 @@ bool GitRepository::pull()
     
     handle_libgit_error(git_merge_analysis(&analysis, &preference, repo, (const git_annotated_commit **)heads, 1));
 
-    std::cout << analysis << std::endl
-            << preference << std::endl;
-
     if (analysis & GIT_MERGE_ANALYSIS_UP_TO_DATE) {
         git_annotated_commit_free(heads[0]);
         git_repository_state_cleanup(repo);
-        git_remote_free(remote);
+        git_remote_free(*remote);
         return true;
     } else if (analysis & GIT_MERGE_ANALYSIS_FASTFORWARD) {
         git_buf ref_name;
         git_remote_callbacks callbacks = GIT_REMOTE_CALLBACKS_INIT;
         git_proxy_options proxy_opts = GIT_PROXY_OPTIONS_INIT;
 
-        handle_libgit_error(git_remote_connect(remote, GIT_DIRECTION_FETCH, &callbacks, &proxy_opts, NULL));
-        if (!git_remote_connected(remote)) throw std::runtime_error{fmt::format("failed to connect to '{}'", remote_uri)};
-        handle_libgit_error(git_remote_default_branch(&ref_name, remote));
-        handle_libgit_error(git_remote_disconnect(remote));
+        handle_libgit_error(git_remote_connect(*remote, GIT_DIRECTION_FETCH, &callbacks, &proxy_opts, NULL));
+        if (!git_remote_connected(*remote)) throw std::runtime_error{fmt::format("failed to connect to '{}'", remote_uri)};
+        handle_libgit_error(git_remote_default_branch(&ref_name, *remote));
+        handle_libgit_error(git_remote_disconnect(*remote));
         
         git_reference *ref;
         git_reference *newref;
@@ -118,7 +112,7 @@ bool GitRepository::pull()
 
     git_annotated_commit_free(heads[0]);
     git_repository_state_cleanup(repo);
-    git_remote_free(remote);
+    git_remote_free(*remote);
     return true;
 }
 

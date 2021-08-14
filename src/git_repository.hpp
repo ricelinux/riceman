@@ -12,7 +12,8 @@ class GitRepository
     ~GitRepository();
     void clone();
     void checkout_commit(std::string &hash);
-    bool pull();
+    void fetch(git_remote **remote);
+    bool merge_default(git_remote **remote);
 
     bool cloned;
 

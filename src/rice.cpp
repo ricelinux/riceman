@@ -93,7 +93,9 @@ void Rice::install_git()
 
     if (!git_repo.cloned) git_repo.clone();
     else {
-        git_repo.pull();
+        git_remote *remote;
+        git_repo.fetch(&remote);
+        git_repo.merge_default(&remote);
     }
     git_repo.checkout_commit(git_commit_hash);
 
