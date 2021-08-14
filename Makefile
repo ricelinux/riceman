@@ -34,6 +34,7 @@ release: $(BIN)
 release_ubuntu: CFLAGS += -Os
 release_ubuntu: CFLAGS += $(shell pkg-config --cflags libcrypto++)
 release_ubuntu: LDFLAGS += $(shell pkg-config --libs libcrypto++)
+release_ubuntu: INCFLAGS +=  -Ideps/cpptoml
 release_ubuntu: $(BIN)
 
 $(BIN): $(OBJECTS) $(HEADERS) $(CPR_OBJECTS)
