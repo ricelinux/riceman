@@ -16,6 +16,6 @@ jobs:
     - name: clean
       run: make clean
     - name: install deps
-      run: sudo apt install libgit2-dev libfmt-dev libcrypto++-dev libcurlpp-dev
+      run: sudo apt install libgit2-dev libfmt-dev libcrypto++-dev libcurlpp-dev libcurl4-openssl-dev
     - name: make release
       run: make release
