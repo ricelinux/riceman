@@ -16,26 +16,16 @@ HEADERS := $(wildcard $(SRC)/*.hpp)
 CPR_SOURCES := $(wildcard $(CPR_SRC)/*.cpp)
 CPR_OBJECTS := $(patsubst $(CPR_SRC)/%.cpp, $(CPR_OBJ)/%.o, $(CPR_SOURCES))
 
-LIBS 	 := libcurl fmt libgit2
+LIBS 	 := libcurl fmt libgit2 libcryptopp
 INCFLAGS := -Ideps/cpr/include -Ideps/argparse
 CFLAGS   := $(shell pkg-config --cflags $(LIBS)) -std=c++17
 LDFLAGS  := $(shell pkg-config --libs $(LIBS)) -lstdc++ -lm
 
 debug: CFLAGS += -O0
-debug: CFLAGS += $(shell pkg-config --cflags libcryptopp)
-debug: LDFLAGS += $(shell pkg-config --libs libcryptopp)
 debug: $(BIN)
 
 release: CFLAGS += -Os
-release: CFLAGS += $(shell pkg-config --cflags libcryptopp)
-release: LDFLAGS += $(shell pkg-config --libs libcryptopp)
 release: $(BIN)
-
-release_ubuntu: CFLAGS += -Os
-release_ubuntu: CFLAGS += $(shell pkg-config --cflags libcrypto++)
-release_ubuntu: LDFLAGS += $(shell pkg-config --libs libcrypto++)
-release_ubuntu: INCFLAGS +=  -Ideps/cpptoml
-release_ubuntu: $(BIN)
 
 $(BIN): $(OBJECTS) $(HEADERS) $(CPR_OBJECTS)
 	$(CC) -o $(BIN) $(OBJECTS) $(CPR_OBJECTS) $(LDFLAGS) $(INCFLAGS)
