@@ -53,10 +53,7 @@ class Rice
     };
 
     private:
-
-    static void checkout_progress(const char *path, size_t cur, size_t tot, void *payload);
-    static int fetch_progress(const git_indexer_progress *stats, void *payload);
-
+    
     std::chrono::high_resolution_clock::time_point start_time;
     std::string display_server;
     std::string wm_path;
