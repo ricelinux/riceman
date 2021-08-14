@@ -14,8 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Arch Linux's package action
-      uses: datakrama/archlinux-package-action@v1.0.3
+      uses: 2m/arch-pkgbuild-builder@v1.16
       with:
-        path: .
-        flags: '-si --noconfirm'
-        namcap: false
+        target: 'PKGBUILD'
+        pkgname: 'riceman'
