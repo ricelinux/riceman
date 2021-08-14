@@ -13,9 +13,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: clean
-      run: make clean_all
-    - name: install deps
-      run: sudo apt install libgit2-dev libfmt-dev libcrypto++-dev libcurlpp-dev libcurl4-openssl-dev
-    - name: make release
-      run: make release_ubuntu
+    - name: Arch Linux's package action
+      uses: datakrama/archlinux-package-action@v1.0.3
+        with:
+          path: $GITHUB_WORKSPACE
+          flags: '-si --noconfirm'
+          namcap: false
