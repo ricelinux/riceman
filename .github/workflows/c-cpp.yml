@@ -16,6 +16,6 @@ jobs:
     - name: Arch Linux's package action
       uses: datakrama/archlinux-package-action@v1.0.3
       with:
-        path: $GITHUB_WORKSPACE
+        path: .
         flags: '-si --noconfirm'
         namcap: false
