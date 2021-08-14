@@ -201,7 +201,7 @@ bool SyncHandler::install_rices()
             }
         }
 
-        ProgressBar{"(1/1) installing dependencies", 0.4}.done();
+        ProgressBar{fmt::format("({0}/{0}) installing dependencies", rices.size()), 0.4}.done();
 
         utils.colon_log("Removing outdated dependencies...");
 
