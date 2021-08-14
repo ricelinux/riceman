@@ -13,7 +13,5 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Arch Linux's package action
-      uses: 2m/arch-pkgbuild-builder@v1.16
-      with:
-        target: 'pkgbuild'
+    - name: Build archlinux package
+      uses: mijailr/arch-makepkg-action@v1
