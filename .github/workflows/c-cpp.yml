@@ -18,4 +18,4 @@ jobs:
     - name: install deps
       run: sudo apt install libgit2-dev libfmt-dev libcrypto++-dev libcurlpp-dev libcurl4-openssl-dev
     - name: make release
-      run: make release
+      run: make release_ubuntu
