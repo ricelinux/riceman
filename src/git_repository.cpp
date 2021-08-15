@@ -50,9 +50,10 @@ void GitRepository::checkout_commit(std::string &hash)
     git_commit_free(commit);
 }
 
-void GitRepository::fetch(git_remote **remote)
+void GitRepository::fetch(git_remote **remote, ProgressBar *pb, int &rice_index, int rice_count)
 {
     git_fetch_options fetch_options = GIT_FETCH_OPTIONS_INIT;
+    fetch_options.callbacks.credentials = (git_credential_acquire_cb)GitRepository::cred_acquire;
 
     handle_libgit_error(git_remote_lookup(remote, repo, "origin"));
     handle_libgit_error(git_remote_fetch(*remote, NULL, &fetch_options, NULL));
