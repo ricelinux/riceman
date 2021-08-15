@@ -1,4 +1,5 @@
 #include "git_repository.hpp"
+#include "utils.hpp"
 
 #include <filesystem>
 #include <iostream>
@@ -6,6 +7,8 @@
 #include <fmt/format.h>
 
 namespace fs = std::filesystem;
+
+#define GIT "/usr/bin/git"
 
 typedef struct fetch_progress_payload {
     ProgressBar *progress_bar;
@@ -60,79 +63,19 @@ void GitRepository::checkout_commit(std::string &hash)
     git_commit_free(commit);
 }
 
-void GitRepository::fetch(git_remote **remote, ProgressBar *pb, int &rice_index, int rice_count)
+// todo: Figure out how to implement `git pull` and `git checkout -` into pure libgit
+// note: My brain is hemorrhaging
+
+void GitRepository::pull()
 {
-    git_fetch_options fetch_options = GIT_FETCH_OPTIONS_INIT;
-    fetch_progress_payload pd = {
-        pb,
-        &rice_index,
-        &rice_count
-    };
-
-    fetch_options.callbacks.credentials = (git_credential_acquire_cb)GitRepository::cred_acquire;
-    fetch_options.callbacks.transfer_progress = (git_indexer_progress_cb)GitRepository::fetch_progress;
-    fetch_options.callbacks.payload = &pd;
-
-    handle_libgit_error(git_remote_lookup(remote, repo, "origin"));
-    handle_libgit_error(git_remote_fetch(*remote, NULL, &fetch_options, NULL));
+    char * const args[] = {GIT, "pull"};
+    Utils::exec(args);
 }
 
-bool GitRepository::merge_default(git_remote **remote)
+void GitRepository::checkout_default()
 {
-    /* Perform `git merge origin/master` */
-    fetchhead_foreach_payload pd = {
-        NULL,
-        NULL
-    };
-    git_merge_analysis_t analysis;
-    git_merge_preference_t preference;
-    git_annotated_commit *heads[ 1 ];
-
-    git_repository_fetchhead_foreach(repo, [](
-        const char *ref_name,
-        const char *remote_url,
-        const git_oid *oid,
-        unsigned int is_merge,
-        void *payload) -> int {
-            fetchhead_foreach_payload *pd = (fetchhead_foreach_payload*)payload;
-
-            if (is_merge) {
-                pd->branch_oid = oid;
-                pd->branch_name = &ref_name;
-            }
-            
-            return 0;
-    }, &pd);
-
-    if (pd.branch_name == NULL) return false;
-    if (git_annotated_commit_lookup( &heads[ 0 ], repo, pd.branch_oid)) return false;
-    
-    handle_libgit_error(git_merge_analysis(&analysis, &preference, repo, (const git_annotated_commit **)heads, 1));
-
-    if (analysis & GIT_MERGE_ANALYSIS_UP_TO_DATE) {
-        git_annotated_commit_free(heads[0]);
-        git_repository_state_cleanup(repo);
-        git_remote_free(*remote);
-        return true;
-    } else if (analysis & GIT_MERGE_ANALYSIS_FASTFORWARD) {
-        git_remote_callbacks callbacks = GIT_REMOTE_CALLBACKS_INIT;
-        git_proxy_options proxy_opts = GIT_PROXY_OPTIONS_INIT;
-        git_reference *newref;
-        git_reference *branch;
-
-        if (git_reference_lookup(&branch, repo, *pd.branch_name) == 0)
-            git_reference_set_target(&newref, branch, pd.branch_oid, "pull: Fast-forward");
-        
-        git_reset_from_annotated(repo, heads[0], GIT_RESET_HARD, NULL);
-
-        git_reference_free(branch);
-        git_reference_free(newref);
-    }
-
-    git_annotated_commit_free(heads[0]);
-    git_repository_state_cleanup(repo);
-    git_remote_free(*remote);
-    return true;
+    char * const args[] = {GIT, "checkout", "-", NULL};
+    Utils::exec(args);
 }
 
 
