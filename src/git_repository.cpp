@@ -75,16 +75,23 @@ void GitRepository::pull()
 void GitRepository::checkout_default()
 {
     git_reference *origin_head;
+    git_object *treeish;
+    git_checkout_options checkout_opts = GIT_CHECKOUT_OPTIONS_INIT;
+    checkout_opts.checkout_strategy = GIT_CHECKOUT_SAFE;
+
     std::string origin_default_branch;
 
+    /* Get default branch */
     handle_libgit_error(git_reference_lookup(&origin_head, repo, "refs/remotes/origin/HEAD"));
     origin_default_branch = git_reference_symbolic_target(origin_head);
-    origin_default_branch = origin_default_branch.substr(20, origin_default_branch.size());
+    origin_default_branch = origin_default_branch.substr(20, origin_default_branch.length());
 
-    if (origin_default_branch == "\0") throw std::runtime_error{"remote does not have a default branch"};
-    
-    char * const args[] = {GIT, "-C", (char *const)path.data(), "checkout", origin_default_branch.data(), NULL};
-    Utils::exec(args);
+    /* Checkout default branch */
+    handle_libgit_error(git_revparse_single(&treeish, repo, origin_default_branch.data()));
+    handle_libgit_error(git_checkout_tree(repo, treeish, &checkout_opts));
+
+    /* Set HEAD to default branch */
+    handle_libgit_error(git_repository_set_head(repo, fmt::format("refs/heads/{}", origin_default_branch).data()));
 }
 
 
