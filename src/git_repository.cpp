@@ -13,6 +13,11 @@ typedef struct fetch_progress_payload {
     int *rice_count;
 } fetch_progress_payload;
 
+typedef struct fetchhead_foreach_payload {
+    const git_oid *branch_oid;
+    const char **branch_name;
+} fetchhead_foreach_payload;
+
 GitRepository::GitRepository(const std::string &path, const std::string &remote_uri)
     : path{path}, remote_uri{remote_uri}
 {
@@ -75,7 +80,10 @@ void GitRepository::fetch(git_remote **remote, ProgressBar *pb, int &rice_index,
 bool GitRepository::merge_default(git_remote **remote)
 {
     /* Perform `git merge origin/master` */
-    git_oid branch_oid;
+    fetchhead_foreach_payload pd = {
+        NULL,
+        NULL
+    };
     git_merge_analysis_t analysis;
     git_merge_preference_t preference;
     git_annotated_commit *heads[ 1 ];
@@ -86,13 +94,18 @@ bool GitRepository::merge_default(git_remote **remote)
         const git_oid *oid,
         unsigned int is_merge,
         void *payload) -> int {
-            if (is_merge) *(git_oid*)payload = *oid;
-            else *(git_oid*)payload = {};
-            return 0;
-    }, &branch_oid);
+            fetchhead_foreach_payload *pd = (fetchhead_foreach_payload*)payload;
 
-    if (git_oid_is_zero(&branch_oid)) return false;
-    if (git_annotated_commit_lookup( &heads[ 0 ], repo, &branch_oid)) return false;
+            if (is_merge) {
+                pd->branch_oid = oid;
+                pd->branch_name = &ref_name;
+            }
+            
+            return 0;
+    }, &pd);
+
+    if (pd.branch_name == NULL) return false;
+    if (git_annotated_commit_lookup( &heads[ 0 ], repo, pd.branch_oid)) return false;
     
     handle_libgit_error(git_merge_analysis(&analysis, &preference, repo, (const git_annotated_commit **)heads, 1));
 
@@ -102,26 +115,18 @@ bool GitRepository::merge_default(git_remote **remote)
         git_remote_free(*remote);
         return true;
     } else if (analysis & GIT_MERGE_ANALYSIS_FASTFORWARD) {
-        git_buf ref_name;
         git_remote_callbacks callbacks = GIT_REMOTE_CALLBACKS_INIT;
         git_proxy_options proxy_opts = GIT_PROXY_OPTIONS_INIT;
-        
-        handle_libgit_error(git_remote_connect(*remote, GIT_DIRECTION_FETCH, &callbacks, &proxy_opts, NULL));
-        if (!git_remote_connected(*remote)) throw std::runtime_error{fmt::format("failed to connect to '{}'", remote_uri)};
-        handle_libgit_error(git_remote_default_branch(&ref_name, *remote));
-        handle_libgit_error(git_remote_disconnect(*remote));
-        
-        git_reference *ref;
         git_reference *newref;
-        
-        if (git_reference_lookup(&ref, repo, ref_name.ptr) == 0)
-            git_reference_set_target(&newref, ref, &branch_oid, "pull: Fast-forward");
+        git_reference *branch;
+
+        if (git_reference_lookup(&branch, repo, *pd.branch_name) == 0)
+            git_reference_set_target(&newref, branch, pd.branch_oid, "pull: Fast-forward");
         
         git_reset_from_annotated(repo, heads[0], GIT_RESET_HARD, NULL);
 
-        git_reference_free(ref);
+        git_reference_free(branch);
         git_reference_free(newref);
-        git_buf_free(&ref_name);
     }
 
     git_annotated_commit_free(heads[0]);
