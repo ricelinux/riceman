@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 
-#define DEFAULT_PACMAN_SYNC_ARGS "pacman", "-S", "--noconfirm", "--needed"
-#define DEFAULT_PACMAN_REMOVE_ARGS "pacman", "-Rus", "--noconfirm"
+#define DEFAULT_PACMAN_SYNC_ARGS "/usr/bin/pacman", "-S", "--noconfirm", "--needed"
+#define DEFAULT_PACMAN_REMOVE_ARGS "/usr/bin/pacman", "-Rus", "--noconfirm"
 #define DEFAULT_PACMAN_SYNC_ARG_LEN 4
 #define DEFAULT_PACMAN_REMOVE_ARG_LEN 3
 
