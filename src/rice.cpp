@@ -97,7 +97,6 @@ void Rice::install_git(ProgressBar *pb, int &rice_index, int rice_count)
         git_repo.pull();
     }
     git_repo.checkout_commit(git_commit_hash);
-
 }
 
 void Rice::install_desktop()
