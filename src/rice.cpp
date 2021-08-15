@@ -87,14 +87,14 @@ void Rice::parse_toml()
     if (git_commit_hash.length() == 0) throw std::runtime_error{fmt::format("git commit hash not specified in '{}' config", name)};
 }
 
-void Rice::install_git()
+void Rice::install_git(ProgressBar *pb, int &rice_index, int rice_count)
 {
     GitRepository git_repo{git_path, git_repo_uri};
 
     if (!git_repo.cloned) git_repo.clone();
     else {
         git_remote *remote;
-        git_repo.fetch(&remote);
+        git_repo.fetch(&remote, pb, rice_index, rice_count);
         git_repo.merge_default(&remote);
     }
     git_repo.checkout_commit(git_commit_hash);

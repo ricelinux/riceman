@@ -22,6 +22,7 @@ class GitRepository
     private:
 
     int handle_libgit_error(int error);
+    static int fetch_progress(const git_indexer_progress *stats, void *payload);
     static void cred_acquire(git_credential **out, const char *url, const char *username_from_url, unsigned int allowed_types, void *payload);
 
     git_repository *repo;

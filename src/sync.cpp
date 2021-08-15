@@ -248,7 +248,7 @@ bool SyncHandler::install_rices()
             pb.update("", (double)i / (double)rices.size());
 
             try {
-                rices[i].install_git();
+                rices[i].install_git(&pb, i, rices.size());
             } catch (std::runtime_error err) {
                 utils.log(LOG_FATAL, err.what());
             }

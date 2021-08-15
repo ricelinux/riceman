@@ -7,6 +7,11 @@
 
 namespace fs = std::filesystem;
 
+typedef struct fetch_progress_payload {
+    ProgressBar *progress_bar;
+    int *rice_index;
+    int *rice_count;
+} fetch_progress_payload;
 
 GitRepository::GitRepository(const std::string &path, const std::string &remote_uri)
     : path{path}, remote_uri{remote_uri}
@@ -53,7 +58,15 @@ void GitRepository::checkout_commit(std::string &hash)
 void GitRepository::fetch(git_remote **remote, ProgressBar *pb, int &rice_index, int rice_count)
 {
     git_fetch_options fetch_options = GIT_FETCH_OPTIONS_INIT;
+    fetch_progress_payload pd = {
+        pb,
+        &rice_index,
+        &rice_count
+    };
+
     fetch_options.callbacks.credentials = (git_credential_acquire_cb)GitRepository::cred_acquire;
+    fetch_options.callbacks.transfer_progress = (git_indexer_progress_cb)GitRepository::fetch_progress;
+    fetch_options.callbacks.payload = &pd;
 
     handle_libgit_error(git_remote_lookup(remote, repo, "origin"));
     handle_libgit_error(git_remote_fetch(*remote, NULL, &fetch_options, NULL));
@@ -92,7 +105,7 @@ bool GitRepository::merge_default(git_remote **remote)
         git_buf ref_name;
         git_remote_callbacks callbacks = GIT_REMOTE_CALLBACKS_INIT;
         git_proxy_options proxy_opts = GIT_PROXY_OPTIONS_INIT;
-
+        
         handle_libgit_error(git_remote_connect(*remote, GIT_DIRECTION_FETCH, &callbacks, &proxy_opts, NULL));
         if (!git_remote_connected(*remote)) throw std::runtime_error{fmt::format("failed to connect to '{}'", remote_uri)};
         handle_libgit_error(git_remote_default_branch(&ref_name, *remote));
@@ -100,7 +113,7 @@ bool GitRepository::merge_default(git_remote **remote)
         
         git_reference *ref;
         git_reference *newref;
-
+        
         if (git_reference_lookup(&ref, repo, ref_name.ptr) == 0)
             git_reference_set_target(&newref, ref, &branch_oid, "pull: Fast-forward");
         
@@ -115,6 +128,19 @@ bool GitRepository::merge_default(git_remote **remote)
     git_repository_state_cleanup(repo);
     git_remote_free(*remote);
     return true;
+}
+
+
+int GitRepository::fetch_progress(const git_indexer_progress *stats, void *payload)
+{
+    fetch_progress_payload *pd = (fetch_progress_payload*)payload;
+    double index = *(pd->rice_index);
+    double count = *(pd->rice_count);
+    double percent = (stats->indexed_deltas + stats->indexed_objects) / (stats->total_deltas + stats->total_objects);
+    
+    pd->progress_bar->update("", ((index + percent) / count));
+
+    return 0;
 }
 
 int GitRepository::handle_libgit_error(int error)
