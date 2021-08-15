@@ -45,6 +45,7 @@ class Utils
     static const std::string get_uri_content(const std::string &uri);
     static const std::string hash_sha256(const std::string &content);
     static const std::string hash_file(const std::string &path);
+    static void exec(char * const *args);
 
     RicemanConfig &config;
 

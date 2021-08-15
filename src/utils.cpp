@@ -8,6 +8,7 @@
 
 #include <cpr/cpr.h>
 #include <fmt/format.h>
+#include <sys/wait.h>
 
 namespace fs = std::filesystem;
 using CryptoPP::byte, CryptoPP::SHA256;
@@ -178,4 +179,24 @@ const std::string Utils::hash_sha256(const std::string &content)
 const std::string Utils::hash_file(const std::string &path)
 {
 	return hash_sha256(get_file_content(path));
+}
+
+void Utils::exec(char * const *args)
+{
+    pid_t pid, wpid;
+    int status;
+
+    pid = fork();
+
+    if (pid == 0) {
+        if (execvp(args[0], args) == -1) {
+            throw std::runtime_error{fmt::format("'{}' failed to run in child process", args[0])};
+        }
+    } else if (pid > 0) {
+        do {
+            wpid = waitpid(pid, &status, WUNTRACED);
+        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+    } else {
+        throw std::runtime_error{"failed to fork child process"};
+    }
 }

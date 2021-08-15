@@ -42,6 +42,4 @@ class PackageManager
     PackageManager();
 
     static void install_aur(std::vector<std::string> &deps);
-    
-    static void exec(char * const *args);
 };

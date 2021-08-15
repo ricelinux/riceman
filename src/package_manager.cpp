@@ -1,12 +1,11 @@
 #include "package_manager.hpp"
+#include "utils.hpp"
 
 #include <algorithm>
 #include <iostream>
 #include <sstream>
 
-#include <unistd.h>
 #include <git2.h>
-#include <sys/wait.h>
 
 DependencyDiff PackageManager::get_diff(DependencyVec &old_deps, DependencyVec &new_deps)
 {
@@ -52,7 +51,7 @@ void PackageManager::install(DependencyVec &deps)
 
     pacman.push_back(NULL);
 
-    if (pacman.size() > 5) exec(pacman.data());
+    if (pacman.size() > 5) Utils::exec(pacman.data());
     if (aur.size() > 0) install_aur(aur);
 }
 
@@ -83,7 +82,7 @@ void PackageManager::remove(DependencyVec &deps, std::vector<int> &ignore_indexe
 
     remove_args.push_back(NULL);
 
-    if (remove_args.size() > DEFAULT_PACMAN_REMOVE_ARG_LEN + 1) exec(remove_args.data());
+    if (remove_args.size() > DEFAULT_PACMAN_REMOVE_ARG_LEN + 1) Utils::exec(remove_args.data());
 }
 
 int PackageManager::parse_ignore(std::string &ignore, std::vector<int> *vec)
@@ -100,24 +99,4 @@ int PackageManager::parse_ignore(std::string &ignore, std::vector<int> *vec)
     }
 
     return 0;
-}
-
-void PackageManager::exec(char * const *args)
-{
-    pid_t pid, wpid;
-    int status;
-
-    pid = fork();
-
-    if (pid == 0) {
-        if (execvp(args[0], args) == -1) {
-            throw std::runtime_error{"failed to run pacman in child process"};
-        }
-    } else if (pid > 0) {
-        do {
-            wpid = waitpid(pid, &status, WUNTRACED);
-        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
-    } else {
-        throw std::runtime_error{"failed to fork child process"};
-    }
 }
