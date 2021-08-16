@@ -9,7 +9,7 @@ const struct option<int> SyncHandler::op_modifiers[SyncHandler::s_op_modifiers] 
 };
 
 SyncHandler::SyncHandler(argparse::ArgumentParser &parser, RicemanConfig &conf, Utils &util, DatabaseCollection &database_col) 
-: OperationHandler(parser, conf, util, database_col)
+: OperationHandler(parser, conf, util, database_col), install{true}
 {
     git_libgit2_init();
     
@@ -30,9 +30,15 @@ SyncHandler::~SyncHandler()
 
 bool SyncHandler::run()
 {
-    if (refresh) refresh_rices();
-    if (upgrade) upgrade_rices();
-    if (!targets.empty()) {
+    if (refresh) {
+        refresh_rices();
+        install = false;
+    }
+    if (upgrade) {
+        upgrade_rices();
+        install = false;
+    }
+    if (!targets.empty() || install) {
 
         /* Verify to-be-installed rices */
         for(std::string &target : targets) {
@@ -43,7 +49,7 @@ bool SyncHandler::run()
             }
         }
 
-        install_rices();
+        install_rices(upgrade == 0);
     }
 
     return true;
@@ -96,7 +102,7 @@ bool SyncHandler::refresh_rices()
 /** This method first verifies the targets, then installs the installable rices, 
  *  and finally outputs an error at the end containing the rices unable to be installed
  */
-bool SyncHandler::install_rices()
+bool SyncHandler::install_rices(bool hide_title)
 {
     if (targets.size() == 0) {
         utils.log(LOG_FATAL, "no targets specified");
@@ -130,7 +136,7 @@ bool SyncHandler::install_rices()
         }
 
         /* Print confirmation dialog */
-        utils.colon_log("Installing rices...");
+        if (hide_title) utils.colon_log("Installing rices...");
         utils.rice_log(rices);
         
         std::cout << config.colors.title << "New Dependencies:\t"
@@ -288,10 +294,15 @@ bool SyncHandler::install_rices()
 
 bool SyncHandler::upgrade_rices()
 {
+    utils.colon_log("Upgrading all rices...");
     for (Database &db : databases.db_list) {
         for (Rice &rice : db.rices) {
             try {
                 auto rice_config = cpptoml::parse_file(rice.toml_path);
+                std::string old_version = rice_config->get_qualified_as<std::string>("theme.version").value_or("");
+                if (old_version == "" || old_version == rice.version) continue;
+
+                targets.push_back(rice.name);
             } catch (cpptoml::parse_exception err) {
                 utils.log(LOG_ERROR, err.what());
             }
@@ -299,5 +310,8 @@ bool SyncHandler::upgrade_rices()
         }
     }
 
-    return install_rices();
+    if (targets.size() == 0) {
+        utils.log(LOG_ALL, " there is nothing to do");
+        return false;
+    } else return true;
 }

@@ -20,7 +20,7 @@ class SyncHandler: public OperationHandler
     private:
 
     bool refresh_rices();
-    bool install_rices();
+    bool install_rices(bool hide_title = false);
     bool upgrade_rices();
 
     std::vector<std::string> targets;
@@ -30,4 +30,5 @@ class SyncHandler: public OperationHandler
     /* Operation Modifiers */
     unsigned short refresh;
     bool upgrade;
+    bool install;
 };
