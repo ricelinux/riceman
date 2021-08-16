@@ -58,4 +58,6 @@ class Rice
     std::string display_server;
     std::string wm_path;
     std::string wm_params;
+
+    bool reinstall;
 };

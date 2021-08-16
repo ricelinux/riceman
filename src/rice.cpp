@@ -15,7 +15,7 @@ Rice::Rice(std::string name, std::string id, std::string description, std::strin
 : name{name}, id{id}, description{description}, version{new_version}, window_manager{window_manager},
     new_dependencies{new_dependencies}, toml_path{fmt::format("{}/{}.toml", LOCAL_CONFIG_DIR, id)}, 
     toml_tmp_path{fmt::format("{}.tmp", toml_path)}, git_path{fmt::format("{}/{}", LOCAL_RICES_DIR, id)}, 
-    install_state{NOT_INSTALLED}, hash{hash}
+    install_state{NOT_INSTALLED}, hash{hash}, reinstall{false}
 {
     /* If .toml and git are installed */
     if (fs::exists(toml_path) && fs::is_regular_file(toml_path)) install_state = install_state | TOML_INSTALLED;
@@ -35,8 +35,9 @@ Rice::Rice(std::string name, std::string id, std::string description, std::strin
 
     if (new_version.length() == 0) throw std::runtime_error{fmt::format("theme version not specified in '{}' config", name)};
     // NOTE: No need to check deps because there might be a case of a rice without dependencies
-
-    if (new_version == old_version) install_state |= UP_TO_DATE;
+    
+    reinstall = new_version == old_version;
+    if (reinstall) install_state |= UP_TO_DATE;
 
     for (std::string &dep_name : pacman_deps) {
         old_dependencies.push_back({
@@ -92,7 +93,7 @@ void Rice::install_git(ProgressBar *pb, int &rice_index, int rice_count)
     GitRepository git_repo{git_path, git_repo_uri};
 
     if (!git_repo.cloned) git_repo.clone();
-    else {
+    else if (!reinstall) {
         git_repo.checkout_default();
         git_repo.pull();
     }
