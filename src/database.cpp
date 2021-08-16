@@ -25,6 +25,7 @@ void Database::update_rice_cache()
     std::ifstream file{local_path};
     if (file.is_open()) {
         for(std::string line; std::getline(file, line); ) {
+            if (line.length() == 0) continue;
             std::stringstream line_stream{line};
             std::string rice_data[7];
             DependencyVec deps;
