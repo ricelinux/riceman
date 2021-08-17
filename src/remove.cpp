@@ -12,6 +12,10 @@ RemoveHandler::RemoveHandler(argparse::ArgumentParser &parser, RicemanConfig &co
     remove_git   = argparser.is_used("--remove-git");
     remove_toml  = argparser.is_used("--remove-toml");
     keep_desktop = argparser.is_used("--keep-desktop");
+
+    if (argparser.is_used("targets")) {
+        targets = argparser.get<std::vector<std::string>>("targets");
+    }
 }
 
 bool RemoveHandler::run()
