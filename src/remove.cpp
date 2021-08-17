@@ -18,8 +18,15 @@ RemoveHandler::RemoveHandler(argparse::ArgumentParser &parser, RicemanConfig &co
     }
 }
 
-bool RemoveHandler::run()
+void RemoveHandler::run()
 {
-    std::cout << "Removing..." << std::endl;
-    return true;
+    /* */
+    
+    
+    
+}
+
+bool RemoveHandler::remove_rices()
+{
+    utils.colon_log("Removing rices...");
 }

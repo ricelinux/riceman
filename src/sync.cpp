@@ -28,7 +28,7 @@ SyncHandler::~SyncHandler()
     git_libgit2_shutdown();
 }
 
-bool SyncHandler::run()
+void SyncHandler::run()
 {
     if (refresh) {
         refresh_rices();
@@ -51,8 +51,6 @@ bool SyncHandler::run()
 
         install_rices(upgrade == 0);
     }
-
-    return true;
 }
 
 /* Backend code */

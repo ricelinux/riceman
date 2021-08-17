@@ -12,7 +12,7 @@ class SyncHandler: public OperationHandler
 
     SyncHandler(argparse::ArgumentParser &parser, RicemanConfig &conf, Utils &util, DatabaseCollection &databases);
     ~SyncHandler();
-    bool run();
+    void run();
 
     static const int op_modifiers_s = 2;
     static const struct option<int> op_modifiers[op_modifiers_s];

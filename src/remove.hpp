@@ -9,12 +9,14 @@ class RemoveHandler: public OperationHandler
     public:
 
     RemoveHandler(argparse::ArgumentParser &parser, RicemanConfig &conf, Utils &util, DatabaseCollection &databases);
-    bool run();
+    void run();
+    bool remove_rices();
 
     static const int op_modifiers_s = 3;
     static const struct option<int> op_modifiers[op_modifiers_s];
 
     std::vector<std::string> targets;
+    std::vector<Rice> rices;
 
     /* Operation Modifiers */
     bool remove_git;
