@@ -20,13 +20,24 @@ RemoveHandler::RemoveHandler(argparse::ArgumentParser &parser, RicemanConfig &co
 
 void RemoveHandler::run()
 {
-    /* */
-    
-    
-    
+    if (!targets.empty()) {
+
+        std::vector<std::string> incorrect_rice_names;
+
+        for(std::string &target : targets) {
+            try {
+                rices.push_back(databases.get_rice(target));
+            } catch (std::runtime_error) {
+                incorrect_rice_names.push_back(target);
+            }
+        }
+
+        remove_rices();
+    } else utils.log(LOG_FATAL, "no targets specified");
 }
 
 bool RemoveHandler::remove_rices()
 {
     utils.colon_log("Removing rices...");
+    utils.rice_log(rices);
 }
