@@ -11,7 +11,7 @@ class RemoveHandler: public OperationHandler
     RemoveHandler(argparse::ArgumentParser &parser, RicemanConfig &conf, Utils &util, DatabaseCollection &databases);
     bool run();
 
-    static const int op_modifiers_s = 2;
+    static const int op_modifiers_s = 3;
     static const struct option<int> op_modifiers[op_modifiers_s];
 
     std::vector<std::string> targets;
