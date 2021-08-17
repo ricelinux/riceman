@@ -1,7 +1,9 @@
 #include "constants.hpp"
 #include "utils.hpp"
 #include "database_collection.hpp"
+
 #include "sync.hpp"
+#include "remove.hpp"
 
 #include "argparse/argparse.hpp"
 #include <fmt/format.h>
@@ -58,6 +60,7 @@ int main(int argc, char *argv[])
 
     ADD_ARGUMENTS(argparser, op_opts);
     ADD_ARGUMENTS(argparser, SyncHandler::op_modifiers);
+    ADD_ARGUMENTS(argparser, RemoveHandler::op_modifiers);
 
     argparser.add_argument("targets").remaining();
 
@@ -81,6 +84,8 @@ int main(int argc, char *argv[])
             ophandler = new SyncHandler(argparser, config, utils, databases);
             break;
         case OP_REMOVE:
+            NEEDS_ROOT(utils);
+            ophandler = new RemoveHandler(argparser, config, utils, databases);
             break;
         case OP_QUERY:
             break;
