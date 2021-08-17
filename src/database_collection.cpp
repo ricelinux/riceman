@@ -42,5 +42,5 @@ Rice& DatabaseCollection::get_rice(std::string name)
         } catch (std::runtime_error err) {/* Can't find rice in current database */};
     }
 
-    throw std::runtime_error{""}; /* No need to waste processing on formatting an error message since it won't be displayed */
+    throw std::runtime_error{NULL}; /* No need to waste processing on formatting an error message since it won't be displayed */
 }
