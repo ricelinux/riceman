@@ -4,7 +4,7 @@
 #include "utils.hpp"
 #include "database_collection.hpp"
 
-#include "argparse/argparse.hpp"
+#include <argparse/argparse.hpp>
 
 class OperationHandler
 {
