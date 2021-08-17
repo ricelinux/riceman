@@ -3,7 +3,7 @@
 #include <filesystem>
 
 /* Init statics */
-const struct option<int> SyncHandler::op_modifiers[SyncHandler::s_op_modifiers] = { 
+const struct option<int> SyncHandler::op_modifiers[SyncHandler::op_modifiers_s] = { 
     OPT('y', "refresh", 0, 1, "refreshes downloaded databases"),
     OPT('u', "upgrade", 0, 1, "upgrades installed rices")
 };

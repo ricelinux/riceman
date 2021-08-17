@@ -14,8 +14,8 @@ class SyncHandler: public OperationHandler
     ~SyncHandler();
     bool run();
 
-    static const int s_op_modifiers = 2;
-    static const struct option<int> op_modifiers[s_op_modifiers];
+    static const int op_modifiers_s = 2;
+    static const struct option<int> op_modifiers[op_modifiers_s];
 
     private:
 
