@@ -36,7 +36,7 @@ void RemoveHandler::run()
     } else utils.log(LOG_FATAL, "no targets specified");
 }
 
-bool RemoveHandler::remove_rices()
+void RemoveHandler::remove_rices()
 {
     utils.colon_log("Removing rices...");
     utils.rice_log(rices);
