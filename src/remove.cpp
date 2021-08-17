@@ -21,4 +21,5 @@ RemoveHandler::RemoveHandler(argparse::ArgumentParser &parser, RicemanConfig &co
 bool RemoveHandler::run()
 {
     std::cout << "Removing..." << std::endl;
+    return true;
 }
