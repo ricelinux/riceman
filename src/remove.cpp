@@ -13,3 +13,8 @@ RemoveHandler::RemoveHandler(argparse::ArgumentParser &parser, RicemanConfig &co
     remove_toml  = argparser.is_used("--remove-toml");
     keep_desktop = argparser.is_used("--keep-desktop");
 }
+
+bool RemoveHandler::run()
+{
+    std::cout << "Removing..." << std::endl;
+}
