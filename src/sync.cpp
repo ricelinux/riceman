@@ -213,33 +213,9 @@ bool SyncHandler::install_rices(bool hide_title)
             DependencyDiff &diff = dep_changes[i];
             
             if (diff.remove.size() > 0) {
-                std::string ignore;
-                std::vector<int> ignore_indexes;
+                std::vector<int> ignore_indexes = utils.remove_confirmation_dialog(diff.remove);
 
-                std::cout << std::endl;
-
-                for (int i = 0; i < diff.remove.size(); ++i) {
-                    std::cout << config.colors.groups << i+1 << config.colors.nocolor << " " << config.colors.title << diff.remove[i].name << config.colors.nocolor << std::endl;
-                }
-                utils.colon_log("These packages are no longer in use and will be removed. Ignore any? [N]", true, false);
-                utils.colon_log("[N]one [A]ll or (1 2 3)", true, false);
-                std::cout << config.colors.version << ">> " << config.colors.nocolor;
-
-                Utils::show_cursor(true);
-                std::getline(std::cin, ignore);
-                Utils::show_cursor(false);
-
-                if (PackageManager::parse_ignore(ignore, &ignore_indexes) != 0) continue;
-
-                for (int index: ignore_indexes) {
-                    if (index <= diff.remove.size()) std::cout << "(1/1) skipping " << diff.remove[index - 1].name << std::endl;
-                }
-
-                try { 
-                    PackageManager::remove(diff.remove, ignore_indexes);
-                } catch (std::runtime_error err) {
-                    utils.log(LOG_FATAL, err.what());
-                }
+                PackageManager::remove(diff.remove, ignore_indexes);
             } else utils.log(LOG_ALL, fmt::format(" nothing to remove for {}", rices[i].name));
         }
 

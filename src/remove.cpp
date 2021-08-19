@@ -40,4 +40,8 @@ void RemoveHandler::remove_rices()
 {
     utils.colon_log("Removing rices...");
     utils.rice_log(rices);
+
+    for (Rice &rice : rices) {
+        
+    }
 }

@@ -99,6 +99,33 @@ void Utils::rice_log(const std::vector<Rice> &rices)
 	std::cout << std::endl << std::endl;
 }
 
+std::vector<int> Utils::remove_confirmation_dialog(DependencyVec &deps)
+{
+    std::string ignore;
+    std::vector<int> ignore_indexes;
+
+    std::cout << std::endl;
+
+    for (int i = 0; i < deps.size(); ++i) {
+        std::cout << config.colors.groups << i+1 << config.colors.nocolor << " " << config.colors.title << deps[i].name << config.colors.nocolor << std::endl;
+    }
+	colon_log("These packages are no longer in use and will be removed. Ignore any? [N]", true, false);
+    colon_log("[N]one [A]ll or (1 2 3)", true, false);
+    std::cout << config.colors.version << ">> " << config.colors.nocolor;
+
+    show_cursor(true);
+    std::getline(std::cin, ignore);
+    show_cursor(false);
+
+    if (PackageManager::parse_ignore(ignore, &ignore_indexes) != 0) return {};
+
+    for (int index: ignore_indexes) {
+        if (index <= deps.size()) std::cout << "(1/1) skipping " << deps[index - 1].name << std::endl;
+    }
+	
+	return ignore_indexes;
+}
+
 void Utils::show_cursor(const bool status)
 {
 	if (status) std::cout << "\033[?25h";

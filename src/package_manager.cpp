@@ -64,7 +64,7 @@ void PackageManager::install_aur(std::vector<std::string> &deps)
     }
 }
 
-void PackageManager::remove(DependencyVec &deps, std::vector<int> &ignore_indexes)
+void PackageManager::remove(DependencyVec &deps, std::vector<int> ignore_indexes)
 {
     std::vector<char *> remove_args = { DEFAULT_PACMAN_REMOVE_ARGS };
 
@@ -84,6 +84,7 @@ void PackageManager::remove(DependencyVec &deps, std::vector<int> &ignore_indexe
 
     if (remove_args.size() > DEFAULT_PACMAN_REMOVE_ARG_LEN + 1) Utils::exec(remove_args.data());
 }
+
 
 int PackageManager::parse_ignore(std::string &ignore, std::vector<int> *vec)
 {
