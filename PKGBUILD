@@ -1,6 +1,6 @@
 # Maintainer: Zaedus <nintendozaedus@gmail.com>
 pkgname='riceman'
-pkgver=
+pkgver=0
 pkgrel=1
 pkgdesc="The official rice manager for Rice Linux"
 arch=("x86_64")
