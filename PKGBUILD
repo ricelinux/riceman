@@ -32,3 +32,14 @@ package() {
 	cd "$pkgname"
 	install -Dm755 ./riceman "$pkgdir/usr/bin/riceman"
 }
+
+post_install() {
+	if [ ! $(getent group | grep $pkgname) ]; then
+		useradd -M -N -U -r $pkgname
+	fi
+}
+
+post_remove() {
+	userdel -f $pkgname
+	groupdel $pkgname
+}
