@@ -4,7 +4,10 @@
 #include <algorithm>
 #include <iostream>
 #include <sstream>
+#include <filesystem>
 
+#include <cpr/cpr.h>
+#include <fmt/format.h>
 #include <git2.h>
 
 DependencyDiff PackageManager::get_diff(DependencyVec &old_deps, DependencyVec &new_deps)
@@ -58,9 +61,24 @@ void PackageManager::install(DependencyVec &deps)
 void PackageManager::install_aur(std::vector<std::string> &deps)
 {
     for (std::string &dep : deps) {
-        git_repository *repo = NULL;
+        using namespace std::placeholders;
 
-        
+        std::string dep_path{fmt::format("{}/{}", AUR_INSTALL_DIR, dep)};
+        try {
+            Utils::create_directory(dep_path);
+        } catch (std::filesystem::filesystem_error err) {
+            throw (std::runtime_error)err;
+        }
+
+        ProgressBar pb{dep, 0.4};
+        cpr::Response r = cpr::Get(
+            cpr::Url{fmt::format("{}{}", AUR_PKGBUILD_BASE, dep)}, 
+            cpr::ProgressCallback{std::bind(&ProgressBar::progress_callback_download, pb, _1, _2, _3, _4)}
+        );
+
+        if (r.error) throw std::runtime_error{fmt::format("{} (error code {})", r.error.message, r.error.code)};
+
+        if (!Utils::write_file_content(dep_path.append("/PKGBUILD"), r.text)) throw std::runtime_error{fmt::format("unable to write to '{}'", dep_path)};
     }
 }
 
