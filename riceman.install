@@ -1,6 +1,6 @@
 post_install() {
 	if [ ! $(getent group | grep riceman) ]; then
-		useradd -M -U -r riceman
+		useradd -MUru 966 riceman
 	fi
 }
 
