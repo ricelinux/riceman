@@ -12,6 +12,7 @@ provides=('riceman')
 source=('git+https://github.com/ricelinux/riceman.git#commit=538f3e2417715bd6ab3281eb682728fbfc882b31')
 noextract=()
 md5sums=('SKIP')
+install="$pkgname.install"
 
 pkgver() {
 	cd "$pkgname"
@@ -31,15 +32,4 @@ build() {
 package() {
 	cd "$pkgname"
 	install -Dm755 ./riceman "$pkgdir/usr/bin/riceman"
-}
-
-post_install() {
-	if [ ! $(getent group | grep $pkgname) ]; then
-		useradd -M -U -r $pkgname
-	fi
-}
-
-post_remove() {
-	userdel -f $pkgname
-	groupdel $pkgname
 }
