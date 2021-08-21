@@ -5,6 +5,11 @@ post_install() {
 }
 
 post_remove() {
-	userdel -f riceman
-	groupdel riceman
+	if [ $(getent group | grep riceman) ]; then
+		groupdel riceman
+	fi
+	if [ $(getent passwd | grep riceman) ]; then
+		userdel -f riceman
+	fi
+	
 }
