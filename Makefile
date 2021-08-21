@@ -19,7 +19,7 @@ CPR_OBJECTS := $(patsubst $(CPR_SRC)/%.cpp, $(CPR_OBJ)/%.o, $(CPR_SOURCES))
 LIBS 	 := libcurl fmt libgit2 libcryptopp
 INCFLAGS := -Ideps/cpr/include -Ideps/argparse
 CFLAGS   := $(shell pkg-config --cflags $(LIBS)) -std=c++17
-LDFLAGS  := $(shell pkg-config --libs $(LIBS)) -lstdc++ -lm
+LDFLAGS  := $(shell pkg-config --libs $(LIBS)) -lstdc++ -lm -lstdc++fs
 
 debug: CFLAGS += -O0
 debug: $(BIN)
