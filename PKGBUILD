@@ -25,7 +25,7 @@ prepare() {
 
 build() {
 	cd "$pkgname"
-	make
+	make release
 }
 
 package() {
