@@ -9,7 +9,7 @@ license=('GPL')
 depends=('curl' 'crypto++' 'fmt' 'libgit2')
 makedepends=('clang' 'git' 'cmake' 'make' 'cpptoml')
 provides=('riceman')
-source=('git+https://github.com/ricelinux/riceman.git#commit=edb81944f8b03038d198fb18055e8d100977b5c9')
+source=('git+https://github.com/ricelinux/riceman.git#commit=538f3e2417715bd6ab3281eb682728fbfc882b31')
 noextract=()
 md5sums=('SKIP')
 
