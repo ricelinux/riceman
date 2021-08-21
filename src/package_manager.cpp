@@ -83,7 +83,7 @@ void PackageManager::install_aur(std::vector<std::string> &deps)
 
     for (std::string &dep : deps) {
         char * makepkg_args[] = {"/usr/bin/makepkg", "-sf", "--verifysource", "--needed"};
-        Utils::exec(makepkg_args, fmt::format("{}/{}", AUR_INSTALL_DIR, dep).c_str());
+        Utils::exec(makepkg_args, fmt::format("{}/{}", AUR_INSTALL_DIR, dep).c_str(), true);
     }
 }
 
