@@ -68,8 +68,9 @@ void GitRepository::checkout_commit(std::string &hash)
 
 void GitRepository::pull()
 {
-    char * const args[] = {GIT, "-C", (char *const)path.data(), "pull", NULL};
-    Utils::exec(args);
+    char * args[] = {GIT, "-C", (char *const)path.data(), "pull", NULL};
+    Utils::exec(args, NULL);
+    free(args);
 }
 
 void GitRepository::checkout_default()
