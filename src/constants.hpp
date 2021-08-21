@@ -32,6 +32,10 @@
 #define AUR_BASE_URI "https://aur.archlinux.org/"
 #define AUR_INSTALL_DIR "/var/cache/riceman"
 
+/* Riceman user and group info */
+#define RICEMAN_GID 966
+#define RICEMAN_UID 966
+
 /* Colors */
 #define NOCOLOR       "\033[0m"
 
