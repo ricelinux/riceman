@@ -35,7 +35,7 @@ package() {
 
 post_install() {
 	if [ ! $(getent group | grep $pkgname) ]; then
-		useradd -M -N -U -r $pkgname
+		useradd -M -U -r $pkgname
 	fi
 }
 
