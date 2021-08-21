@@ -70,7 +70,7 @@ void PackageManager::install_aur(std::vector<std::string> &deps)
             throw (std::runtime_error)err;
         }
 
-        ProgressBar pb{dep, 0.4};
+        ProgressBar pb{" " + dep, 0.4};
         cpr::Response r = cpr::Get(
             cpr::Url{fmt::format("{}{}", AUR_PKGBUILD_BASE, dep)}, 
             cpr::ProgressCallback{std::bind(&ProgressBar::progress_callback_download, pb, _1, _2, _3, _4)}
