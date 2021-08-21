@@ -54,7 +54,7 @@ void PackageManager::install(DependencyVec &deps)
 
     pacman.push_back(NULL);
 
-    if (pacman.size() > 5) Utils::exec(pacman.data());
+    if (pacman.size() > 5) Utils::exec(pacman.data(), NULL);
     if (aur.size() > 0) install_aur(aur);
 }
 
@@ -78,8 +78,13 @@ void PackageManager::install_aur(std::vector<std::string> &deps)
         pb.done();
 
         if (r.error) throw std::runtime_error{fmt::format("{} (error code {})", r.error.message, r.error.code)};
-
         if (!Utils::write_file_content(dep_path.append("/PKGBUILD"), r.text)) throw std::runtime_error{fmt::format("unable to write to '{}'", dep_path)};
+    }
+
+    for (std::string &dep : deps) {
+        char * makepkg_args[] = {"/usr/bin/makepkg", "-sf", "--verifysource", "--needed"};
+        Utils::exec(makepkg_args, fmt::format("{}/{}", AUR_INSTALL_DIR, dep).c_str());
+        free(makepkg_args);
     }
 }
 
@@ -101,7 +106,7 @@ void PackageManager::remove(DependencyVec &deps, std::vector<int> ignore_indexes
 
     remove_args.push_back(NULL);
 
-    if (remove_args.size() > DEFAULT_PACMAN_REMOVE_ARG_LEN + 1) Utils::exec(remove_args.data());
+    if (remove_args.size() > DEFAULT_PACMAN_REMOVE_ARG_LEN + 1) Utils::exec(remove_args.data(), NULL);
 }
 
 
