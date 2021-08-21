@@ -208,7 +208,7 @@ const std::string Utils::hash_file(const std::string &path)
 	return hash_sha256(get_file_content(path));
 }
 
-void Utils::exec(char * const *args)
+void Utils::exec(char * const *args, const char * working_dir)
 {
     pid_t pid, wpid;
     int status;
@@ -216,6 +216,7 @@ void Utils::exec(char * const *args)
     pid = fork();
 
     if (pid == 0) {
+        if (working_dir != NULL) chdir(working_dir);
         if (execvp(args[0], args) == -1) {
             throw std::runtime_error{fmt::format("'{}' failed to run in child process", args[0])};
         }
