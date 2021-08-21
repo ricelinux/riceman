@@ -1,7 +1,7 @@
 # Maintainer: Zaedus <nintendozaedus@gmail.com>
 pkgname='riceman'
-pkgver=0
-pkgrel=1
+pkgver=v0.0.1.5
+pkgrel=
 pkgdesc="The official rice manager for Rice Linux"
 arch=("x86_64")
 url="https://github.com/ricelinux/riceman"
@@ -15,7 +15,6 @@ md5sums=('SKIP')
 
 pkgver() {
 	cd "$pkgname"
-	echo "$pkgname"
   	git describe --long | sed -r 's/-([0-9,a-g,A-G]{7}.*)//' | sed 's/-/./g'
 }
 
