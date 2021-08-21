@@ -75,6 +75,7 @@ void PackageManager::install_aur(std::vector<std::string> &deps)
             cpr::Url{fmt::format("{}{}", AUR_PKGBUILD_BASE, dep)}, 
             cpr::ProgressCallback{std::bind(&ProgressBar::progress_callback_download, pb, _1, _2, _3, _4)}
         );
+        pb.done();
 
         if (r.error) throw std::runtime_error{fmt::format("{} (error code {})", r.error.message, r.error.code)};
 
