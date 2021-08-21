@@ -29,7 +29,7 @@
 #define WSESSIONS_PATH "/usr/share/wayland-sessions"
 
 /* AUR Info */
-#define AUR_BASE_URI "https://aur.archlinux.org/"
+#define AUR_BASE_URI "https://aur.archlinux.org"
 #define AUR_INSTALL_DIR "/var/cache/riceman"
 
 /* Riceman user and group info */
