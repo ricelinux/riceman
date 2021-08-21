@@ -80,6 +80,7 @@ bool ProgressBar::progress_callback_download(size_t dtotal, size_t dnow, size_t 
     milliseconds millis = std::chrono::duration_cast<milliseconds>(Clock::now() - start_time);
     double rate = (double)dnow / millis.count();
     double percentage = trunc((double)dnow / (double)(dtotal == 0 ? 1 : dtotal));
+    if (percentage > 1) percentage = 1; 
     std::string prefix = fmt::format("{} {}/s ", ProgressBar::format_prefix_module(dnow), ProgressBar::format_prefix_module(rate * 1000));
     
     update(prefix, percentage);
