@@ -11,5 +11,4 @@ post_remove() {
 	if [ $(getent passwd | grep riceman) ]; then
 		userdel -f riceman
 	fi
-	
 }
