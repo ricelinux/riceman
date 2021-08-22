@@ -8,6 +8,7 @@ DatabaseCollection::DatabaseCollection() {
     Utils::create_directory(LOCAL_CONFIG_DIR);
     Utils::create_directory(LOCAL_RICES_DIR);
     Utils::create_directory(AUR_INSTALL_DIR);
+    Utils::own_directory(AUR_INSTALL_DIR);
 };
 
 Database& DatabaseCollection::get(std::string &file_name)
