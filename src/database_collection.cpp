@@ -24,18 +24,17 @@ Database& DatabaseCollection::get(int &index)
     return db_list[index];
 }
 
-Database& DatabaseCollection::add(Database &db)
+void DatabaseCollection::add(Database db)
 {
     db_list.push_back(db);
-    return db;
 }
 
-Database& DatabaseCollection::add(std::string name, std::string remote_uri)
+void DatabaseCollection::add(std::string name, std::string remote_uri)
 {
-    return add(*(new Database{name, remote_uri}));
+    add(Database{name, remote_uri});
 }
 
-Rice& DatabaseCollection::get_rice(std::string name)
+Rice DatabaseCollection::get_rice(std::string name)
 {
     for (Database db : db_list) {
         try {
