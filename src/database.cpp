@@ -23,6 +23,7 @@ void Database::update_rice_cache()
 {
     rices.clear();
     std::ifstream file{local_path};
+    
     if (file.is_open()) {
         for(std::string line; std::getline(file, line); ) {
             if (line.length() == 0) continue;
@@ -53,7 +54,8 @@ void Database::update_rice_cache()
 
             rices.push_back(Rice(rice_data[0], rice_data[1], rice_data[2], rice_data[3], rice_data[4], rice_data[6], deps));
         }
-    } 
+        downloaded = true;
+    } else downloaded = false;
     /* If not open, don't throw error because it could be newly added or recently removed */
     file.close();
 }

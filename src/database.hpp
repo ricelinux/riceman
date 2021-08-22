@@ -18,6 +18,7 @@ class Database
     const std::string remote_uri;
     const std::string remote_db;
     const std::string remote_hash_uri;
+    bool downloaded;
 
     std::vector<Rice> rices;
 
