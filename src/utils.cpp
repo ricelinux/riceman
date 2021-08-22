@@ -179,6 +179,10 @@ void Utils::create_directory(const std::string &path)
     }
 }
 
+void Utils::own_directory(const std::string &path) {
+    if (chown(path.c_str(), RICEMAN_UID, RICEMAN_GID) != 0) throw std::runtime_error{fmt::format("failed to set owner and group of '{}'", path)};
+}
+
 const std::string Utils::get_uri_content(const std::string &uri)
 {
 	cpr::Response r = cpr::Get(cpr::Url(uri));
