@@ -1,5 +1,6 @@
 #include "package_manager.hpp"
 #include "utils.hpp"
+#include "git_repository.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -9,6 +10,8 @@
 #include <cpr/cpr.h>
 #include <fmt/format.h>
 #include <git2.h>
+
+namespace fs = std::filesystem;
 
 DependencyDiff PackageManager::get_diff(DependencyVec &old_deps, DependencyVec &new_deps)
 {
@@ -44,52 +47,84 @@ DependencyDiff PackageManager::get_diff(DependencyVec &old_deps, DependencyVec &
 
 void PackageManager::install(DependencyVec &deps)
 {
-    std::vector<char *> pacman = { DEFAULT_PACMAN_SYNC_ARGS };
+    std::vector<char *> pacman = { strdup(PACMAN), strdup("-S"), strdup("--noconfirm"), strdup("--needed") };
     std::vector<std::string> aur;
 
     for (Dependency &dep : deps) {
         if (dep.aur) aur.push_back(dep.name);
-        else pacman.push_back(dep.name.data());
+        else pacman.push_back(strdup(dep.name.data()));
     }
 
     pacman.push_back(NULL);
 
     if (pacman.size() > 5) Utils::exec(pacman.data(), NULL);
     if (aur.size() > 0) install_aur(aur);
+
+    FREE_ARRAY(pacman);
 }
 
 void PackageManager::install_aur(std::vector<std::string> &deps)
-{
+{   
+    /* Clone and chown git repo */
     for (std::string &dep : deps) {
         using namespace std::placeholders;
 
         std::string dep_path{fmt::format("{}/{}", AUR_INSTALL_DIR, dep)};
-        try {
-            Utils::create_directory(dep_path);
-        } catch (std::filesystem::filesystem_error err) {
-            throw (std::runtime_error)err;
+        std::string aur_repo_uri{fmt::format("{}/{}.git", AUR_BASE_URI, dep)};
+        GitRepository repo{dep_path, aur_repo_uri};
+        if (!repo.cloned) {
+            try {
+                repo.clone();
+            } catch (std::runtime_error err) {
+                std::filesystem::remove_all(dep_path);
+                repo.clone(); /* Try to clone one more time, but if it fails just throw the error */
+            } 
         }
-
-        ProgressBar pb{" " + dep, 0.4};
-        cpr::Response r = cpr::Get(
-            cpr::Url{fmt::format("{}{}", AUR_PKGBUILD_BASE, dep)}, 
-            cpr::ProgressCallback{std::bind(&ProgressBar::progress_callback_download, pb, _1, _2, _3, _4)}
-        );
-        pb.done();
-
-        if (r.error) throw std::runtime_error{fmt::format("{} (error code {})", r.error.message, r.error.code)};
-        if (!Utils::write_file_content(dep_path.append("/PKGBUILD"), r.text)) throw std::runtime_error{fmt::format("unable to write to '{}'", dep_path)};
+        Utils::own_directory(dep_path);
     }
 
+    /* Run makepkg */
+    char * makepkg_args[] = {strdup("/usr/bin/makepkg"), strdup("-sf")};
     for (std::string &dep : deps) {
-        char * makepkg_args[] = {"/usr/bin/makepkg", "-sf", "--verifysource", "--needed"};
         Utils::exec(makepkg_args, fmt::format("{}/{}", AUR_INSTALL_DIR, dep).c_str(), true);
     }
+
+    /* Find all package files */
+    std::vector<char *> pacman_args = { strdup("/usr/bin/pacman"), strdup("-U"), strdup("--noconfirm") };
+
+    for (std::string &dep : deps) {
+        for (const auto & entry : fs::directory_iterator(fmt::format("{}/{}", AUR_INSTALL_DIR, dep))) {
+            const std::string &name = entry.path().filename();
+            if( name.length() > dep.length() + 11 &&
+                name.substr(0, dep.length()) == dep &&
+                name.substr(name.length() - 11, name.length()) == ".pkg.tar.gz") {
+                pacman_args.push_back(strdup(entry.path().generic_string().data()));
+                break;
+            }
+        }
+    }
+
+    pacman_args.push_back(NULL);
+
+    for (char * arg : pacman_args) {
+        std::cout << arg << " ";
+    }
+    std::cout << std::endl;
+
+    /* Install all package files */
+    Utils::exec(pacman_args.data(), NULL, false);
+
+    /* Free all duped strings */
+    FREE_ARRAY(pacman_args);
+    FREE_ARRAY(makepkg_args);
 }
 
 void PackageManager::remove(DependencyVec &deps, std::vector<int> ignore_indexes)
 {
-    std::vector<char *> remove_args = { DEFAULT_PACMAN_REMOVE_ARGS };
+    std::vector<char *> remove_args;
+    remove_args.push_back(strdup(PACMAN));
+    remove_args.push_back(strdup("-Rus"));
+    remove_args.push_back(strdup("--noconfirm"));
 
     if (ignore_indexes.size() > 0 && ignore_indexes[0] == -2) return;
 
