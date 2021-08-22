@@ -3,8 +3,7 @@
 #include <string>
 #include <vector>
 
-#define DEFAULT_PACMAN_SYNC_ARGS "/usr/bin/pacman", "-S", "--noconfirm", "--needed"
-#define DEFAULT_PACMAN_REMOVE_ARGS "/usr/bin/pacman", "-Rus", "--noconfirm"
+#define PACMAN "/usr/bin/pacman"
 #define DEFAULT_PACMAN_SYNC_ARG_LEN 4
 #define DEFAULT_PACMAN_REMOVE_ARG_LEN 3
 #define AUR_PKGBUILD_BASE "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h="
