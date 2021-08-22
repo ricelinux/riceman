@@ -99,8 +99,8 @@ const short Database::refresh(std::string expected_hash)
 
 Rice& Database::get_rice(std::string name)
 {
-    for (int i = 0; i < rices.size(); ++i) {
-        if (rices[i].name.compare(name) == 0) return rices[i];
+    for (Rice &rice : rices) {
+        if (rice.name == name) return rice;
     }
     throw std::runtime_error{""}; /* No need to waste processing on formatting an error message since it won't be displayed */
 }
