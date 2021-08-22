@@ -209,7 +209,13 @@ const std::string Utils::hash_sha256(const std::string &content)
 
 const std::string Utils::hash_file(const std::string &path)
 {
-	return hash_sha256(get_file_content(path));
+    std::string file_content;
+    try {
+        file_content = get_file_content(path);
+    } catch (std::runtime_error err) {
+        file_content = "";
+    }
+	return hash_sha256(file_content);
 }
 
 void Utils::exec(char * const *args, const char * working_dir, bool drop_root)
