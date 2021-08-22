@@ -2,6 +2,7 @@
 
 /* Macros */
 #define STRUCT_LEN(s) sizeof(s) / sizeof(s[0])
+#define FREE_ARRAY(a) for (char * e : a) free(e);
 
 /* Setup fmt */
 #define FMT_HEADER_ONLY

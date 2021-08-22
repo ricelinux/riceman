@@ -70,6 +70,8 @@ void GitRepository::pull()
 {
     char * args[] = {strdup(GIT), strdup("-C"), strdup(path.data()), strdup("pull"), NULL};
     Utils::exec(args, NULL);
+
+    FREE_ARRAY(args);
 }
 
 void GitRepository::checkout_default()
