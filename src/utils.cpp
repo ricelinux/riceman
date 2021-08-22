@@ -212,7 +212,6 @@ void Utils::exec(char * const *args, const char * working_dir, bool drop_root)
 {
     pid_t pid, wpid;
     int status;
-
     pid = fork();
 
     if (pid == 0) {
@@ -222,7 +221,7 @@ void Utils::exec(char * const *args, const char * working_dir, bool drop_root)
             if (setuid(RICEMAN_UID) != 0) throw std::runtime_error{fmt::format("unable to drop user permissions: {}", strerror(errno))};
         }
         if (execvp(args[0], args) == -1) {
-            throw std::runtime_error{fmt::format("'{}' failed to run in child process", args[0])};
+            throw std::runtime_error{fmt::format("'{}' failed to run in child process", Utils::basename(args[0]))};
         }
     } else if (pid > 0) {
         do {
