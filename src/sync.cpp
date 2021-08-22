@@ -257,11 +257,14 @@ bool SyncHandler::install_rices(bool hide_title)
     /* Deal with invalid rice names */
     if (incorrect_rice_names.size() == 0) return true;
     
-    utils.log(LOG_ERROR, fmt::format("target not found:"), false);
     for (int i = 0; i < incorrect_rice_names.size(); ++i) {
-        utils.log(LOG_ALL, " " + incorrect_rice_names[i], false);
+        utils.log(LOG_ERROR, "target not found: " + incorrect_rice_names[i]);
     }
-    std::cout << std::endl;
+
+    for (Database db : databases.db_list) {
+        if (!db.downloaded) 
+            utils.log(LOG_ERROR, fmt::format("{} is not downloaded (use -Sy to download)", db.db_name));
+    }
 
     return true;
 }
