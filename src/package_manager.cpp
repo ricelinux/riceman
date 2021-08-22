@@ -3,7 +3,6 @@
 #include "git_repository.hpp"
 
 #include <algorithm>
-#include <iostream>
 #include <sstream>
 #include <filesystem>
 
@@ -105,11 +104,6 @@ void PackageManager::install_aur(std::vector<std::string> &deps)
     }
 
     pacman_args.push_back(NULL);
-
-    for (char * arg : pacman_args) {
-        std::cout << arg << " ";
-    }
-    std::cout << std::endl;
 
     /* Install all package files */
     Utils::exec(pacman_args.data(), NULL, false);
