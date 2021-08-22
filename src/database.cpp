@@ -13,9 +13,9 @@
 namespace fs = std::filesystem;
 
 Database::Database(std::string name, std::string remoteuri)
-: db_name{name}, local_path{fmt::format("{}/{}.db", LOCAL_DB_DIR, name)}, remote_uri{remoteuri}, remote_hash_uri{fmt::format("{}/rices.db.sha256sum", remoteuri)}, local_tmp_path{fmt::format("{}.tmp", local_path)}, remote_db{fmt::format("{}/rices.db", remoteuri)}
+: db_name{name}, local_path{fmt::format("{}/{}.db", LOCAL_DB_DIR, name)}, remote_uri{remoteuri}, remote_hash_uri{fmt::format("{}/rices.db.sha256sum", remoteuri)}, local_tmp_path{fmt::format("{}.tmp", local_path)}, remote_db{fmt::format("{}/rices.db", remoteuri)}, downloaded{false}
 {
-    create_local();
+    //create_local();
     update_rice_cache();
 }
 
@@ -23,7 +23,7 @@ void Database::update_rice_cache()
 {
     rices.clear();
     std::ifstream file{local_path};
-    
+
     if (file.is_open()) {
         for(std::string line; std::getline(file, line); ) {
             if (line.length() == 0) continue;
@@ -55,7 +55,7 @@ void Database::update_rice_cache()
             rices.push_back(Rice(rice_data[0], rice_data[1], rice_data[2], rice_data[3], rice_data[4], rice_data[6], deps));
         }
         downloaded = true;
-    } else downloaded = false;
+    }
     /* If not open, don't throw error because it could be newly added or recently removed */
     file.close();
 }
