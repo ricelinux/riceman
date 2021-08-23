@@ -8,6 +8,8 @@ const struct option<int> SyncHandler::op_modifiers[SyncHandler::op_modifiers_s] 
     OPT('u', "upgrade", 0, 1, "upgrades installed rices")
 };
 
+namespace fs = std::filesystem;
+
 SyncHandler::SyncHandler(argparse::ArgumentParser &parser, RicemanConfig &conf, Utils &util, DatabaseCollection &database_col) 
 : OperationHandler(parser, conf, util, database_col), install{true}
 {
@@ -43,7 +45,8 @@ void SyncHandler::run()
         /* Verify to-be-installed rices */
         for(std::string &target : targets) {
             try {
-                rices.push_back(databases.get_rice(target));
+                Rice *rice = databases.get_rice(target);
+                if (rice != NULL) rices.push_back(rice);
             } catch (std::runtime_error) {
                 incorrect_rice_names.push_back(target);
             }
@@ -69,7 +72,7 @@ bool SyncHandler::refresh_rices()
 
         try {
             local_hash = Utils::hash_file(db.local_path);
-            remote_hash = Utils::get_uri_content(db.remote_hash_uri);
+            remote_hash = Utils::get_uri_content(fmt::format("{}/rices.db.sha256sum", db.remote_uri));
         } catch (std::runtime_error err) {
             utils.log(LOG_FATAL, err.what());
         }
@@ -77,7 +80,7 @@ bool SyncHandler::refresh_rices()
         if (local_hash.compare(remote_hash) != 0 || refresh == 2) {
             switch(db.refresh(remote_hash)) {
                 case -3:
-                    utils.log(LOG_FATAL, fmt::format("download of '{}' database corrupted", db.db_name));
+                    utils.log(LOG_FATAL, fmt::format("download of '{}' database corrupted", db.name));
                     break;
                 case -2:
                     utils.log(LOG_FATAL, "failed to write database to file");
@@ -87,7 +90,7 @@ bool SyncHandler::refresh_rices()
                     break;
             }
         } else {
-            std::cout << " " << db.db_name << " is up to date\n";
+            std::cout << " " << db.name << " is up to date\n";
         }
     }
 
@@ -112,8 +115,8 @@ bool SyncHandler::install_rices(bool hide_title)
 
     if (rices.size() > 0) {
         /* Resolve new and outdated dependencies */
-        for (Rice &rice : rices) {
-            DependencyDiff diff = PackageManager::get_diff(rice.old_dependencies, rice.new_dependencies);
+        for (Rice *rice : rices) {
+            DependencyDiff diff = PackageManager::get_diff(rice->old_dependencies, rice->new_dependencies);
             
             for (Dependency &rm_dep : diff.remove) {
                 removing_dep_str.append(rm_dep.name + " ");
@@ -127,9 +130,9 @@ bool SyncHandler::install_rices(bool hide_title)
         }
 
         /* Log reinstall */
-        for(Rice &rice : rices) {
-            if ((rice.install_state & Rice::UP_TO_DATE) != 0) {
-                utils.log(LOG_WARNING, fmt::format("{}-{} is up to date -- reinstalling", rice.name, rice.version));
+        for(Rice *rice : rices) {
+            if ((rice->install_state & Rice::UP_TO_DATE) != 0) {
+                utils.log(LOG_WARNING, fmt::format("{}-{} is up to date -- reinstalling", rice->name, rice->version));
             }
         }
 
@@ -152,10 +155,10 @@ bool SyncHandler::install_rices(bool hide_title)
         Utils::handle_signals(true);
 
         /* Download toml */
-        for (Rice &rice : rices) {
-            ProgressBar pb{fmt::format(" {}{}-{}{}", rice.name, config.colors.faint, rice.version, config.colors.nocolor), 0.4};
+        for (Rice *rice : rices) {
+            ProgressBar pb{fmt::format(" {}{}-{}{}", rice->name, config.colors.faint, rice->version, config.colors.nocolor), 0.4};
             try {
-                rice.download_toml(&pb);
+                rice->download_toml(&pb);
             } catch (std::runtime_error err) {
                 utils.log(LOG_FATAL, err.what());
             }
@@ -167,7 +170,7 @@ bool SyncHandler::install_rices(bool hide_title)
         for (int i = 0; i < rices.size(); ++i) {
             pb.update_title(fmt::format("({}/{}) checking integrity", i+1, rices.size()));
             pb.update("", (double)i / (double)rices.size());
-            if (!rices[i].verify_toml()) utils.log(LOG_FATAL, fmt::format("download of rice '{}' corrupted", rices[i].name));
+            if (!rices[i]->verify_toml()) utils.log(LOG_FATAL, fmt::format("download of rice '{}' corrupted", rices[i]->name));
         }
         pb.done();
 
@@ -178,7 +181,7 @@ bool SyncHandler::install_rices(bool hide_title)
             pb.update("", (double)i / (double)rices.size());
 
             try {
-                rices[i].parse_toml();
+                rices[i]->parse_toml();
             } catch (std::runtime_error err) {
                 utils.log(LOG_FATAL, err.what());
             }
@@ -186,11 +189,11 @@ bool SyncHandler::install_rices(bool hide_title)
         pb.done();
         
         /* Move .toml.tmp to .toml */
-        for (Rice &rice : rices) {
+        for (Rice *rice : rices) {
             try {
-                std::filesystem::rename(rice.toml_tmp_path, rice.toml_path);
+                std::filesystem::rename(rice->toml_tmp_path, rice->toml_path);
             } catch (std::filesystem::filesystem_error err) {
-                utils.log(LOG_FATAL, fmt::format("unable to write to '{}'", rice.toml_path));
+                utils.log(LOG_FATAL, fmt::format("unable to write to '{}'", rice->toml_path));
             }
         }
 
@@ -216,7 +219,7 @@ bool SyncHandler::install_rices(bool hide_title)
                 std::vector<int> ignore_indexes = utils.remove_confirmation_dialog(diff.remove);
 
                 PackageManager::remove(diff.remove, ignore_indexes);
-            } else utils.log(LOG_ALL, fmt::format(" nothing to remove for {}", rices[i].name));
+            } else utils.log(LOG_ALL, fmt::format(" nothing to remove for {}", rices[i]->name));
         }
 
         utils.colon_log("Processing changes...");
@@ -228,7 +231,7 @@ bool SyncHandler::install_rices(bool hide_title)
             pb.update("", (double)i / (double)rices.size());
 
             try {
-                rices[i].install_git(&pb, i, rices.size());
+                rices[i]->install_git(&pb, i, rices.size());
             } catch (std::runtime_error err) {
                 utils.log(LOG_FATAL, err.what());
             }
@@ -242,7 +245,7 @@ bool SyncHandler::install_rices(bool hide_title)
             pb.update("", (double)i / (double)rices.size());
 
             try {
-                rices[i].install_desktop();
+                rices[i]->install_desktop();
             } catch (std::runtime_error err) {
                 utils.log(LOG_FATAL, err.what());
             }
@@ -263,7 +266,7 @@ bool SyncHandler::install_rices(bool hide_title)
 
     for (Database db : databases.db_list) {
         if (!db.downloaded) 
-            utils.log(LOG_ERROR, fmt::format("{} is not downloaded (use -Sy to download)", db.db_name));
+            utils.log(LOG_ERROR, fmt::format("{} is not downloaded (use -Sy to download)", db.name));
     }
 
     return true;
@@ -273,18 +276,46 @@ bool SyncHandler::upgrade_rices()
 {
     utils.colon_log("Upgrading all rices...");
     for (Database &db : databases.db_list) {
-        for (Rice &rice : db.rices) {
-            try {
-                auto rice_config = cpptoml::parse_file(rice.toml_path);
-                std::string old_version = rice_config->get_qualified_as<std::string>("theme.version").value_or("");
-                if (old_version == "" || old_version == rice.version) continue;
+        std::ifstream file{db.local_path};
+        if (file.is_open()) {
+            for (std::string line; std::getline(file, line); ) {
+                std::string new_version;
+                std::string toml_path;
+                std::string name;
+                int i = 0;
+                
+                // todo: there has to be a better way to handle this
+                std::stringstream line_stream{line};
+                for (std::string value; std::getline(line_stream, value, ','); ) {
+                    if (i == 0) {
+                        name = value;
+                    } else if (i == 1) {
+                        toml_path = fmt::format("{}/{}.toml", LOCAL_CONFIG_DIR, value);
+                    } else if (i == 3) {
+                        new_version = value;
+                        break;
+                    }
+                    i++;
+                }
+                
+                /* Verify toml exists */
+                if (!fs::exists(toml_path) || !fs::is_regular_file(toml_path)) continue;
 
-                targets.push_back(rice.name);
-            } catch (cpptoml::parse_exception err) {
-                utils.log(LOG_ERROR, err.what());
+                try {
+                    /* Parse toml */
+                    auto rice_config = cpptoml::parse_file(toml_path);
+                    std::string old_version = rice_config->get_qualified_as<std::string>("theme.version").value_or("");
+                    if (old_version == "" || old_version == new_version) continue;
+
+                    /* Add to targets array */
+                    targets.push_back(name);
+
+                } catch (cpptoml::parse_exception &err) {
+                    utils.log(LOG_WARNING, err.what());
+                }
             }
-            
-        }
+        } else utils.log(LOG_WARNING, fmt::format("unable to access '{}' database", db.name));
+        /* Above code could be a permissions issue, but it could also be a system which hasn't synced ever */
     }
 
     if (targets.size() == 0) {
