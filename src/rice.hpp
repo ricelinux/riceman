@@ -42,6 +42,7 @@ class Rice
     DependencyVec old_dependencies;
     DependencyVec new_dependencies; 
 
+    std::string desktop_path;
     std::string git_repo_uri;
     std::string git_commit_hash;
 
@@ -56,7 +57,6 @@ class Rice
     private:
     
     std::chrono::high_resolution_clock::time_point start_time;
-    std::string session_path;
     std::string wm_path;
     std::string wm_params;
 };

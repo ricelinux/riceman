@@ -35,8 +35,8 @@ Rice::Rice(std::string name, std::string id, std::string description, std::strin
     std::vector<std::string> aur_deps = rice_config->get_qualified_array_of<std::string>("packages.aur")
         .value_or<std::vector<std::string>>({});
     
-    if (display_server == "xorg") session_path = fmt::format("{}/{}.desktop", XSESSIONS_PATH, id);
-    else if (display_server == "wayland") session_path = fmt::format("{}/{}.desktop", WSESSIONS_PATH, id);
+    if (display_server == "xorg") desktop_path = fmt::format("{}/{}.desktop", XSESSIONS_PATH, id);
+    else if (display_server == "wayland") desktop_path = fmt::format("{}/{}.desktop", WSESSIONS_PATH, id);
     else throw std::runtime_error{fmt::format("invalid display server specified in '{}' config", name)};
 
     if (new_version.length() == 0) throw std::runtime_error{fmt::format("theme version not specified in '{}' config", name)};
@@ -55,7 +55,7 @@ Rice::Rice(std::string name, std::string id, std::string description, std::strin
         });
     }
 
-    if (fs::exists(session_path) && fs::is_regular_file(session_path)) {
+    if (fs::exists(desktop_path) && fs::is_regular_file(desktop_path)) {
         install_state |= DESKTOP_INSTALLED;
         if (new_version == old_version && (install_state & GIT_INSTALLED) != 0) install_state |= UP_TO_DATE;
     }
@@ -112,7 +112,7 @@ void Rice::install_desktop()
         "[Desktop Entry]\nName={0}\nComment={1}\nExec=env RICE_DIR={2} {3} {4}\nType=Application\nPath={2}\n",
         name, description, git_path, wm_path, wm_params);
 
-    Utils::write_file_content(fmt::format("{}/{}.desktop", session_path, id), file_content);
+    Utils::write_file_content(desktop_path, file_content);
 }
 
 Rice Rice::from_string(std::string &db_line) {
