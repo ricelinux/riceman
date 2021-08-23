@@ -126,10 +126,7 @@ bool SyncHandler::install_rices(bool hide_title)
             }
             
             dep_changes.push_back(diff);
-        }
 
-        /* Log reinstall */
-        for(Rice &rice : rices) {
             if ((rice.install_state & Rice::UP_TO_DATE) != 0) {
                 utils.log(LOG_WARNING, fmt::format("{}-{} is up to date -- reinstalling", rice.name, rice.version));
             }
