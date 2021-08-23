@@ -115,7 +115,6 @@ bool SyncHandler::install_rices(bool hide_title)
     if (rices.size() > 0) {
         /* Resolve new and outdated dependencies */
         for (Rice &rice : rices) {
-            std::cout << rice.name << std::endl;
             DependencyDiff diff = PackageManager::get_diff(rice.old_dependencies, rice.new_dependencies);
             
             for (Dependency &rm_dep : diff.remove) {
