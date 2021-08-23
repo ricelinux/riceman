@@ -16,7 +16,8 @@ class RemoveHandler: public OperationHandler
     static const struct option<int> op_modifiers[op_modifiers_s];
 
     std::vector<std::string> targets;
-    std::vector<Rice*> rices;
+    std::vector<std::string> incorrect_rice_names;
+    std::vector<Rice> rices;
 
     /* Operation Modifiers */
     bool remove_git;

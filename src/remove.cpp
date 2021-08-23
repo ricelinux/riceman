@@ -1,5 +1,7 @@
 #include "remove.hpp"
 
+#include <fmt/format.h>
+
 const struct option<int> RemoveHandler::op_modifiers[RemoveHandler::op_modifiers_s] = {
     OPT('g', "remove-git",      0,  1,  "removes the git repository"),
     OPT('t', "remove-toml",     0,  1,  "removes the rice config"),
@@ -29,13 +31,11 @@ void RemoveHandler::run()
 {
     if (!targets.empty()) {
 
-        std::vector<std::string> incorrect_rice_names;
-
+        /* Verify to-be-installed rices */
         for(std::string &target : targets) {
             try {
-                Rice *rice = databases.get_rice(target);
-                if (rice != NULL) rices.push_back(databases.get_rice(target));
-            } catch (std::runtime_error) {
+                rices.push_back(databases.get_rice(target));
+            } catch (std::runtime_error err) {
                 incorrect_rice_names.push_back(target);
             }
         }
@@ -49,7 +49,7 @@ void RemoveHandler::remove_rices()
     utils.colon_log("Removing rices...");
     utils.rice_log(rices);
 
-    for (Rice *rice : rices) {
+    for (Rice &rice : rices) {
         
     }
 }
