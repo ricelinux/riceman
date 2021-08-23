@@ -279,6 +279,7 @@ bool SyncHandler::upgrade_rices()
         std::ifstream file{db.local_path};
         if (file.is_open()) {
             for (std::string line; std::getline(file, line); ) {
+                if (line.length() == 0) continue;
                 std::string new_version;
                 std::string toml_path;
                 std::string name;
