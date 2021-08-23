@@ -128,7 +128,14 @@ std::vector<int> Utils::remove_confirmation_dialog(DependencyVec &deps)
     std::getline(std::cin, ignore);
     show_cursor(false);
 
-    if (PackageManager::parse_ignore(ignore, &ignore_indexes) != 0) return {};
+    switch (PackageManager::parse_ignore(ignore, &ignore_indexes)) {
+        case -1:
+            for (int i = 1; i <= deps.size(); ++i) ignore_indexes.push_back(i);
+            break;
+        case 1:
+            return ignore_indexes;
+            break;
+    }
 
     for (int index: ignore_indexes) {
         if (index <= deps.size()) std::cout << "(1/1) skipping " << deps[index - 1].name << std::endl;

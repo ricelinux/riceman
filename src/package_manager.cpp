@@ -140,7 +140,7 @@ void PackageManager::remove(DependencyVec &deps, std::vector<int> ignore_indexes
 
 int PackageManager::parse_ignore(std::string &ignore, std::vector<int> *vec)
 {
-    if (ignore.length() == 0 || ignore[0] == 'n' || ignore[0] == 'N') return 0;
+    if (ignore.length() == 0 || ignore[0] == 'n' || ignore[0] == 'N') return 1;
     else if (ignore[0] == 'a' || ignore[0] == 'A') return -1;
 
     std::stringstream ignore_stream{ignore};
