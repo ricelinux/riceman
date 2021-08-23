@@ -1,6 +1,10 @@
 #include "remove.hpp"
 
+#include <filesystem>
+
 #include <fmt/format.h>
+
+namespace fs = std::filesystem;
 
 const struct option<int> RemoveHandler::op_modifiers[RemoveHandler::op_modifiers_s] = {
     OPT('g', "remove-git",      0,  1,  "removes the git repository"),
@@ -50,6 +54,25 @@ void RemoveHandler::remove_rices()
     utils.rice_log(rices);
 
     for (Rice &rice : rices) {
-        
+        try {
+            if ((rice.install_state | Rice::DESKTOP_INSTALLED) && remove_desktop) 
+                fs::remove(rice.desktop_path);
+        } catch (fs::filesystem_error) {
+            utils.log(LOG_ERROR, fmt::format("failed to remove desktop entry for '{}'", rice.name));
+        }
+
+        try {
+            if ((rice.install_state | Rice::GIT_INSTALLED) && remove_git) 
+                fs::remove(rice.git_path);
+        } catch (fs::filesystem_error) {
+            utils.log(LOG_ERROR, fmt::format("failed to remove git repository for '{}'", rice.name));
+        }
+
+        try {
+            if ((rice.install_state | Rice::TOML_INSTALLED) && remove_toml) 
+                fs::remove(rice.toml_path);
+        } catch (fs::filesystem_error) {
+            utils.log(LOG_ERROR, fmt::format("failed to remove rice config for '{}'", rice.name));
+        }
     }
 }
