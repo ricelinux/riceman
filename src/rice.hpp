@@ -46,19 +46,17 @@ class Rice
     std::string git_commit_hash;
 
     enum {
-        NOT_INSTALLED  = 0b000,
-        TOML_INSTALLED = 0b001,
-        GIT_INSTALLED  = 0b010,
-        UP_TO_DATE     = 0b100,
-        BOTH_INSTALLED = TOML_INSTALLED | GIT_INSTALLED,
+        NOT_INSTALLED     = 0b0000,
+        TOML_INSTALLED    = 0b0001,
+        GIT_INSTALLED     = 0b0010,
+        DESKTOP_INSTALLED = 0b0100,
+        UP_TO_DATE        = 0b1000,
     };
 
     private:
     
     std::chrono::high_resolution_clock::time_point start_time;
-    std::string display_server;
+    std::string session_path;
     std::string wm_path;
     std::string wm_params;
-
-    bool reinstall;
 };
