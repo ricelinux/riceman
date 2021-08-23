@@ -21,5 +21,5 @@ class RemoveHandler: public OperationHandler
     /* Operation Modifiers */
     bool remove_git;
     bool remove_toml;
-    bool keep_desktop;
+    bool remove_desktop;
 };

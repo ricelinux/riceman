@@ -9,9 +9,9 @@ const struct option<int> RemoveHandler::op_modifiers[RemoveHandler::op_modifiers
 RemoveHandler::RemoveHandler(argparse::ArgumentParser &parser, RicemanConfig &conf, Utils &util, DatabaseCollection &database_col)
 : OperationHandler(parser, conf, util, database_col)
 {
-    remove_git   = argparser.is_used("--remove-git");
-    remove_toml  = argparser.is_used("--remove-toml");
-    keep_desktop = argparser.is_used("--keep-desktop");
+    remove_git      =  argparser.is_used("--remove-git");
+    remove_toml     =  argparser.is_used("--remove-toml");
+    remove_desktop  = !argparser.is_used("--keep-desktop");
 
     if (argparser.is_used("targets")) {
         targets = argparser.get<std::vector<std::string>>("targets");
