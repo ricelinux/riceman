@@ -25,7 +25,7 @@ class SyncHandler: public OperationHandler
 
     std::vector<std::string> targets;
     std::vector<std::string> incorrect_rice_names;
-    std::vector<Rice*> rices;
+    std::vector<Rice> rices;
 
     /* Operation Modifiers */
     unsigned short refresh;

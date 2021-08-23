@@ -41,23 +41,15 @@ const short Database::refresh(std::string expected_hash)
     return 1;
 }
 
-Rice* Database::get_rice(std::string name)
+Rice Database::get_rice(std::string &name)
 {
     std::ifstream file{local_path};
     if (file.is_open()) {
         for(std::string line; std::getline(file, line); ) {
             if (line.length() == 0) continue;
-            Rice *rice;
-            switch(Rice::from_string(line, rice)) {
-                case -1:
-                    throw std::runtime_error{fmt::format("'{}' database malformatted", name)};
-                    break;
-                case -2:
-                    throw std::runtime_error{fmt::format("incorrect dependency type in '{}' database", name)};
-                    break;
-            };
-            return rice;
+            if (line.substr(0, name.size()) == name) 
+                return Rice::from_string(line);
         }
     }
-    return NULL;
+    throw std::runtime_error{""};
 }

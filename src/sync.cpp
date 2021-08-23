@@ -45,9 +45,8 @@ void SyncHandler::run()
         /* Verify to-be-installed rices */
         for(std::string &target : targets) {
             try {
-                Rice *rice = databases.get_rice(target);
-                if (rice != NULL) rices.push_back(rice);
-            } catch (std::runtime_error) {
+                rices.push_back(databases.get_rice(target));
+            } catch (std::runtime_error err) {
                 incorrect_rice_names.push_back(target);
             }
         }
@@ -115,8 +114,9 @@ bool SyncHandler::install_rices(bool hide_title)
 
     if (rices.size() > 0) {
         /* Resolve new and outdated dependencies */
-        for (Rice *rice : rices) {
-            DependencyDiff diff = PackageManager::get_diff(rice->old_dependencies, rice->new_dependencies);
+        for (Rice &rice : rices) {
+            std::cout << rice.name << std::endl;
+            DependencyDiff diff = PackageManager::get_diff(rice.old_dependencies, rice.new_dependencies);
             
             for (Dependency &rm_dep : diff.remove) {
                 removing_dep_str.append(rm_dep.name + " ");
@@ -130,9 +130,9 @@ bool SyncHandler::install_rices(bool hide_title)
         }
 
         /* Log reinstall */
-        for(Rice *rice : rices) {
-            if ((rice->install_state & Rice::UP_TO_DATE) != 0) {
-                utils.log(LOG_WARNING, fmt::format("{}-{} is up to date -- reinstalling", rice->name, rice->version));
+        for(Rice &rice : rices) {
+            if ((rice.install_state & Rice::UP_TO_DATE) != 0) {
+                utils.log(LOG_WARNING, fmt::format("{}-{} is up to date -- reinstalling", rice.name, rice.version));
             }
         }
 
@@ -155,10 +155,10 @@ bool SyncHandler::install_rices(bool hide_title)
         Utils::handle_signals(true);
 
         /* Download toml */
-        for (Rice *rice : rices) {
-            ProgressBar pb{fmt::format(" {}{}-{}{}", rice->name, config.colors.faint, rice->version, config.colors.nocolor), 0.4};
+        for (Rice &rice : rices) {
+            ProgressBar pb{fmt::format(" {}{}-{}{}", rice.name, config.colors.faint, rice.version, config.colors.nocolor), 0.4};
             try {
-                rice->download_toml(&pb);
+                rice.download_toml(&pb);
             } catch (std::runtime_error err) {
                 utils.log(LOG_FATAL, err.what());
             }
@@ -170,7 +170,7 @@ bool SyncHandler::install_rices(bool hide_title)
         for (int i = 0; i < rices.size(); ++i) {
             pb.update_title(fmt::format("({}/{}) checking integrity", i+1, rices.size()));
             pb.update("", (double)i / (double)rices.size());
-            if (!rices[i]->verify_toml()) utils.log(LOG_FATAL, fmt::format("download of rice '{}' corrupted", rices[i]->name));
+            if (!rices[i].verify_toml()) utils.log(LOG_FATAL, fmt::format("download of rice '{}' corrupted", rices[i].name));
         }
         pb.done();
 
@@ -181,7 +181,7 @@ bool SyncHandler::install_rices(bool hide_title)
             pb.update("", (double)i / (double)rices.size());
 
             try {
-                rices[i]->parse_toml();
+                rices[i].parse_toml();
             } catch (std::runtime_error err) {
                 utils.log(LOG_FATAL, err.what());
             }
@@ -189,11 +189,11 @@ bool SyncHandler::install_rices(bool hide_title)
         pb.done();
         
         /* Move .toml.tmp to .toml */
-        for (Rice *rice : rices) {
+        for (Rice &rice : rices) {
             try {
-                std::filesystem::rename(rice->toml_tmp_path, rice->toml_path);
+                std::filesystem::rename(rice.toml_tmp_path, rice.toml_path);
             } catch (std::filesystem::filesystem_error err) {
-                utils.log(LOG_FATAL, fmt::format("unable to write to '{}'", rice->toml_path));
+                utils.log(LOG_FATAL, fmt::format("unable to write to '{}'", rice.toml_path));
             }
         }
 
@@ -219,7 +219,7 @@ bool SyncHandler::install_rices(bool hide_title)
                 std::vector<int> ignore_indexes = utils.remove_confirmation_dialog(diff.remove);
 
                 PackageManager::remove(diff.remove, ignore_indexes);
-            } else utils.log(LOG_ALL, fmt::format(" nothing to remove for {}", rices[i]->name));
+            } else utils.log(LOG_ALL, fmt::format(" nothing to remove for {}", rices[i].name));
         }
 
         utils.colon_log("Processing changes...");
@@ -231,7 +231,7 @@ bool SyncHandler::install_rices(bool hide_title)
             pb.update("", (double)i / (double)rices.size());
 
             try {
-                rices[i]->install_git(&pb, i, rices.size());
+                rices[i].install_git(&pb, i, rices.size());
             } catch (std::runtime_error err) {
                 utils.log(LOG_FATAL, err.what());
             }
@@ -245,7 +245,7 @@ bool SyncHandler::install_rices(bool hide_title)
             pb.update("", (double)i / (double)rices.size());
 
             try {
-                rices[i]->install_desktop();
+                rices[i].install_desktop();
             } catch (std::runtime_error err) {
                 utils.log(LOG_FATAL, err.what());
             }

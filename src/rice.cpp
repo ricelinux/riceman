@@ -118,12 +118,7 @@ void Rice::install_desktop()
     Utils::write_file_content(fmt::format("{}/{}.desktop", session_path, id), file_content);
 }
 
-/** Constructs a Rice given a line from a database and a pointer to store the object
- *  @param db_line A line from a database
- *  @param rice The location in memory to store the constructed Rice
- *  @returns 0 if successful, -1 if incorrect number of values, -2 if invalid dependency type
- */
-const short Rice::from_string(std::string &db_line, Rice *rice) {
+Rice Rice::from_string(std::string &db_line) {
     std::stringstream line_stream{db_line};
     std::string rice_data[7];
     DependencyVec deps;
@@ -135,7 +130,7 @@ const short Rice::from_string(std::string &db_line, Rice *rice) {
         ++valuei;
     }
 
-    if (valuei != 7) return -1;
+    if (valuei != 7) throw std::runtime_error{fmt::format("malformatted database string")};
 
     /* Parse dependencies */
     std::stringstream deps_stream{rice_data[5]};
@@ -145,7 +140,7 @@ const short Rice::from_string(std::string &db_line, Rice *rice) {
         std::string type = dependency.substr(0, slash_loc);
         if (type.compare("pacman") == 0) aur = false;
         else if (type.compare("aur") == 0) aur = true;
-        else return -2;
+        else throw std::runtime_error{"incorrect dependency type in database string"};
 
         deps.push_back({
             aur,
@@ -153,6 +148,5 @@ const short Rice::from_string(std::string &db_line, Rice *rice) {
         });
     }
 
-    rice = new Rice(rice_data[0], rice_data[1], rice_data[2], rice_data[3], rice_data[4], rice_data[6], deps);
-    return 0;
+    return Rice(rice_data[0], rice_data[1], rice_data[2], rice_data[3], rice_data[4], rice_data[6], deps);
 }

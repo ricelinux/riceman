@@ -9,7 +9,7 @@ class Database
     public:
     Database(std::string name, std::string remoteuri);
 
-    Rice* get_rice(std::string name);
+    Rice get_rice(std::string &name);
     const short refresh(std::string expected_hash);
 
 

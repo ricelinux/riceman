@@ -27,7 +27,7 @@ class Rice
     void parse_toml();
     void install_git(ProgressBar *pb, int &rice_index, int rice_count);
     void install_desktop();
-    static const short from_string(std::string &database_line, Rice *rice);
+    static Rice from_string(std::string &database_line);
 
     short install_state;
     const std::string name;
