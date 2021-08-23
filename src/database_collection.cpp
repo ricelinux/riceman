@@ -34,7 +34,7 @@ void DatabaseCollection::add(std::string name, std::string remote_uri)
     add(Database{name, remote_uri});
 }
 
-Rice DatabaseCollection::get_rice(std::string name)
+Rice* DatabaseCollection::get_rice(std::string name)
 {
     for (Database db : db_list) {
         try {

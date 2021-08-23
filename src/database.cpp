@@ -12,66 +12,10 @@
 
 namespace fs = std::filesystem;
 
-Database::Database(std::string name, std::string remoteuri)
-: db_name{name}, local_path{fmt::format("{}/{}.db", LOCAL_DB_DIR, name)}, remote_uri{remoteuri}, remote_hash_uri{fmt::format("{}/rices.db.sha256sum", remoteuri)}, local_tmp_path{fmt::format("{}.tmp", local_path)}, remote_db{fmt::format("{}/rices.db", remoteuri)}, downloaded{false}
-{
-    //create_local();
-    update_rice_cache();
-}
+Database::Database(std::string name, std::string remote_uri)
+: name{name}, local_path{fmt::format("{}/{}.db", LOCAL_DB_DIR, name)}, remote_uri{remote_uri}, local_tmp_path{fmt::format("{}.tmp", local_path)}, downloaded{false}
+{}
 
-void Database::update_rice_cache()
-{
-    rices.clear();
-    std::ifstream file{local_path};
-
-    if (file.is_open()) {
-        for(std::string line; std::getline(file, line); ) {
-            if (line.length() == 0) continue;
-            std::stringstream line_stream{line};
-            std::string rice_data[7];
-            DependencyVec deps;
-            int valuei = 0;
-            
-            for(std::string value; std::getline(line_stream, value, ','); ) {
-                rice_data[valuei] = value;
-                ++valuei;
-            }
-
-            std::stringstream deps_stream{rice_data[5]};
-            for(std::string dependency; std::getline(deps_stream, dependency, ';'); ) {
-                int slash_loc = dependency.find("/");
-                bool aur;
-                std::string type = dependency.substr(0, slash_loc);
-                if (type.compare("pacman") == 0) aur = false;
-                else if (type.compare("aur") == 0) aur = true;
-                else throw std::runtime_error{fmt::format("unexpected dependecy type found in theme '{}'", rice_data[0])};
-
-                deps.push_back({
-                    aur,
-                    dependency.substr(slash_loc + 1, dependency.length())
-                });
-            }
-
-            rices.push_back(Rice(rice_data[0], rice_data[1], rice_data[2], rice_data[3], rice_data[4], rice_data[6], deps));
-        }
-        downloaded = true;
-    }
-    /* If not open, don't throw error because it could be newly added or recently removed */
-    file.close();
-}
-
-const bool Database::create_local()
-{
-    std::ofstream stream;
-
-    stream.open(local_path, std::fstream::app);
-    if (!stream.is_open()) return false;
-    stream.close();
-
-    fs::permissions(local_path, fs::perms::owner_read | fs::perms::owner_write | fs::perms::group_read | fs::perms::others_read);
-    
-    return true;
-}
 
 /** Downloads a fresh copy of the database
  * @param expected_hash the hash to be used for verifying the downloaded database
@@ -82,8 +26,8 @@ const short Database::refresh(std::string expected_hash)
 {
     using namespace std::placeholders;
 
-    ProgressBar progress_bar{" " + db_name, 0.4};
-    cpr::Response r = cpr::Get(cpr::Url{remote_db}, cpr::ProgressCallback(std::bind(&ProgressBar::progress_callback_download, &progress_bar, _1, _2, _3, _4)));
+    ProgressBar progress_bar{" " + name, 0.4};
+    cpr::Response r = cpr::Get(cpr::Url{fmt::format("{}/rices.db", remote_uri)}, cpr::ProgressCallback(std::bind(&ProgressBar::progress_callback_download, &progress_bar, _1, _2, _3, _4)));
     progress_bar.done();
 
     if (r.error) return -1;
@@ -94,15 +38,25 @@ const short Database::refresh(std::string expected_hash)
     if (Utils::hash_file(local_tmp_path).compare(expected_hash) == 0) fs::rename(local_tmp_path, local_path);
     else return -3; /* Integrity check failed */
 
-    update_rice_cache();
-
     return 1;
 }
 
-Rice& Database::get_rice(std::string name)
+Rice* Database::get_rice(std::string name)
 {
-    for (Rice &rice : rices) {
-        if (rice.name == name) return rice;
-    }
-    throw std::runtime_error{""}; /* No need to waste processing on formatting an error message since it won't be displayed */
+    std::ifstream file{local_path};
+    if (file.is_open()) {
+        for(std::string line; std::getline(file, line); ) {
+            if (line.length() == 0) continue;
+            Rice *rice;
+            switch(Rice::from_string(line, rice)) {
+                case -1:
+                    throw std::runtime_error{fmt::format("'{}' database malformatted", name)};
+                    break;
+                case -2:
+                    throw std::runtime_error{fmt::format("incorrect dependency type in '{}' database", name)};
+                    break;
+            };
+            return rice;
+        }
+    } else return NULL;
 }

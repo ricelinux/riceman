@@ -13,7 +13,7 @@ class DatabaseCollection
     Database& get(int &index);
     void add(Database db);
     void add(std::string name, std::string remote_uri);
-    Rice get_rice(std::string name);
+    Rice* get_rice(std::string name);
 
     std::vector<Database> db_list;
 
