@@ -212,9 +212,7 @@ bool SyncHandler::install_rices(bool hide_title)
             DependencyDiff &diff = dep_changes[i];
             
             if (diff.remove.size() > 0) {
-                std::vector<int> ignore_indexes = utils.remove_confirmation_dialog(diff.remove);
-
-                PackageManager::remove(diff.remove, ignore_indexes);
+                PackageManager::remove(diff.remove, utils.remove_confirmation_dialog(diff.remove));
             } else utils.log(LOG_ALL, fmt::format(" nothing to remove for {}", rices[i].name));
         }
 
