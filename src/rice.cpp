@@ -117,3 +117,42 @@ void Rice::install_desktop()
 
     Utils::write_file_content(fmt::format("{}/{}.desktop", session_path, id), file_content);
 }
+
+/** Constructs a Rice given a line from a database and a pointer to store the object
+ *  @param db_line A line from a database
+ *  @param rice The location in memory to store the constructed Rice
+ *  @returns 0 if successful, -1 if incorrect number of values, -2 if invalid dependency type
+ */
+const short Rice::from_string(std::string &db_line, Rice *rice) {
+    std::stringstream line_stream{db_line};
+    std::string rice_data[7];
+    DependencyVec deps;
+    int valuei = 0;
+    
+    /* Parse comma separated list into array */
+    for(std::string value; std::getline(line_stream, value, ','); ) {
+        rice_data[valuei] = value;
+        ++valuei;
+    }
+
+    if (valuei != 7) return -1;
+
+    /* Parse dependencies */
+    std::stringstream deps_stream{rice_data[5]};
+    for(std::string dependency; std::getline(deps_stream, dependency, ';'); ) {
+        int slash_loc = dependency.find("/");
+        bool aur;
+        std::string type = dependency.substr(0, slash_loc);
+        if (type.compare("pacman") == 0) aur = false;
+        else if (type.compare("aur") == 0) aur = true;
+        else return -2;
+
+        deps.push_back({
+            aur,
+            dependency.substr(slash_loc + 1, dependency.length())
+        });
+    }
+
+    rice = new Rice(rice_data[0], rice_data[1], rice_data[2], rice_data[3], rice_data[4], rice_data[6], deps);
+    return 0;
+}
