@@ -138,7 +138,7 @@ bool SyncHandler::install_rices(bool hide_title)
         
         std::cout << config.colors.title << "New Dependencies:\t"
                 << config.colors.nocolor << (adding_dep_str.length() ? adding_dep_str : "None") << std::endl
-                << config.colors.title << "Outdated Dependencies:\t" 
+                << config.colors.title << "Unused Dependencies:\t" 
                 << config.colors.nocolor << (removing_dep_str.length() ? removing_dep_str : "None") << std::endl 
                 << std::endl;
 
