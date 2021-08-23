@@ -99,6 +99,17 @@ void Utils::rice_log(const std::vector<Rice> &rices)
 	std::cout << std::endl << std::endl;
 }
 
+void Utils::rice_log(const std::vector<Rice*> &rices)
+{
+    std::cout << std::endl << config.colors.title << "Rices (" << rices.size() << ") " << config.colors.nocolor;
+
+	for(int i = 0; i < rices.size(); ++i) {
+		std::cout << rices[i]->name << config.colors.faint << "-" << rices[i]->version << config.colors.nocolor << "  ";
+	}
+
+	std::cout << std::endl << std::endl;
+}
+
 std::vector<int> Utils::remove_confirmation_dialog(DependencyVec &deps)
 {
     std::string ignore;
