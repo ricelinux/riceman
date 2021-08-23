@@ -7,24 +7,17 @@
 namespace fs = std::filesystem;
 
 const struct option<int> RemoveHandler::op_modifiers[RemoveHandler::op_modifiers_s] = {
-    OPT('g', "remove-git",      0,  1,  "removes the git repository"),
-    OPT('t', "remove-toml",     0,  1,  "removes the rice config"),
-    OPT('d', "keep-desktop",    0,  1,  "ignores the removal of the desktop entry"),
-    OPT('c', "complete",        0,  1,  "removes the git repository, rice config, and desktop entry (overrides all other options)"),
+    OPT('g', "keep-git",      0,  1,  "keeps the git repository"),
+    OPT('t', "keep-toml",     0,  1,  "keeps the rice config (only use if you know what you're doing)"),
+    OPT('d', "keep-desktop",  0,  1,  "keeps the desktop entry (only use if you know what you're dong)"),
 };
 
 RemoveHandler::RemoveHandler(argparse::ArgumentParser &parser, RicemanConfig &conf, Utils &util, DatabaseCollection &database_col)
 : OperationHandler(parser, conf, util, database_col)
 {
-    if (argparser.is_used("--complete")) {
-        remove_git = true;
-        remove_toml = true;
-        remove_desktop = true;
-    } else {
-        remove_git      =  argparser.is_used("--remove-git");
-        remove_toml     =  argparser.is_used("--remove-toml");
-        remove_desktop  = !argparser.is_used("--keep-desktop");
-    }
+    remove_git      = !argparser.is_used("--keep-git");
+    remove_toml     = !argparser.is_used("--keep-toml");
+    remove_desktop  = !argparser.is_used("--keep-desktop");
 
     if (argparser.is_used("targets")) {
         targets = argparser.get<std::vector<std::string>>("targets");
