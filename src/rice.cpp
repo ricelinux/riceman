@@ -55,8 +55,6 @@ Rice::Rice(std::string name, std::string id, std::string description, std::strin
         });
     }
 
-    std::cout << session_path << std::endl;
-
     if (fs::exists(session_path) && fs::is_regular_file(session_path)) {
         install_state |= DESKTOP_INSTALLED;
         if (new_version == old_version && (install_state & GIT_INSTALLED) != 0) install_state |= UP_TO_DATE;
