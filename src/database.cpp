@@ -58,5 +58,6 @@ Rice* Database::get_rice(std::string name)
             };
             return rice;
         }
-    } else return NULL;
+    }
+    return NULL;
 }
