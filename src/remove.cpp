@@ -32,7 +32,6 @@ void RemoveHandler::run()
         for(std::string &target : targets) {
             try {
                 Rice rice = databases.get_rice(target);
-                std::cout << rice.install_state << std::endl;
                 if (rice.install_state != Rice::NOT_INSTALLED) rices.push_back(rice);
             } catch (std::runtime_error err) {
                 incorrect_rice_names.push_back(target);
@@ -82,7 +81,7 @@ void RemoveHandler::remove_rices()
 
         try {
             if ((rice.install_state & Rice::GIT_INSTALLED) != 0 && remove_git) 
-                fs::remove(rice.git_path);
+                fs::remove_all(rice.git_path);
             pb.update("", 0.66);
         } catch (fs::filesystem_error) {
             utils.log(LOG_ERROR, fmt::format("failed to remove git repository for '{}'", rice.name));
@@ -99,10 +98,20 @@ void RemoveHandler::remove_rices()
         pb.done();
     }
 
+    
+
     utils.colon_log("Processing package changes...");
 
+    DependencyVec dependencies;
+
     for (Rice &rice : rices) {
-        PackageManager::remove(rice.old_dependencies, utils.remove_confirmation_dialog(rice.old_dependencies));
+        for (Dependency &dependency : rice.old_dependencies) dependencies.push_back(dependency);
+    }
+
+    if (dependencies.size() != 0) {
+        PackageManager::remove(dependencies, utils.remove_confirmation_dialog(dependencies));
+    } else {
+        utils.log(LOG_ALL, " nothing to do");
     }
 
     Utils::show_cursor(true);
