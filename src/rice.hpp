@@ -55,6 +55,8 @@ class Rice
     };
 
     private:
+
+    std::string get_desktop_path(std::shared_ptr<cpptoml::table> rice_config);
     
     std::chrono::high_resolution_clock::time_point start_time;
     std::string wm_path;

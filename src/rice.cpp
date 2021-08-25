@@ -25,19 +25,15 @@ Rice::Rice(std::string name, std::string id, std::string description, std::strin
 
     /* If rice is up-to-date */
     auto rice_config = cpptoml::parse_file(toml_path);
-    
+
+    desktop_path = get_desktop_path(rice_config);
+
     std::string old_version = rice_config->get_qualified_as<std::string>("theme.version")
-        .value_or("");
-    std::string display_server = rice_config->get_qualified_as<std::string>("window-manager.display-server")
         .value_or("");
     std::vector<std::string> pacman_deps = rice_config->get_qualified_array_of<std::string>("packages.pacman")
         .value_or<std::vector<std::string>>({});
     std::vector<std::string> aur_deps = rice_config->get_qualified_array_of<std::string>("packages.aur")
         .value_or<std::vector<std::string>>({});
-    
-    if (display_server == "xorg") desktop_path = fmt::format("{}/{}.desktop", XSESSIONS_PATH, id);
-    else if (display_server == "wayland") desktop_path = fmt::format("{}/{}.desktop", WSESSIONS_PATH, id);
-    else throw std::runtime_error{fmt::format("invalid display server specified in '{}' config", name)};
 
     if (new_version.length() == 0) throw std::runtime_error{fmt::format("theme version not specified in '{}' config", name)};
 
@@ -112,7 +108,7 @@ void Rice::install_desktop()
         "[Desktop Entry]\nName={0}\nComment={1}\nExec=env RICE_DIR={2} {3} {4}\nType=Application\nPath={2}\n",
         name, description, git_path, wm_path, wm_params);
 
-    Utils::write_file_content(desktop_path, file_content);
+    Utils::write_file_content(desktop_path.empty() ? get_desktop_path(cpptoml::parse_file(toml_path)) : desktop_path, file_content);
 }
 
 Rice Rice::from_string(std::string &db_line) {
@@ -146,4 +142,16 @@ Rice Rice::from_string(std::string &db_line) {
     }
 
     return Rice(rice_data[0], rice_data[1], rice_data[2], rice_data[3], rice_data[4], rice_data[6], deps);
+}
+
+std::string Rice::get_desktop_path(std::shared_ptr<cpptoml::table> rice_config)
+{
+    std::string path = rice_config->get_qualified_as<std::string>("window-manager.display-server")
+        .value_or("");
+    
+    if (path == "xorg") path = fmt::format("{}/{}.desktop", XSESSIONS_PATH, id);
+    else if (path == "wayland") path = fmt::format("{}/{}.desktop", WSESSIONS_PATH, id);
+    else throw std::runtime_error{fmt::format("invalid display server specified in '{}' config", name)};
+
+    return path;
 }
