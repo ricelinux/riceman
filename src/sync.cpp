@@ -55,7 +55,7 @@ void SyncHandler::run()
             utils.log(LOG_FATAL, "no targets specified");
         }
 
-        install_rices(upgrade == 0);
+        if (rices.size() > 0) install_rices(upgrade == 0);
 
         /* Deal with invalid rice names */
         if (incorrect_rice_names.size() != 0) {
@@ -124,141 +124,139 @@ bool SyncHandler::install_rices(bool hide_title)
     std::string removing_dep_str;
     std::vector<DependencyDiff> dep_changes;
 
-    if (rices.size() > 0) {
-        /* Resolve new and outdated dependencies */
-        for (Rice &rice : rices) {
-            DependencyDiff diff = PackageManager::get_diff(rice.old_dependencies, rice.new_dependencies);
-            
-            for (Dependency &rm_dep : diff.remove) {
-                removing_dep_str.append(rm_dep.name + " ");
-            }
-
-            for (Dependency &add_dep : diff.add) {
-                adding_dep_str.append(add_dep.name + " ");
-            }
-            
-            dep_changes.push_back(diff);
-
-            if ((rice.install_state & Rice::UP_TO_DATE) != 0) {
-                utils.log(LOG_WARNING, fmt::format("{}-{} is up to date -- reinstalling", rice.name, rice.version));
-            }
+    /* Resolve new and outdated dependencies */
+    for (Rice &rice : rices) {
+        DependencyDiff diff = PackageManager::get_diff(rice.old_dependencies, rice.new_dependencies);
+        
+        for (Dependency &rm_dep : diff.remove) {
+            removing_dep_str.append(rm_dep.name + " ");
         }
 
-        /* Print confirmation dialog */
-        if (hide_title) utils.colon_log("Installing rices...");
-        utils.rice_log(rices);
-        
-        std::cout << config.colors.title << "New Dependencies:\t"
-                << config.colors.nocolor << (adding_dep_str.length() ? adding_dep_str : "None") << std::endl
-                << config.colors.title << "Unused Dependencies:\t" 
-                << config.colors.nocolor << (removing_dep_str.length() ? removing_dep_str : "None") << std::endl 
-                << std::endl;
-
-        utils.colon_log("Proceed with installation? [Y/n] ", false);
-        
-        const char confirm = std::getchar();
-        if (confirm != '\n' && confirm != 'y' && confirm != 'Y' && confirm != ' ') utils.log(LOG_FATAL, "install aborted");
-
-        Utils::show_cursor(false);
-        Utils::handle_signals(true);
-
-        /* Download toml */
-        for (Rice &rice : rices) {
-            ProgressBar pb{fmt::format(" {}{}-{}{}", rice.name, config.colors.faint, rice.version, config.colors.nocolor), 0.4};
-            try {
-                rice.download_toml(&pb);
-            } catch (std::runtime_error err) {
-                utils.log(LOG_FATAL, err.what());
-            }
-            pb.done();
+        for (Dependency &add_dep : diff.add) {
+            adding_dep_str.append(add_dep.name + " ");
         }
         
-        /* Check integrity */
-        ProgressBar pb{fmt::format("(0/{}) checking integrity", rices.size()), 0.4};
-        for (int i = 0; i < rices.size(); ++i) {
-            pb.update_title(fmt::format("({}/{}) checking integrity", i+1, rices.size()));
-            pb.update("", (double)i / (double)rices.size());
-            if (!rices[i].verify_toml()) utils.log(LOG_FATAL, fmt::format("download of rice '{}' corrupted", rices[i].name));
+        dep_changes.push_back(diff);
+
+        if ((rice.install_state & Rice::UP_TO_DATE) != 0) {
+            utils.log(LOG_WARNING, fmt::format("{}-{} is up to date -- reinstalling", rice.name, rice.version));
+        }
+    }
+
+    /* Print confirmation dialog */
+    if (hide_title) utils.colon_log("Installing rices...");
+    utils.rice_log(rices);
+    
+    std::cout << config.colors.title << "New Dependencies:\t"
+            << config.colors.nocolor << (adding_dep_str.length() ? adding_dep_str : "None") << std::endl
+            << config.colors.title << "Unused Dependencies:\t" 
+            << config.colors.nocolor << (removing_dep_str.length() ? removing_dep_str : "None") << std::endl 
+            << std::endl;
+
+    utils.colon_log("Proceed with installation? [Y/n] ", false);
+    
+    const char confirm = std::getchar();
+    if (confirm != '\n' && confirm != 'y' && confirm != 'Y' && confirm != ' ') utils.log(LOG_FATAL, "install aborted");
+
+    Utils::show_cursor(false);
+    Utils::handle_signals(true);
+
+    /* Download toml */
+    for (Rice &rice : rices) {
+        ProgressBar pb{fmt::format(" {}{}-{}{}", rice.name, config.colors.faint, rice.version, config.colors.nocolor), 0.4};
+        try {
+            rice.download_toml(&pb);
+        } catch (std::runtime_error err) {
+            utils.log(LOG_FATAL, err.what());
         }
         pb.done();
+    }
+    
+    /* Check integrity */
+    ProgressBar pb{fmt::format("(0/{}) checking integrity", rices.size()), 0.4};
+    for (int i = 0; i < rices.size(); ++i) {
+        pb.update_title(fmt::format("({}/{}) checking integrity", i+1, rices.size()));
+        pb.update("", (double)i / (double)rices.size());
+        if (!rices[i].verify_toml()) utils.log(LOG_FATAL, fmt::format("download of rice '{}' corrupted", rices[i].name));
+    }
+    pb.done();
 
-        /* Parse toml */
-        pb = ProgressBar{fmt::format("(0/{}) parsing configuration files", rices.size()), 0.4};
-        for (int i = 0; i < rices.size(); ++i) {
-            pb.update_title(fmt::format("({}/{}) parsing configuration files", i+1, rices.size()));
-            pb.update("", (double)i / (double)rices.size());
+    /* Parse toml */
+    pb = ProgressBar{fmt::format("(0/{}) parsing configuration files", rices.size()), 0.4};
+    for (int i = 0; i < rices.size(); ++i) {
+        pb.update_title(fmt::format("({}/{}) parsing configuration files", i+1, rices.size()));
+        pb.update("", (double)i / (double)rices.size());
 
-            try {
-                rices[i].parse_toml();
-            } catch (std::runtime_error err) {
-                utils.log(LOG_FATAL, err.what());
-            }
+        try {
+            rices[i].parse_toml();
+        } catch (std::runtime_error err) {
+            utils.log(LOG_FATAL, err.what());
         }
-        pb.done();
+    }
+    pb.done();
+    
+    /* Move .toml.tmp to .toml */
+    for (Rice &rice : rices) {
+        try {
+            std::filesystem::rename(rice.toml_tmp_path, rice.toml_path);
+        } catch (std::filesystem::filesystem_error err) {
+            utils.log(LOG_FATAL, fmt::format("unable to write to '{}'", rice.toml_path));
+        }
+    }
+
+    utils.colon_log("Installing dependencies...");
+
+    for (int i = 0; i < rices.size(); ++i) {
+        DependencyDiff &diff = dep_changes[i];
+        try { 
+            PackageManager::install(diff.add);
+        } catch (std::runtime_error err) {
+            utils.log(LOG_FATAL, err.what());
+        }
+    }
+
+    ProgressBar{fmt::format("({0}/{0}) installing dependencies", rices.size()), 0.4}.done();
+
+    utils.colon_log("Removing outdated dependencies...");
+
+    for (int i = 0; i < rices.size(); ++i) {
+        DependencyDiff &diff = dep_changes[i];
         
-        /* Move .toml.tmp to .toml */
-        for (Rice &rice : rices) {
-            try {
-                std::filesystem::rename(rice.toml_tmp_path, rice.toml_path);
-            } catch (std::filesystem::filesystem_error err) {
-                utils.log(LOG_FATAL, fmt::format("unable to write to '{}'", rice.toml_path));
-            }
+        if (diff.remove.size() > 0) {
+            PackageManager::remove(diff.remove, utils.remove_confirmation_dialog(diff.remove));
+        } else utils.log(LOG_ALL, fmt::format(" nothing to remove for {}", rices[i].name));
+    }
+
+    utils.colon_log("Processing changes...");
+
+    /* Clone git repo */
+    pb = ProgressBar{fmt::format("(0/{}) installing rices", rices.size()), 0.4};
+    for(int i = 0; i < rices.size(); ++i) {
+        pb.update_title(fmt::format("({}/{}) installing rices", i+1, rices.size()));
+        pb.update("", (double)i / (double)rices.size());
+
+        try {
+            rices[i].install_git(&pb, i, rices.size());
+        } catch (std::runtime_error err) {
+            utils.log(LOG_FATAL, err.what());
         }
+    }
+    pb.done();
 
-        utils.colon_log("Installing dependencies...");
+    /* Write .desktop files to session dir */
+    pb = ProgressBar{fmt::format("(0/{}) writing desktop entries", rices.size()), 0.4}; 
+    for (int i = 0; i < rices.size(); ++i) {
+        pb.update_title(fmt::format("({}/{}) writing desktop entries", i+1, rices.size()));
+        pb.update("", (double)i / (double)rices.size());
 
-        for (int i = 0; i < rices.size(); ++i) {
-            DependencyDiff &diff = dep_changes[i];
-            try { 
-                PackageManager::install(diff.add);
-            } catch (std::runtime_error err) {
-                utils.log(LOG_FATAL, err.what());
-            }
+        try {
+            rices[i].install_desktop();
+        } catch (std::runtime_error err) {
+            utils.log(LOG_FATAL, err.what());
         }
+    }
 
-        ProgressBar{fmt::format("({0}/{0}) installing dependencies", rices.size()), 0.4}.done();
-
-        utils.colon_log("Removing outdated dependencies...");
-
-        for (int i = 0; i < rices.size(); ++i) {
-            DependencyDiff &diff = dep_changes[i];
-            
-            if (diff.remove.size() > 0) {
-                PackageManager::remove(diff.remove, utils.remove_confirmation_dialog(diff.remove));
-            } else utils.log(LOG_ALL, fmt::format(" nothing to remove for {}", rices[i].name));
-        }
-
-        utils.colon_log("Processing changes...");
-
-        /* Clone git repo */
-        pb = ProgressBar{fmt::format("(0/{}) installing rices", rices.size()), 0.4};
-        for(int i = 0; i < rices.size(); ++i) {
-            pb.update_title(fmt::format("({}/{}) installing rices", i+1, rices.size()));
-            pb.update("", (double)i / (double)rices.size());
-
-            try {
-                rices[i].install_git(&pb, i, rices.size());
-            } catch (std::runtime_error err) {
-                utils.log(LOG_FATAL, err.what());
-            }
-        }
-        pb.done();
-
-        /* Write .desktop files to session dir */
-        pb = ProgressBar{fmt::format("(0/{}) writing desktop entries", rices.size()), 0.4}; 
-        for (int i = 0; i < rices.size(); ++i) {
-            pb.update_title(fmt::format("({}/{}) writing desktop entries", i+1, rices.size()));
-            pb.update("", (double)i / (double)rices.size());
-
-            try {
-                rices[i].install_desktop();
-            } catch (std::runtime_error err) {
-                utils.log(LOG_FATAL, err.what());
-            }
-        }
-
-        pb.done();
-    } 
+    pb.done();
 
     Utils::show_cursor(true);
     Utils::handle_signals(false);
