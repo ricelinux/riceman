@@ -55,7 +55,7 @@ void RemoveHandler::remove_rices()
         }
     }
 
-    std::cout << config.colors.title << "Removed Rices:\t"
+    std::cout << config.colors.title << "Removed Dependencies:\t"
             << config.colors.nocolor << (dependency_string.length() == 0 ? "None" : dependency_string) 
             << std::endl << std::endl;
     
