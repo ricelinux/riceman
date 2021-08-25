@@ -14,7 +14,9 @@ namespace fs = std::filesystem;
 
 Database::Database(std::string name, std::string remote_uri)
 : name{name}, local_path{fmt::format("{}/{}.db", LOCAL_DB_DIR, name)}, remote_uri{remote_uri}, local_tmp_path{fmt::format("{}.tmp", local_path)}, downloaded{false}
-{}
+{
+    downloaded = fs::exists(local_path) && fs::is_regular_file(local_path);
+}
 
 
 /** Downloads a fresh copy of the database
