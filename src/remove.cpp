@@ -33,6 +33,7 @@ void RemoveHandler::run()
             try {
                 Rice rice = databases.get_rice(target);
                 if (rice.install_state != Rice::NOT_INSTALLED) rices.push_back(rice);
+                else incorrect_rice_names.push_back(target);
             } catch (std::runtime_error err) {
                 incorrect_rice_names.push_back(target);
             }
