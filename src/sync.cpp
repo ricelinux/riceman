@@ -51,7 +51,23 @@ void SyncHandler::run()
             }
         }
 
+        if (targets.size() == 0) {
+            utils.log(LOG_FATAL, "no targets specified");
+        }
+
         install_rices(upgrade == 0);
+
+        /* Deal with invalid rice names */
+        if (incorrect_rice_names.size() != 0) {
+            for (int i = 0; i < incorrect_rice_names.size(); ++i) {
+                utils.log(LOG_ERROR, "target not found: " + incorrect_rice_names[i]);
+            }
+
+            for (Database db : databases.db_list) {
+                if (!db.downloaded) 
+                    utils.log(LOG_ERROR, fmt::format("{} is not downloaded (use -Sy to download)", db.name));
+            }
+        }
     }
 }
 
@@ -104,10 +120,6 @@ bool SyncHandler::refresh_rices()
  */
 bool SyncHandler::install_rices(bool hide_title)
 {
-    if (targets.size() == 0) {
-        utils.log(LOG_FATAL, "no targets specified");
-    }
-
     std::string adding_dep_str;
     std::string removing_dep_str;
     std::vector<DependencyDiff> dep_changes;
@@ -250,18 +262,6 @@ bool SyncHandler::install_rices(bool hide_title)
 
     Utils::show_cursor(true);
     Utils::handle_signals(false);
-
-    /* Deal with invalid rice names */
-    if (incorrect_rice_names.size() == 0) return true;
-    
-    for (int i = 0; i < incorrect_rice_names.size(); ++i) {
-        utils.log(LOG_ERROR, "target not found: " + incorrect_rice_names[i]);
-    }
-
-    for (Database db : databases.db_list) {
-        if (!db.downloaded) 
-            utils.log(LOG_ERROR, fmt::format("{} is not downloaded (use -Sy to download)", db.name));
-    }
 
     return true;
 }

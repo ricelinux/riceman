@@ -38,7 +38,23 @@ void RemoveHandler::run()
             }
         }
 
-        remove_rices();
+        if (targets.size() == 0) {
+            utils.log(LOG_FATAL, "no targets specified");
+        }
+
+        if (rices.size() > 0) remove_rices();
+
+        /* Deal with invalid rice names */
+        if (incorrect_rice_names.size() != 0) {
+            for (int i = 0; i < incorrect_rice_names.size(); ++i) {
+                utils.log(LOG_ERROR, "target not found: " + incorrect_rice_names[i]);
+            }
+
+            for (Database db : databases.db_list) {
+                if (!db.downloaded) 
+                    utils.log(LOG_ERROR, fmt::format("{} is not downloaded (use -Sy to download)", db.name));
+            }
+        }
     } else utils.log(LOG_FATAL, "no targets specified");
 }
 
@@ -97,8 +113,6 @@ void RemoveHandler::remove_rices()
 
         pb.done();
     }
-
-    
 
     utils.colon_log("Processing package changes...");
 
