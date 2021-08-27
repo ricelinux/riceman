@@ -24,7 +24,7 @@ LDFLAGS  := $(shell pkg-config --libs $(LIBS)) -lstdc++ -lm -lstdc++fs
 debug: CFLAGS += -O0
 debug: $(BIN)
 
-release: CFLAGS += -Os
+release: CFLAGS += -O2
 release: $(BIN)
 
 $(BIN): $(OBJECTS) $(HEADERS) $(CPR_OBJECTS)
