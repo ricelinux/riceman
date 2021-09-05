@@ -47,7 +47,8 @@ void SyncHandler::run()
             try {
                 rices.push_back(databases.get_rice(target));
             } catch (std::runtime_error err) {
-                incorrect_rice_names.push_back(target);
+                if (strcmp(err.what(), "") == 0) incorrect_rice_names.push_back(target);
+                else utils.log(LOG_FATAL, err.what());
             }
         }
 

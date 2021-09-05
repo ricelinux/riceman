@@ -35,7 +35,8 @@ void RemoveHandler::run()
                 if (rice.install_state != Rice::NOT_INSTALLED) rices.push_back(rice);
                 else incorrect_rice_names.push_back(target);
             } catch (std::runtime_error err) {
-                incorrect_rice_names.push_back(target);
+                if (strcmp(err.what(), "") == 0) incorrect_rice_names.push_back(target);
+                else utils.log(LOG_FATAL, err.what());
             }
         }
 
