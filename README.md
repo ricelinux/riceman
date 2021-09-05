@@ -30,13 +30,11 @@ SYNC OPTIONS
 
 ```
 
-> Note: This text above is only temporary
-
 ## Goals
 
 The goal of riceman is to make easy the installation of window manager configurations while allowing for multiple configurations of one window manager. In other words, it does not limit the user in the number of configurations per window manager. 
 
-Part of riceman's design philosophy is the idea that a user's home directory should not be modified, and the configurations for various software should be all sourced from one location for two reasons. The first is that it makes development easier when all a person needs to do is work in one directory, instead of moving around their file system making changes. The second is that the user can use the installed window manager how they please, without their own configuration being overwritten.
+Part of riceman's design philosophy is the idea that a user's home directory should not be modified, and the configurations for various software should be all sourced from one location for two reasons. The first is that it makes development easier when all a person needs to do is work in one directory, instead of moving around their file system making changes. The second is that the user can use the installed window manager how they please, without their own configuration being overwritten. As such, riceman functions very much like a system package manager, and is modeled after pacman, the Arch Linux package manager.
 
 As an example, lets say a user wants to install a rice of bspwm which configures bspwm, sxhkd, alacritty, polybar, various themes (icon, GTK, cursor, etc), rofi, and picom. This would be slightly annoying if the user didn't configure those programs already, but if they did they would have to archive the old configs, install the new configs, change their themes, etc. If they have an additional rice alongside the one they just installed on their system, there might be some conflicts with configurations for the same program like alacritty, rofi, or GTK themes. The conclusion is that this system doesn't really work.
 
