@@ -139,7 +139,7 @@ Rice Rice::from_string(std::string &db_line) {
             dependency.substr(slash_loc + 1, dependency.length())
         });
     }
-    return Rice(rice_data[0], rice_data[1], rice_data[2], rice_data[3], rice_data[4], deps);
+    return Rice(rice_data[0], rice_data[1], rice_data[2], rice_data[3], rice_data[5], deps);
 }
 
 std::string Rice::get_desktop_path(std::shared_ptr<cpptoml::table> rice_config)
