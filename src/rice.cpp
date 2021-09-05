@@ -89,7 +89,7 @@ void Rice::parse_toml()
     if (git_commit_hash.length() == 0) throw std::runtime_error{fmt::format("git commit hash not specified in '{}' config", name)};
 }
 
-void Rice::install_git(ProgressBar *pb, int &rice_index, int rice_count)
+void Rice::install_git()
 {
     GitRepository git_repo{git_path, git_repo_uri};
 

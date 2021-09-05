@@ -24,7 +24,7 @@ class Rice
     void download_toml(ProgressBar *pb);
     bool verify_toml();
     void parse_toml();
-    void install_git(ProgressBar *pb, int &rice_index, int rice_count);
+    void install_git();
     void install_desktop();
     static Rice from_string(std::string &database_line);
 
