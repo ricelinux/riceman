@@ -1,6 +1,6 @@
 #pragma once
 
-#include "progressbar.hpp"
+#include "progress_bar.hpp"
 
 #include <string>
 

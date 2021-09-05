@@ -1,5 +1,5 @@
 #include "database.hpp"
-#include "progressbar.hpp"
+#include "progress_bar.hpp"
 #include "utils.hpp"
 #include "constants.hpp"
 

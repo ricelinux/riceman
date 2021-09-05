@@ -1,4 +1,4 @@
-#include "progressbar.hpp"
+#include "progress_bar.hpp"
 
 #include <iostream>
 #include <cmath>
