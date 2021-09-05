@@ -11,10 +11,10 @@
 
 namespace fs = std::filesystem;
 
-Rice::Rice(std::string name, std::string id, std::string description, std::string new_version, std::string window_manager, std::string hash, DependencyVec new_dependencies)
-: name{name}, id{id}, description{description}, version{new_version}, window_manager{window_manager},
-    new_dependencies{new_dependencies}, toml_path{fmt::format("{}/{}.toml", LOCAL_CONFIG_DIR, id)}, 
-    toml_tmp_path{fmt::format("{}.tmp", toml_path)}, git_path{fmt::format("{}/{}", LOCAL_RICES_DIR, id)}, 
+Rice::Rice(std::string name, std::string description, std::string new_version, std::string window_manager, std::string hash, DependencyVec new_dependencies)
+: name{name}, description{description}, version{new_version}, window_manager{window_manager},
+    new_dependencies{new_dependencies}, toml_path{fmt::format("{}/{}.toml", LOCAL_CONFIG_DIR, name)}, 
+    toml_tmp_path{fmt::format("{}.tmp", toml_path)}, git_path{fmt::format("{}/{}", LOCAL_RICES_DIR, name)}, 
     install_state{NOT_INSTALLED}, hash{hash}
 {
     /* If .toml and git are installed */
@@ -60,7 +60,7 @@ Rice::Rice(std::string name, std::string id, std::string description, std::strin
 void Rice::download_toml(ProgressBar *pb)
 {
     using namespace std::placeholders;
-    cpr::Response r = cpr::Get(cpr::Url{fmt::format("{}/{}.toml", REMOTE_RICES_URI, id)}, cpr::ProgressCallback{std::bind(&ProgressBar::progress_callback_download, pb, _1, _2, _3, _4)});
+    cpr::Response r = cpr::Get(cpr::Url{fmt::format("{}/{}.toml", REMOTE_RICES_URI, name)}, cpr::ProgressCallback{std::bind(&ProgressBar::progress_callback_download, pb, _1, _2, _3, _4)});
 
     /* Handle potential errors */
     if (r.error) throw std::runtime_error{fmt::format("{} (error code {})", r.error.message, r.error.code)};
@@ -113,7 +113,7 @@ void Rice::install_desktop()
 
 Rice Rice::from_string(std::string &db_line) {
     std::stringstream line_stream{db_line};
-    std::string rice_data[7];
+    std::string rice_data[6];
     DependencyVec deps;
     int valuei = 0;
     
@@ -122,11 +122,10 @@ Rice Rice::from_string(std::string &db_line) {
         rice_data[valuei] = value;
         ++valuei;
     }
-
-    if (valuei != 7) throw std::runtime_error{fmt::format("malformatted database string")};
+    if (valuei != 6) throw std::runtime_error{"malformatted database string"};
 
     /* Parse dependencies */
-    std::stringstream deps_stream{rice_data[5]};
+    std::stringstream deps_stream{rice_data[4]};
     for(std::string dependency; std::getline(deps_stream, dependency, ';'); ) {
         int slash_loc = dependency.find("/");
         bool aur;
@@ -140,8 +139,7 @@ Rice Rice::from_string(std::string &db_line) {
             dependency.substr(slash_loc + 1, dependency.length())
         });
     }
-
-    return Rice(rice_data[0], rice_data[1], rice_data[2], rice_data[3], rice_data[4], rice_data[6], deps);
+    return Rice(rice_data[0], rice_data[1], rice_data[2], rice_data[3], rice_data[4], deps);
 }
 
 std::string Rice::get_desktop_path(std::shared_ptr<cpptoml::table> rice_config)
@@ -149,8 +147,8 @@ std::string Rice::get_desktop_path(std::shared_ptr<cpptoml::table> rice_config)
     std::string path = rice_config->get_qualified_as<std::string>("window-manager.display-server")
         .value_or("");
     
-    if (path == "xorg") path = fmt::format("{}/{}.desktop", XSESSIONS_PATH, id);
-    else if (path == "wayland") path = fmt::format("{}/{}.desktop", WSESSIONS_PATH, id);
+    if (path == "xorg") path = fmt::format("{}/{}.desktop", XSESSIONS_PATH, name);
+    else if (path == "wayland") path = fmt::format("{}/{}.desktop", WSESSIONS_PATH, name);
     else throw std::runtime_error{fmt::format("invalid display server specified in '{}' config", name)};
 
     return path;
