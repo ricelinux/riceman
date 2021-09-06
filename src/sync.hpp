@@ -11,7 +11,6 @@ class SyncHandler: public OperationHandler
     public:
 
     SyncHandler(argparse::ArgumentParser &parser, RicemanConfig &conf, Utils &util, DatabaseCollection &databases);
-    ~SyncHandler();
     void run();
 
     static const int op_modifiers_s = 2;

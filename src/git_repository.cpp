@@ -24,6 +24,8 @@ typedef struct fetchhead_foreach_payload {
 GitRepository::GitRepository(const std::string &path, const std::string &remote_uri)
     : path{path}, remote_uri{remote_uri}
 {
+    git_libgit2_init();
+
     if (fs::exists(path) && fs::is_directory(path)) {
         int error = git_repository_open_ext(&repo, path.c_str(), GIT_REPOSITORY_OPEN_NO_SEARCH, NULL);
         cloned = error >= 0;
@@ -35,6 +37,7 @@ GitRepository::GitRepository(const std::string &path, const std::string &remote_
 GitRepository::~GitRepository()
 {
     git_repository_free(repo);
+    git_libgit2_shutdown();
 }
 
 void GitRepository::clone()
