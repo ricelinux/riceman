@@ -126,7 +126,7 @@ bool SyncHandler::install_rices(bool hide_title)
     std::vector<DependencyDiff> dep_changes;
 
     /* Resolve new and outdated dependencies */
-    for (Rice &rice : rices) {
+    for (auto &rice : rices) {
         DependencyDiff diff = PackageManager::get_diff(rice.old_dependencies, rice.new_dependencies);
         
         for (Dependency &rm_dep : diff.remove) {
@@ -139,7 +139,7 @@ bool SyncHandler::install_rices(bool hide_title)
         
         dep_changes.push_back(diff);
 
-        if ((rice.install_state & Rice::UP_TO_DATE) != 0) {
+        if ((rice.install_state & DatabaseRice::UP_TO_DATE) != 0) {
             utils.log(LOG_WARNING, fmt::format("{}-{} is up to date -- reinstalling", rice.name, rice.version));
         }
     }

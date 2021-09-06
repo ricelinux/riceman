@@ -88,23 +88,12 @@ void Utils::colon_log(const std::string &message, const bool line_break, const b
 	if (line_break) std::cout << std::endl;
 }
 
-void Utils::rice_log(const std::vector<Rice> &rices)
+void Utils::rice_log(const std::vector<DatabaseRice> &rices)
 {
 	std::cout << std::endl << config.colors.title << "Rices (" << rices.size() << ") " << config.colors.nocolor;
 
 	for(int i = 0; i < rices.size(); ++i) {
 		std::cout << rices[i].name << config.colors.faint << "-" << rices[i].version << config.colors.nocolor << "  ";
-	}
-
-	std::cout << std::endl << std::endl;
-}
-
-void Utils::rice_log(const std::vector<Rice*> &rices)
-{
-    std::cout << std::endl << config.colors.title << "Rices (" << rices.size() << ") " << config.colors.nocolor;
-
-	for(int i = 0; i < rices.size(); ++i) {
-		std::cout << rices[i]->name << config.colors.faint << "-" << rices[i]->version << config.colors.nocolor << "  ";
 	}
 
 	std::cout << std::endl << std::endl;

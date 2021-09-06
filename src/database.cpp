@@ -43,14 +43,14 @@ const short Database::refresh(std::string expected_hash)
     return 1;
 }
 
-Rice Database::get_rice(std::string &name)
+DatabaseRice Database::get_rice(std::string &name)
 {
     std::ifstream file{local_path};
     if (file.is_open()) {
         for(std::string line; std::getline(file, line); ) {
             if (line.length() == 0) continue;
             if (line.substr(0, name.size()) == name) 
-                return Rice::from_string(line);
+                return DatabaseRice::from_string(line);
         }
     }
     throw std::runtime_error{""};

@@ -2,7 +2,7 @@
 
 #include "config.hpp"
 #include "constants.hpp"
-#include "rice.hpp"
+#include "database_rice.hpp"
 
 #include <unistd.h>
 
@@ -35,8 +35,7 @@ class Utils
     const bool log(const int level, const std::string &message, const bool line_break = true);
     const bool log(const int level, const int &message, const bool line_break = true);
     void colon_log(const std::string &message, const bool line_break = true, const bool bold = true);
-    void rice_log(const std::vector<Rice> &rices);
-    void rice_log(const std::vector<Rice*> &rices);
+    void rice_log(const std::vector<DatabaseRice> &rices);
     std::vector<int> remove_confirmation_dialog(DependencyVec &deps);
     static void show_cursor(const bool status);
     static void handle_signals(const bool status);

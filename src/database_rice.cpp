@@ -25,3 +25,35 @@ void DatabaseRice::download_toml(std::string path, ProgressBar &pb)
 
     if (!Utils::write_file_content(path, r.text)) throw std::runtime_error{fmt::format("unable to write to '{}'", path)};
 }
+
+DatabaseRice DatabaseRice::from_string(std::string &db_line)
+{
+    std::stringstream line_stream{db_line};
+    std::string rice_data[6];
+    DependencyVec deps;
+    int valuei = 0;
+    
+    /* Parse comma separated list into array */
+    for(std::string value; std::getline(line_stream, value, ','); ) {
+        rice_data[valuei] = value;
+        ++valuei;
+    }
+    if (valuei != 6) throw std::runtime_error{"malformatted database string"};
+
+    /* Parse dependencies */
+    std::stringstream deps_stream{rice_data[4]};
+    for(std::string dependency; std::getline(deps_stream, dependency, ';'); ) {
+        int slash_loc = dependency.find("/");
+        bool aur;
+        std::string type = dependency.substr(0, slash_loc);
+        if (type.compare("pacman") == 0) aur = false;
+        else if (type.compare("aur") == 0) aur = true;
+        else throw std::runtime_error{"incorrect dependency type in database string"};
+
+        deps.push_back({
+            aur,
+            dependency.substr(slash_loc + 1, dependency.length())
+        });
+    }
+    return DatabaseRice(rice_data[0], rice_data[1], rice_data[2], rice_data[3], rice_data[5], deps);
+}
