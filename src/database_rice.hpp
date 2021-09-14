@@ -10,7 +10,7 @@ class DatabaseRice
     public:
 
     DatabaseRice(std::string name, std::string description, std::string new_version, std::string window_manager, std::string hash, DependencyVec dependencies);
-    void download_toml(std::string path, ProgressBar &pb);
+    void download_toml(std::string path, ProgressBar *pb);
     static DatabaseRice from_string(std::string &database_line);
 
     short install_state;

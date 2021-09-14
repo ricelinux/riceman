@@ -15,10 +15,10 @@ DatabaseRice::DatabaseRice(std::string name, std::string description, std::strin
     if (fs::exists(git_path) && fs::is_directory(git_path)) install_state = install_state | GIT_INSTALLED;
 }
 
-void DatabaseRice::download_toml(std::string path, ProgressBar &pb)
+void DatabaseRice::download_toml(std::string path, ProgressBar *pb)
 {
     using namespace std::placeholders;
-    cpr::Response r = cpr::Get(cpr::Url{fmt::format("{}/{}.toml", REMOTE_RICES_URI, name)}, cpr::ProgressCallback{std::bind(&ProgressBar::progress_callback_download, &pb, _1, _2, _3, _4)});
+    cpr::Response r = cpr::Get(cpr::Url{fmt::format("{}/{}.toml", REMOTE_RICES_URI, name)}, cpr::ProgressCallback{std::bind(&ProgressBar::progress_callback_download, pb, _1, _2, _3, _4)});
 
     /* Handle potential errors */
     if (r.error) throw std::runtime_error{fmt::format("{} (error code {})", r.error.message, r.error.code)};

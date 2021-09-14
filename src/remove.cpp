@@ -1,135 +1,135 @@
-#include "remove.hpp"
+// #include "remove.hpp"
 
-#include <filesystem>
+// #include <filesystem>
 
-#include <fmt/format.h>
+// #include <fmt/format.h>
 
-namespace fs = std::filesystem;
+// namespace fs = std::filesystem;
 
-const struct option<int> RemoveHandler::op_modifiers[RemoveHandler::op_modifiers_s] = {
-    OPT('g', "keep-git",      0,  1,  "keeps the git repository"),
-    OPT('t', "keep-toml",     0,  1,  "keeps the rice config (only use if you know what you're doing)"),
-    OPT('d', "keep-desktop",  0,  1,  "keeps the desktop entry (only use if you know what you're dong)"),
-};
+// const struct option<int> RemoveHandler::op_modifiers[RemoveHandler::op_modifiers_s] = {
+//     OPT('g', "keep-git",      0,  1,  "keeps the git repository"),
+//     OPT('t', "keep-toml",     0,  1,  "keeps the rice config (only use if you know what you're doing)"),
+//     OPT('d', "keep-desktop",  0,  1,  "keeps the desktop entry (only use if you know what you're dong)"),
+// };
 
-RemoveHandler::RemoveHandler(argparse::ArgumentParser &parser, RicemanConfig &conf, Utils &util, DatabaseCollection &database_col)
-: OperationHandler(parser, conf, util, database_col)
-{
-    remove_git      = !argparser.is_used("--keep-git");
-    remove_toml     = !argparser.is_used("--keep-toml");
-    remove_desktop  = !argparser.is_used("--keep-desktop");
+// RemoveHandler::RemoveHandler(argparse::ArgumentParser &parser, RicemanConfig &conf, Utils &util, DatabaseCollection &database_col)
+// : OperationHandler(parser, conf, util, database_col)
+// {
+//     remove_git      = !argparser.is_used("--keep-git");
+//     remove_toml     = !argparser.is_used("--keep-toml");
+//     remove_desktop  = !argparser.is_used("--keep-desktop");
 
-    if (argparser.is_used("targets")) {
-        targets = argparser.get<std::vector<std::string>>("targets");
-    }
-}
+//     if (argparser.is_used("targets")) {
+//         targets = argparser.get<std::vector<std::string>>("targets");
+//     }
+// }
 
-void RemoveHandler::run()
-{
-    if (!targets.empty()) {
+// void RemoveHandler::run()
+// {
+//     if (!targets.empty()) {
 
-        /* Verify to-be-installed rices */
-        for(std::string &target : targets) {
-            try {
-                Rice rice = databases.get_rice(target);
-                if (rice.install_state != Rice::NOT_INSTALLED) rices.push_back(rice);
-                else incorrect_rice_names.push_back(target);
-            } catch (std::runtime_error err) {
-                if (strcmp(err.what(), "") == 0) incorrect_rice_names.push_back(target);
-                else utils.log(LOG_FATAL, err.what());
-            }
-        }
+//         /* Verify to-be-installed rices */
+//         for(std::string &target : targets) {
+//             try {
+//                 Rice rice = databases.get_rice(target);
+//                 if (rice.install_state != Rice::NOT_INSTALLED) rices.push_back(rice);
+//                 else incorrect_rice_names.push_back(target);
+//             } catch (std::runtime_error err) {
+//                 if (strcmp(err.what(), "") == 0) incorrect_rice_names.push_back(target);
+//                 else utils.log(LOG_FATAL, err.what());
+//             }
+//         }
 
-        if (targets.size() == 0) {
-            utils.log(LOG_FATAL, "no targets specified");
-        }
+//         if (targets.size() == 0) {
+//             utils.log(LOG_FATAL, "no targets specified");
+//         }
 
-        if (rices.size() > 0) remove_rices();
+//         if (rices.size() > 0) remove_rices();
 
-        /* Deal with invalid rice names */
-        if (incorrect_rice_names.size() != 0) {
-            for (int i = 0; i < incorrect_rice_names.size(); ++i) {
-                utils.log(LOG_ERROR, "target not found: " + incorrect_rice_names[i]);
-            }
+//         /* Deal with invalid rice names */
+//         if (incorrect_rice_names.size() != 0) {
+//             for (int i = 0; i < incorrect_rice_names.size(); ++i) {
+//                 utils.log(LOG_ERROR, "target not found: " + incorrect_rice_names[i]);
+//             }
 
-            for (Database db : databases.db_list) {
-                if (!db.downloaded) 
-                    utils.log(LOG_ERROR, fmt::format("{} is not downloaded (use -Sy to download)", db.name));
-            }
-        }
-    } else utils.log(LOG_FATAL, "no targets specified");
-}
+//             for (Database db : databases.db_list) {
+//                 if (!db.downloaded) 
+//                     utils.log(LOG_ERROR, fmt::format("{} is not downloaded (use -Sy to download)", db.name));
+//             }
+//         }
+//     } else utils.log(LOG_FATAL, "no targets specified");
+// }
 
-void RemoveHandler::remove_rices()
-{
-    std::string dependency_string;
-    utils.colon_log("Removing rices...");
-    utils.rice_log(rices);
+// void RemoveHandler::remove_rices()
+// {
+//     std::string dependency_string;
+//     utils.colon_log("Removing rices...");
+//     utils.rice_log(rices);
 
-    for (Rice &rice : rices) {
-        for (Dependency &dep : rice.old_dependencies) {
-            dependency_string.append(dep.name).append(" ");
-        }
-    }
+//     for (Rice &rice : rices) {
+//         for (Dependency &dep : rice.old_dependencies) {
+//             dependency_string.append(dep.name).append(" ");
+//         }
+//     }
 
-    std::cout << config.colors.title << "Removed Dependencies:\t"
-            << config.colors.nocolor << (dependency_string.length() == 0 ? "None" : dependency_string) 
-            << std::endl << std::endl;
+//     std::cout << config.colors.title << "Removed Dependencies:\t"
+//             << config.colors.nocolor << (dependency_string.length() == 0 ? "None" : dependency_string) 
+//             << std::endl << std::endl;
     
-    utils.colon_log("Proceed with removal? [Y/n] ", false);
+//     utils.colon_log("Proceed with removal? [Y/n] ", false);
 
-    const char confirm = std::getchar();
-    if (confirm != '\n' && confirm != 'y' && confirm != 'Y' && confirm != ' ') utils.log(LOG_FATAL, "removal aborted");
+//     const char confirm = std::getchar();
+//     if (confirm != '\n' && confirm != 'y' && confirm != 'Y' && confirm != ' ') utils.log(LOG_FATAL, "removal aborted");
 
-    Utils::show_cursor(false);
-    Utils::handle_signals(true);
+//     Utils::show_cursor(false);
+//     Utils::handle_signals(true);
 
-    utils.colon_log("Processing rice changes...");
+//     utils.colon_log("Processing rice changes...");
 
-    for (Rice &rice : rices) {
-        ProgressBar pb{" " + rice.name, 0.4};
+//     for (Rice &rice : rices) {
+//         ProgressBar pb{" " + rice.name, 0.4};
 
-        try {
-            if ((rice.install_state & Rice::DESKTOP_INSTALLED) != 0 && remove_desktop) 
-                fs::remove(rice.desktop_path);
-            pb.update("", 0.33);
-        } catch (fs::filesystem_error) {
-            utils.log(LOG_ERROR, fmt::format("failed to remove desktop entry for '{}'", rice.name));
-        }
+//         try {
+//             if ((rice.install_state & Rice::DESKTOP_INSTALLED) != 0 && remove_desktop) 
+//                 fs::remove(rice.desktop_path);
+//             pb.update("", 0.33);
+//         } catch (fs::filesystem_error) {
+//             utils.log(LOG_ERROR, fmt::format("failed to remove desktop entry for '{}'", rice.name));
+//         }
 
-        try {
-            if ((rice.install_state & Rice::GIT_INSTALLED) != 0 && remove_git) 
-                fs::remove_all(rice.git_path);
-            pb.update("", 0.66);
-        } catch (fs::filesystem_error) {
-            utils.log(LOG_ERROR, fmt::format("failed to remove git repository for '{}'", rice.name));
-        }
+//         try {
+//             if ((rice.install_state & Rice::GIT_INSTALLED) != 0 && remove_git) 
+//                 fs::remove_all(rice.git_path);
+//             pb.update("", 0.66);
+//         } catch (fs::filesystem_error) {
+//             utils.log(LOG_ERROR, fmt::format("failed to remove git repository for '{}'", rice.name));
+//         }
 
-        try {
-            if ((rice.install_state & Rice::TOML_INSTALLED) != 0 && remove_toml) 
-                fs::remove(rice.toml_path);
-            pb.update("", 1);
-        } catch (fs::filesystem_error) {
-            utils.log(LOG_ERROR, fmt::format("failed to remove rice config for '{}'", rice.name));
-        }
+//         try {
+//             if ((rice.install_state & Rice::TOML_INSTALLED) != 0 && remove_toml) 
+//                 fs::remove(rice.toml_path);
+//             pb.update("", 1);
+//         } catch (fs::filesystem_error) {
+//             utils.log(LOG_ERROR, fmt::format("failed to remove rice config for '{}'", rice.name));
+//         }
 
-        pb.done();
-    }
+//         pb.done();
+//     }
 
-    utils.colon_log("Processing package changes...");
+//     utils.colon_log("Processing package changes...");
 
-    DependencyVec dependencies;
+//     DependencyVec dependencies;
 
-    for (Rice &rice : rices) {
-        for (Dependency &dependency : rice.old_dependencies) dependencies.push_back(dependency);
-    }
+//     for (Rice &rice : rices) {
+//         for (Dependency &dependency : rice.old_dependencies) dependencies.push_back(dependency);
+//     }
 
-    if (dependencies.size() != 0) {
-        PackageManager::remove(dependencies, utils.remove_confirmation_dialog(dependencies));
-    } else {
-        utils.log(LOG_ALL, " nothing to do");
-    }
+//     if (dependencies.size() != 0) {
+//         PackageManager::remove(dependencies, utils.remove_confirmation_dialog(dependencies));
+//     } else {
+//         utils.log(LOG_ALL, " nothing to do");
+//     }
 
-    Utils::show_cursor(true);
-    Utils::handle_signals(false);
-}
+//     Utils::show_cursor(true);
+//     Utils::handle_signals(false);
+// }

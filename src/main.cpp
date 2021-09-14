@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 
     ADD_ARGUMENTS(argparser, op_opts);
     ADD_ARGUMENTS(argparser, SyncHandler::op_modifiers);
-    ADD_ARGUMENTS(argparser, RemoveHandler::op_modifiers);
+    //ADD_ARGUMENTS(argparser, RemoveHandler::op_modifiers);
 
     argparser.add_argument("targets").remaining();
 
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
             break;
         case OP_REMOVE:
             NEEDS_ROOT(utils);
-            ophandler = new RemoveHandler(argparser, config, utils, databases);
+            //ophandler = new RemoveHandler(argparser, config, utils, databases);
             break;
         case OP_QUERY:
             break;
