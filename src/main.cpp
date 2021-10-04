@@ -86,9 +86,11 @@ int main(int argc, char *argv[])
             break;
         case OP_REMOVE:
             NEEDS_ROOT(utils);
+            utils.log(LOG_FATAL, "remove operation not implemented yet");
             //ophandler = new RemoveHandler(argparser, config, utils, databases);
             break;
         case OP_QUERY:
+            utils.log(LOG_FATAL, "query operation not implemented yet");
             break;
         default:
             utils.log(LOG_FATAL, "no operation specified");
