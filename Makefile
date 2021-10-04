@@ -1,5 +1,7 @@
 CC = clang
 
+MAKEFLAGS := --jobs=$(shell nproc)
+
 SRC := src
 OBJ := build
 BIN := riceman
