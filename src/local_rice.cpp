@@ -1,11 +1,12 @@
-#include "installed_rice.hpp"
+#include "local_rice.hpp"
 #include "constants.hpp"
 #include "package_manager.hpp"
 
 #include <cpptoml.h>
 #include <fmt/format.h>
 
-InstalledRice::InstalledRice(std::string namearg) {
+LocalRice::LocalRice(std::string namearg) 
+{
     auto toml = cpptoml::parse_file(fmt::format("{}/{}.toml", LOCAL_CONFIG_DIR, namearg));
 
     std::vector<std::string> pacman_deps = toml->get_qualified_array_of<std::string>("packages.pacman").value_or((std::vector<std::string>){});
@@ -25,6 +26,7 @@ InstalledRice::InstalledRice(std::string namearg) {
     );
 }
 
-InstalledRice::InstalledRice(DatabaseRice &rice) {
-    DatabaseRice(rice);
+LocalRice::LocalRice(DatabaseRice &rice)
+{
+    DatabaseRice(rice.name, rice.description, rice.version, rice.window_manager, rice.hash, rice.database_dependencies);
 }

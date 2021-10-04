@@ -9,6 +9,7 @@ class DatabaseRice
 {
     public:
 
+    DatabaseRice();
     DatabaseRice(std::string name, std::string description, std::string new_version, std::string window_manager, std::string hash, DependencyVec dependencies);
     void download_toml(std::string path, ProgressBar *pb);
     static DatabaseRice from_string(std::string &database_line);
@@ -23,7 +24,7 @@ class DatabaseRice
     const std::string toml_path;
     const std::string git_path;
 
-    DependencyVec dependencies;
+    DependencyVec database_dependencies;
 
     enum {
         NOT_INSTALLED     = 0b000,

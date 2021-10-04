@@ -1,5 +1,7 @@
 #include "sync.hpp"
 
+#include "local_rice.hpp"
+
 #include <filesystem>
 
 /* Init statics */
@@ -115,58 +117,60 @@ bool SyncHandler::refresh_rices()
  */
 bool SyncHandler::install_rices(bool hide_title)
 {
+    std::vector<LocalRice> local_rices;
+    
     for (auto &rice : rices) {
         if ((rice.install_state | DatabaseRice::TOML_INSTALLED) != 0) {
             ProgressBar pb{rice.name, 0.4};
             try {
                 rice.download_toml(fmt::format("{}/{}.toml", LOCAL_CONFIG_DIR, rice.name), &pb);
+                local_rices.push_back(LocalRice(rice));
             } catch (std::runtime_error err) {
                 utils.log(LOG_FATAL, err.what());
             }
-            
         }
     }
 
-    // std::string adding_dep_str;
-    // std::string removing_dep_str;
-    // std::vector<DependencyDiff> dep_changes;
+    std::string adding_dep_str;
+    std::string removing_dep_str;
+    std::vector<DependencyDiff> dep_changes;
 
-    // /* Resolve new and outdated dependencies */
-    // for (auto &rice : rices) {
-    //     DependencyDiff diff = PackageManager::get_diff(rice.old_dependencies, rice.new_dependencies);
+    /* Resolve new and outdated dependencies */
+    for (auto &rice : local_rices) {
+        DependencyDiff diff = PackageManager::get_diff(rice.toml_dependencies, rice.database_dependencies);
         
-    //     for (Dependency &rm_dep : diff.remove) {
-    //         removing_dep_str.append(rm_dep.name + " ");
-    //     }
+        for (Dependency &rm_dep : diff.remove) {
+            removing_dep_str.append(rm_dep.name + " ");
+        }
 
-    //     for (Dependency &add_dep : diff.add) {
-    //         adding_dep_str.append(add_dep.name + " ");
-    //     }
+        for (Dependency &add_dep : diff.add) {
+            adding_dep_str.append(add_dep.name + " ");
+        }
         
-    //     dep_changes.push_back(diff);
+        dep_changes.push_back(diff);
 
-    //     if ((rice.install_state & DatabaseRice::UP_TO_DATE) != 0) {
-    //         utils.log(LOG_WARNING, fmt::format("{}-{} is up to date -- reinstalling", rice.name, rice.version));
-    //     }
-    // }
+        if ((rice.install_state & DatabaseRice::UP_TO_DATE) != 0) {
+            utils.log(LOG_WARNING, fmt::format("{}-{} is up to date -- reinstalling", rice.name, rice.version));
+        }
+    }
 
-    // /* Print confirmation dialog */
-    // if (hide_title) utils.colon_log("Installing rices...");
-    // utils.rice_log(rices);
+    /* Print confirmation dialog */
+    if (hide_title) utils.colon_log("Installing rices...");
+    utils.rice_log(rices);
     
-    // std::cout << config.colors.title << "New Dependencies:\t"
-    //         << config.colors.nocolor << (adding_dep_str.length() ? adding_dep_str : "None") << std::endl
-    //         << config.colors.title << "Unused Dependencies:\t" 
-    //         << config.colors.nocolor << (removing_dep_str.length() ? removing_dep_str : "None") << std::endl 
-    //         << std::endl;
+    std::cout << config.colors.title << "New Dependencies:\t"
+              << config.colors.nocolor << (adding_dep_str.length() ? adding_dep_str : "None") << std::endl
+              << config.colors.title << "Unused Dependencies:\t" 
+              << config.colors.nocolor << (removing_dep_str.length() ? removing_dep_str : "None") << std::endl 
+              << std::endl;
 
-    // utils.colon_log("Proceed with installation? [Y/n] ", false);
+    utils.colon_log("Proceed with installation? [Y/n] ", false);
     
-    // const char confirm = std::getchar();
-    // if (confirm != '\n' && confirm != 'y' && confirm != 'Y' && confirm != ' ') utils.log(LOG_FATAL, "install aborted");
+    const char confirm = std::getchar();
+    if (confirm != '\n' && confirm != 'y' && confirm != 'Y' && confirm != ' ') utils.log(LOG_FATAL, "install aborted");
 
-    // Utils::show_cursor(false);
-    // Utils::handle_signals(true);
+    //Utils::show_cursor(false);
+    //Utils::handle_signals(true);
 
     // /* Download toml */
     // for (Rice &rice : rices) {

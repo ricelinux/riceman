@@ -7,8 +7,10 @@
 
 namespace fs = std::filesystem;
 
+DatabaseRice::DatabaseRice() {};
+
 DatabaseRice::DatabaseRice(std::string name, std::string description, std::string version, std::string window_manager, std::string hash, DependencyVec dependencies)
-: name{name}, description{description}, version{version}, window_manager{window_manager}, dependencies{dependencies},
+: name{name}, description{description}, version{version}, window_manager{window_manager}, database_dependencies{dependencies},
     toml_path{fmt::format("{}/{}.toml", LOCAL_CONFIG_DIR, name)}, git_path{fmt::format("{}/{}", LOCAL_RICES_DIR, name)}
 {
     if (fs::exists(toml_path) && fs::is_regular_file(toml_path)) install_state = install_state | TOML_INSTALLED;

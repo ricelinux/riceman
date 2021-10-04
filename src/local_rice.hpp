@@ -1,11 +1,14 @@
 #pragma once
 
 #include "database_rice.hpp"
+#include "package_manager.hpp"
 
-class InstalledRice : public DatabaseRice {
+class LocalRice : public DatabaseRice {
     
     public:
 
-    InstalledRice(std::string name);
-    InstalledRice(DatabaseRice &rice);
+    DependencyVec toml_dependencies;
+
+    LocalRice(std::string name);
+    LocalRice(DatabaseRice &rice);
 };

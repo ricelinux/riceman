@@ -186,6 +186,16 @@ void Utils::create_directory(const std::string &path)
     }
 }
 
+void Utils::create_riceman_directories()
+{
+    create_directory(LOCAL_BASE_DIR);
+    create_directory(LOCAL_DB_DIR);
+    create_directory(LOCAL_CONFIG_DIR);
+    create_directory(LOCAL_RICES_DIR);
+    create_directory(AUR_INSTALL_DIR);
+    own_directory(AUR_INSTALL_DIR);
+}
+
 void Utils::own_directory(const std::string &path) {
     if (chown(path.c_str(), RICEMAN_UID, RICEMAN_GID) != 0) throw std::runtime_error{fmt::format("failed to set owner and group of '{}'", path)};
 }
