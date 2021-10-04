@@ -81,6 +81,7 @@ int main(int argc, char *argv[])
     {
         case OP_SYNC:
             NEEDS_ROOT(utils)
+            Utils::create_riceman_directories();
             ophandler = new SyncHandler(argparser, config, utils, databases);
             break;
         case OP_REMOVE:

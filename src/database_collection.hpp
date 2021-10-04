@@ -7,8 +7,7 @@
 class DatabaseCollection
 {
     public:
-    DatabaseCollection();
-
+    
     Database& get(std::string &file_name);
     Database& get(int &index);
     void add(Database db);

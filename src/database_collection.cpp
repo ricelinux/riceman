@@ -2,15 +2,6 @@
 #include "utils.hpp"
 #include "constants.hpp"
 
-DatabaseCollection::DatabaseCollection() {
-    Utils::create_directory(LOCAL_BASE_DIR);
-    Utils::create_directory(LOCAL_DB_DIR);
-    Utils::create_directory(LOCAL_CONFIG_DIR);
-    Utils::create_directory(LOCAL_RICES_DIR);
-    Utils::create_directory(AUR_INSTALL_DIR);
-    Utils::own_directory(AUR_INSTALL_DIR);
-};
-
 Database& DatabaseCollection::get(std::string &file_name)
 {
     for(int i = 0; i < db_list.size(); i++) {
